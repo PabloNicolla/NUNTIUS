@@ -79,3 +79,10 @@ response.status_code
 response.content
 response.context["latest_question_list"]
 ```
+
+## Coverage
+
+```sh
+coverage run --source='.' manage.py test chat
+coverage report
+```
