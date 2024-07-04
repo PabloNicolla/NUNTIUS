@@ -1,0 +1,41 @@
+services:
+  postgres-db:
+    image: postgres:16.3
+    restart: always
+    container_name: postgres-db
+    ports:
+      - 5600:5432
+    environment:
+      POSTGRES_DB: my_django
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: postgrespassword
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:8.9
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - 15432:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres-db
+
+  # web:
+  #   build: .
+  #   command: python manage.py runserver 0.0.0.0:8000
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - db
+
+volumes:
+  postgres_data:
+  pgadmin:
