@@ -31,6 +31,9 @@ python manage.py shell
 
 
 python manage.py createsuperuser # access domain/admin/
+
+
+python manage.py test chat
 ```
 
 ## Shell
@@ -56,4 +59,23 @@ q.choice_set.count()
 Choice.objects.filter(question__pub_date__year=current_year)
 
 q.delete()
+```
+
+## Mock view
+
+```python shell
+from django.test.utils import setup_test_environment
+setup_test_environment()
+
+from django.test import Client
+client = Client()
+
+response = client.get("/")
+response.status_code
+
+from django.urls import reverse
+response = client.get(reverse("chat:index"))
+response.status_code
+response.content
+response.context["latest_question_list"]
 ```
