@@ -3,6 +3,7 @@
 ## Frontend
 
 ```
+npx expo install expo-dev-client
 npx expo run:android
 ```
 
