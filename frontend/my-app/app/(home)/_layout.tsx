@@ -1,6 +1,6 @@
 import { useSession } from "@/providers/session-provider";
 import FontAwesome from "@expo/vector-icons/build/FontAwesome";
-import { Redirect, Stack, Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
 
 export default function TabLayout() {
