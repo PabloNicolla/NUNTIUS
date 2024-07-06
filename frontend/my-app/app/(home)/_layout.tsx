@@ -1,13 +1,11 @@
-import { Redirect, Stack, Tabs } from "expo-router";
+import useSession from "@/hooks/useSession";
+import { Redirect, Stack } from "expo-router";
 import React from "react";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
-
 export default function TabLayout() {
-  const session = false;
-  const colorScheme = useColorScheme();
+  const session = useSession();
 
-  if (!session) {
+  if (!session.isLoggedIn) {
     return <Redirect href={"/landing"} />;
   }
 
