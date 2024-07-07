@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext } from "react";
 
-type SocketContextType = {
+type SessionContextType = {
   isLoggedIn: boolean;
   login: () => void;
   logout: () => void;
 };
 
-const SessionContext = createContext<SocketContextType>({
+const SessionContext = createContext<SessionContextType>({
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
