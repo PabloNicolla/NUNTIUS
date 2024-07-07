@@ -1,14 +1,5 @@
-import {
-  Image,
-  ImageBackground,
-  Pressable,
-  View,
-  StyleSheet,
-  ColorValue,
-  Text,
-} from "react-native";
-
-import { Link, router } from "expo-router";
+import { ImageBackground, View, ColorValue } from "react-native";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { SvgProps } from "react-native-svg";
@@ -16,31 +7,18 @@ import PagerView from "react-native-pager-view";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 
-import { ThemedText } from "@/components/ThemedText";
-
 import SomethingSVG from "@/assets/images/landing/exploring.svg";
 import LoveItSVG from "@/assets/images/landing/love_it.svg";
 import UnlockSVG from "@/assets/images/landing/unlock.svg";
 
 import { Colors } from "@/constants/Colors";
-import { useEffect, useState } from "react";
+import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import GetStartedModal from "@/components/modals/GetStartedModal";
 
-// const GetStartedButton = () => {
-//   return (
-//     <Pressable
-//       className="h-[68] w-[250] items-center justify-center rounded-xl bg-primary-light shadow-2xl shadow-white"
-//       onPress={() => {
-//         router.replace("/sign-up");
-//       }}
-//     >
-//       <ThemedText className="text-xl font-bold text-white">
-//         GET STARTED
-//       </ThemedText>
-//     </Pressable>
-//   );
-// };
+import { Dimensions } from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 const PrimaryPage = ({
   currentPage,
@@ -55,8 +33,8 @@ const PrimaryPage = ({
       className="flex-1"
       resizeMode="cover"
     >
-      <View className="flex-1 bg-[#00000050]">
-        <SafeAreaView className="mb-10 flex-1 items-center justify-end">
+      <SafeAreaView className="flex-1 items-center justify-end bg-[#00000050]">
+        <View className="justify-en mb-[10%] w-[80%] items-center">
           <ThemedText className="mb-5 text-6xl font-bold text-white">
             Hello!
           </ThemedText>
@@ -67,8 +45,8 @@ const PrimaryPage = ({
             <CircleIndicator currentPage={currentPage} />
           </View>
           <PrimaryButton onPress={() => onClick()} title="GET STARTED" />
-        </SafeAreaView>
-      </View>
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 };
@@ -90,27 +68,31 @@ const SecondaryPageTemplate = ({
         start={[0, 1]}
         className="flex-1"
       >
-        <SafeAreaView className="mb-10 flex-1 items-center justify-end">
-          <View className="bg-transparent">
-            {/* <Image
+        <SafeAreaView className="flex-1 items-center justify-end">
+          <View className="justify-en mb-[10%] w-[80%] items-center">
+            <View className="bg-transparent">
+              {/* <Image
               source={require("@/assets/images/landing/background.jpg")}
               className="mb-10 h-[300] w-[300]"
               resizeMode="cover"
             /> */}
-            <Svg width={300} height={300} className="mb-10" />
+              <Svg
+                width={width * 0.8}
+                height={height * 0.4}
+                className="mb-10"
+              />
+            </View>
+            <ThemedText className="mb-5 text-6xl font-bold text-white">
+              Hello!
+            </ThemedText>
+            <ThemedText className="mb-20 text-xl text-white">
+              Let's improve your life style
+            </ThemedText>
+            <View className="mb-4">
+              <CircleIndicator currentPage={currentPage} />
+            </View>
+            <PrimaryButton onPress={() => onClick()} title="GET STARTED" />
           </View>
-
-          <ThemedText className="mb-5 text-6xl font-bold text-white">
-            Hello!
-          </ThemedText>
-
-          <ThemedText className="mb-20 text-xl text-white">
-            Let's improve your life style
-          </ThemedText>
-          <View className="mb-4">
-            <CircleIndicator currentPage={currentPage} />
-          </View>
-          <PrimaryButton onPress={() => onClick()} title="GET STARTED" />
         </SafeAreaView>
       </LinearGradient>
     </View>

@@ -19,14 +19,14 @@ export default function HomeScreen() {
   // NavigationBar.setBackgroundColorAsync(Colors.light.primary);
   // NavigationBar.setButtonStyleAsync("light");
 
-  const isPresented = router.canGoBack();
+  // const isPresented = router.canGoBack();
 
   return (
     <View className="flex-1 bg-background-light">
       <StatusBar style="light" backgroundColor="black" />
 
-      <SafeAreaView className="mt-[120] flex-1 justify-start">
-        <View className="mx-10">
+      <SafeAreaView className="mt-[30%] flex-1 items-center justify-start">
+        <View className="w-[80%]">
           <ThemedText className="mb-5 text-3xl font-bold text-text-light">
             Lets Get Started!
           </ThemedText>
@@ -34,18 +34,20 @@ export default function HomeScreen() {
             Create your account
           </ThemedText>
 
-          <View className="relative mb-5 h-[60] w-[280] rounded-xl border-2 border-black">
+          <View className="relative mb-5 h-[60] w-full rounded-xl border-2 border-black">
             <View className="ml-2 flex-1 justify-center">
               <ThemedText className="absolute left-0 top-0 text-xs text-text-light/50">
                 Email
               </ThemedText>
               <TextInput
                 className="text-lg"
+                autoFocus={true}
                 keyboardType="email-address"
               ></TextInput>
             </View>
           </View>
-          <View className="relative mb-5 h-[60] w-[280] rounded-xl border-2 border-black">
+
+          <View className="relative mb-5 h-[60] w-full rounded-xl border-2 border-black">
             <View className="ml-2 flex-1 justify-center">
               <ThemedText className="absolute left-0 top-0 text-xs text-text-light/50">
                 Password
