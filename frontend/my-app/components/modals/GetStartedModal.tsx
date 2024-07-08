@@ -59,7 +59,7 @@ export default function GetStartedModal({
     if (isVisible && EmailInputRef.current) {
       const timer = setTimeout(() => {
         EmailInputRef.current?.focus();
-      }, 100); // Adjust the delay if necessary
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [isVisible]);
@@ -107,8 +107,20 @@ export default function GetStartedModal({
 
               <PrimaryButton
                 onPress={() => {
+                  // Check if email is valid
+                  // Call db and check if email exits
+                  let pathname = "/sign-up";
+                  const emailSearch = "test@test.com";
+
+                  if (!emailSearch) {
+                    pathname = "/sign-in";
+                  }
+
                   onClose();
-                  router.push({ pathname: "/sign-in", params: { email } });
+                  router.push({
+                    pathname: pathname,
+                    params: { email: email },
+                  });
                 }}
                 title="GET STARTED"
               />

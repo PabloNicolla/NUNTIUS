@@ -1,4 +1,4 @@
-import { ImageBackground, View, ColorValue } from "react-native";
+import { ImageBackground, View, ColorValue, Dimensions } from "react-native";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,8 +15,6 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import GetStartedModal from "@/components/modals/GetStartedModal";
-
-import { Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 

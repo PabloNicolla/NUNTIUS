@@ -1,6 +1,6 @@
 import { useSession } from "@/providers/session-provider";
 import FontAwesome from "@expo/vector-icons/build/FontAwesome";
-import { Redirect, router, Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
 
 export default function AppLayout() {
@@ -8,12 +8,17 @@ export default function AppLayout() {
 
   console.log(session.isLoggedIn, "AppLayout");
 
-  if (!session.isLoggedIn) {
-    return <Redirect href={"/sign-in"} />;
+  if (session.isLoggedIn) {
+    return <Redirect href={"/landing"} />;
   }
 
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: "blue" }}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "blue",
+        tabBarLabelStyle: { fontSize: 12 },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

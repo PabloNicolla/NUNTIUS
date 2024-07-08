@@ -5,23 +5,32 @@ import {
   Image,
   useColorScheme,
 } from "react-native";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { ThemedText } from "@/components/ThemedText";
 
 import { useSession } from "@/providers/session-provider";
 
+import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { useRoute } from "@react-navigation/native";
+import { useEffect, useRef } from "react";
 
 export default function SignInScreen() {
-  const route = useRoute();
+  const { email } = useLocalSearchParams<{ email: string }>();
   const { login, isLoggedIn } = useSession();
   const theme = useColorScheme() ?? "light";
+
+  const PasswordInputRef = useRef<TextInput | null>(null);
+
+  useEffect(() => {
+    if (PasswordInputRef.current) {
+      const timer = setTimeout(() => {
+        PasswordInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   return (
     <ThemedView className="flex-1">
@@ -53,8 +62,8 @@ export default function SignInScreen() {
                 </ThemedText>
                 <TextInput
                   className="text-lg text-text-light dark:text-text-dark"
-                  autoFocus={true}
                   keyboardType="email-address"
+                  value={email}
                 ></TextInput>
               </View>
             </View>
@@ -65,6 +74,7 @@ export default function SignInScreen() {
                   Password
                 </ThemedText>
                 <TextInput
+                  ref={PasswordInputRef}
                   className="text-lg text-text-light dark:text-text-dark"
                   keyboardType="default"
                   placeholder="Password"
