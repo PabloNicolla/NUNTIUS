@@ -16,7 +16,7 @@ import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function HomeScreen() {
+export default function SignUpScreen() {
   const { login, isLoggedIn } = useSession();
 
   const navigation = useNavigation();

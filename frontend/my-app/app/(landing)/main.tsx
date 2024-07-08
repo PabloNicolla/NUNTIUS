@@ -114,15 +114,16 @@ const CircleIndicator = ({ currentPage }: { currentPage: number }) => {
   );
 };
 
-export default function HomeScreen() {
-  const [isVisible, setIsVisible] = useState(false);
+export default function LandingScreen() {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [email, setEmail] = useState("");
 
-  const onClick = () => {
-    setIsVisible(true);
+  const handleOpenModal = () => {
+    setIsModalVisible(true);
   };
 
-  const onClose = () => {
-    setIsVisible(false);
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
   };
 
   useEffect(() => {
@@ -156,28 +157,33 @@ export default function HomeScreen() {
         initialPage={0}
         // onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
       >
-        <PrimaryPage key={1} currentPage={1} onClick={onClick} />
+        <PrimaryPage key={1} currentPage={1} onClick={handleOpenModal} />
         <SecondaryPageTemplate
           key={2}
           currentPage={2}
           Svg={SomethingSVG}
-          onClick={onClick}
+          onClick={handleOpenModal}
         />
         <SecondaryPageTemplate
           key={3}
           currentPage={3}
           Svg={LoveItSVG}
-          onClick={onClick}
+          onClick={handleOpenModal}
         />
         <SecondaryPageTemplate
           key={4}
           currentPage={4}
           Svg={UnlockSVG}
-          onClick={onClick}
+          onClick={handleOpenModal}
         />
       </PagerView>
 
-      <GetStartedModal isVisible={isVisible} onClose={onClose} />
+      <GetStartedModal
+        isVisible={isModalVisible}
+        onClose={handleCloseModal}
+        email={email}
+        setEmail={(email: string) => setEmail(email)}
+      />
     </View>
   );
 }

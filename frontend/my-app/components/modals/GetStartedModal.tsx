@@ -13,6 +13,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { ThemedView } from "@/components/ThemedView";
+import { useEffect, useRef } from "react";
 
 const CloseModalX = ({
   windowHeight,
@@ -37,16 +38,31 @@ const CloseModalX = ({
   );
 };
 
-export default function HomeScreen({
+export default function GetStartedModal({
   isVisible,
   onClose,
+  email,
+  setEmail,
 }: Readonly<{
   isVisible: boolean;
   onClose: () => void;
+  email: string;
+  setEmail: (email: string) => void;
 }>) {
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
   const theme = useColorScheme() ?? "light";
+
+  const EmailInputRef = useRef<TextInput | null>(null);
+
+  useEffect(() => {
+    if (isVisible && EmailInputRef.current) {
+      const timer = setTimeout(() => {
+        EmailInputRef.current?.focus();
+      }, 100); // Adjust the delay if necessary
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
 
   return (
     <Modal
@@ -79,16 +95,20 @@ export default function HomeScreen({
                     Email
                   </ThemedText>
                   <TextInput
+                    ref={EmailInputRef}
                     className="text-lg text-text-light dark:text-text-dark"
-                    autoFocus={true}
+                    // autoFocus={true}
                     keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
                   ></TextInput>
                 </View>
               </View>
 
               <PrimaryButton
                 onPress={() => {
-                  router.push("/sign-in");
+                  onClose();
+                  router.push({ pathname: "/sign-in", params: { email } });
                 }}
                 title="GET STARTED"
               />

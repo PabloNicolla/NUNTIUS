@@ -5,7 +5,7 @@ import {
   Image,
   useColorScheme,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -15,8 +15,11 @@ import { useSession } from "@/providers/session-provider";
 import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { useRoute } from "@react-navigation/native";
 
-export default function HomeScreen() {
+export default function SignInScreen() {
+  const route = useRoute();
   const { login, isLoggedIn } = useSession();
   const theme = useColorScheme() ?? "light";
 

@@ -3,7 +3,7 @@ import { router } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 
-export default function HomeScreen() {
+export default function ProfileScreen() {
   return (
     <SafeAreaView className="flex-1 items-center justify-center">
       <Pressable
