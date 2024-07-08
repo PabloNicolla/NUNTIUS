@@ -15,6 +15,7 @@ import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
+import { StatusBar } from "expo-status-bar";
 
 export default function SignInScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -34,6 +35,8 @@ export default function SignInScreen() {
 
   return (
     <ThemedView className="flex-1">
+      <StatusBar style="auto" />
+
       <SafeAreaView className="flex-1">
         <View className="relative flex-1 items-center justify-start">
           <View className="w-full flex-row items-center px-2">
