@@ -27,7 +27,7 @@ const PrimaryPage = ({
 }) => {
   return (
     <ImageBackground
-      source={require("@/assets/images/landing/background.jpg")}
+      source={require("@/assets/images/landing/background.jpeg")}
       className="flex-1"
       resizeMode="cover"
     >
