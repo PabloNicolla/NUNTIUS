@@ -34,7 +34,7 @@ const PrimaryPage = ({
       resizeMode="cover"
     >
       <SafeAreaView className="flex-1 items-center justify-end bg-[#00000050]">
-        <View className="justify-en mb-[10%] w-[80%] items-center">
+        <View className="mb-[10%] w-[80%] items-center justify-end">
           <ThemedText className="mb-5 text-6xl font-bold text-white">
             Hello!
           </ThemedText>
@@ -69,7 +69,7 @@ const SecondaryPageTemplate = ({
         className="flex-1"
       >
         <SafeAreaView className="flex-1 items-center justify-end">
-          <View className="justify-en mb-[10%] w-[80%] items-center">
+          <View className="mb-[10%] w-[80%] items-center justify-end">
             <View className="bg-transparent">
               {/* <Image
               source={require("@/assets/images/landing/background.jpg")}
@@ -115,14 +115,14 @@ const CircleIndicator = ({ currentPage }: { currentPage: number }) => {
 };
 
 export default function HomeScreen() {
-  const [isVisible, setVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const onClick = () => {
-    setVisible(true);
+    setIsVisible(true);
   };
 
   const onClose = () => {
-    setVisible(false);
+    setIsVisible(false);
   };
 
   useEffect(() => {

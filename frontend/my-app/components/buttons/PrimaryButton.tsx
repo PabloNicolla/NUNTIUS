@@ -11,7 +11,7 @@ interface Props {
 const PrimaryButton = ({ onPress, title }: Props) => {
   return (
     <Pressable
-      className="h-[68] w-full items-center justify-center rounded-xl bg-primary-light shadow-2xl shadow-white"
+      className="h-[68] w-full items-center justify-center rounded-xl bg-primary-light shadow-2xl shadow-black dark:shadow-white"
       onPress={() => {
         onPress();
       }}
