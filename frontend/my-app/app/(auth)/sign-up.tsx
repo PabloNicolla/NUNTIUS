@@ -107,6 +107,8 @@ export default function SignUpScreen() {
                 console.log(isLoggedIn, "before");
                 login();
                 console.log(isLoggedIn, "after");
+
+                router.dismissAll();
                 router.replace("/");
               }}
               title="CREATE ACCOUNT"

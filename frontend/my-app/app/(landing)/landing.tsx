@@ -1,4 +1,11 @@
-import { ImageBackground, View, ColorValue, Dimensions } from "react-native";
+import {
+  ImageBackground,
+  View,
+  ColorValue,
+  Dimensions,
+  Pressable,
+  Image,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,6 +22,7 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import GetStartedModal from "@/components/modals/GetStartedModal";
+import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -149,6 +157,26 @@ export default function LandingScreen() {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
+
+      <View className="absolute z-10 mt-[7%] w-full flex-row items-center justify-between px-2">
+        <View className="flex-row items-center">
+          <Image
+            source={require("@/assets/images/brand/Logo.png")}
+            className="h-[60] w-[60]"
+          />
+        </View>
+        <View className="items-center">
+          <Pressable
+            onPress={() => {
+              router.push("/sign-in");
+            }}
+          >
+            <ThemedText className="text-lg font-bold text-white">
+              Log in
+            </ThemedText>
+          </Pressable>
+        </View>
+      </View>
 
       <PagerView
         className="flex-1"
