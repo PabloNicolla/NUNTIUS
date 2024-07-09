@@ -39,20 +39,27 @@ const PrimaryPage = ({
       className="flex-1"
       resizeMode="cover"
     >
-      <SafeAreaView className="flex-1 items-center justify-end bg-[#00000050]">
-        <View className="mb-[10%] w-[80%] items-center justify-end">
-          <ThemedText className="mb-5 text-6xl font-bold text-white">
-            Hello!
-          </ThemedText>
-          <ThemedText className="mb-20 text-xl text-white">
-            Let's improve your life style
-          </ThemedText>
-          <View className="mb-4">
-            <CircleIndicator currentPage={currentPage} />
+      <LinearGradient
+        colors={["rgba(255,255,255,0.1)", "rgba(0,0,0,0.9)"]}
+        locations={[0, 1]}
+        start={[1, 0]}
+        className="flex-1"
+      >
+        <SafeAreaView className="flex-1 items-center justify-end">
+          <View className="mb-[10%] w-[80%] items-center justify-end">
+            <ThemedText className="mb-5 text-6xl font-bold text-white">
+              Hello!
+            </ThemedText>
+            <ThemedText className="mb-20 text-xl text-white">
+              Let's improve your life style
+            </ThemedText>
+            <View className="mb-4">
+              <CircleIndicator currentPage={currentPage} />
+            </View>
+            <PrimaryButton handlePress={() => onClick()} title="GET STARTED" />
           </View>
-          <PrimaryButton handlePress={() => onClick()} title="GET STARTED" />
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </LinearGradient>
     </ImageBackground>
   );
 };
@@ -61,11 +68,25 @@ const SecondaryPageTemplate = ({
   currentPage,
   Svg,
   onClick,
+  isModalVisible,
 }: {
   currentPage: number;
   Svg: React.FC<SvgProps>;
   onClick: () => void;
+  isModalVisible: boolean;
 }) => {
+  const [isSvgVisible, setIsSvgVisible] = useState(true);
+
+  useEffect(() => {
+    if (isModalVisible) {
+      setTimeout(() => {
+        setIsSvgVisible(false);
+      }, 120);
+    } else {
+      setIsSvgVisible(true);
+    }
+  }, [isModalVisible]);
+
   return (
     <View className="flex-1">
       <LinearGradient
@@ -76,18 +97,22 @@ const SecondaryPageTemplate = ({
       >
         <SafeAreaView className="flex-1 items-center justify-end">
           <View className="mb-[10%] w-[80%] items-center justify-end">
-            <View className="bg-transparent">
-              {/* <Image
+            {isSvgVisible && (
+              <View className="bg-transparent">
+                {/* <Image
               source={require("@/assets/images/landing/background.jpg")}
               className="mb-10 h-[300] w-[300]"
               resizeMode="cover"
             /> */}
-              <Svg
-                width={width * 0.8}
-                height={height * 0.4}
-                className="mb-10"
-              />
-            </View>
+
+                <Svg
+                  width={width * 0.8}
+                  height={height * 0.4}
+                  className="mb-10"
+                />
+              </View>
+            )}
+
             <ThemedText className="mb-5 text-6xl font-bold text-white">
               Hello!
             </ThemedText>
@@ -122,7 +147,6 @@ const CircleIndicator = ({ currentPage }: { currentPage: number }) => {
 
 export default function LandingScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [email, setEmail] = useState("");
 
   const handleOpenModal = () => {
     setIsModalVisible(true);
@@ -189,27 +213,25 @@ export default function LandingScreen() {
           currentPage={2}
           Svg={SomethingSVG}
           onClick={handleOpenModal}
+          isModalVisible={isModalVisible}
         />
         <SecondaryPageTemplate
           key={3}
           currentPage={3}
           Svg={LoveItSVG}
           onClick={handleOpenModal}
+          isModalVisible={isModalVisible}
         />
         <SecondaryPageTemplate
           key={4}
           currentPage={4}
           Svg={UnlockSVG}
           onClick={handleOpenModal}
+          isModalVisible={isModalVisible}
         />
       </PagerView>
 
-      <GetStartedModal
-        isVisible={isModalVisible}
-        onClose={handleCloseModal}
-        email={email}
-        setEmail={(email: string) => setEmail(email)}
-      />
+      <GetStartedModal isVisible={isModalVisible} onClose={handleCloseModal} />
     </View>
   );
 }

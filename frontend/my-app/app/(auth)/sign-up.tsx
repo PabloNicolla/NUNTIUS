@@ -5,9 +5,9 @@ import {
   Image,
   useColorScheme,
 } from "react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
@@ -16,11 +16,17 @@ import { useSession } from "@/providers/session-provider";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
+import FormTextField from "@/components/form/FormTextField";
 
 export default function SignUpScreen() {
+  const { email } = useLocalSearchParams<{ email: string }>();
+
   const { login, isLoggedIn } = useSession();
 
   const theme = useColorScheme() ?? "light";
+
+  const [emailValue, setEmailValue] = useState(email);
+  const [passwordValue, setPasswordValue] = useState("");
 
   const PasswordInputRef = useRef<TextInput | null>(null);
 
@@ -76,31 +82,25 @@ export default function SignUpScreen() {
               Create your account
             </ThemedText>
 
-            <View className="relative mb-5 h-[60] w-full rounded-xl border-2 border-black dark:border-white">
-              <View className="ml-2 flex-1 justify-center">
-                <ThemedText className="absolute left-0 top-0 text-xs text-text-light/50 dark:text-text-dark/70">
-                  Email
-                </ThemedText>
-                <TextInput
-                  className="text-lg text-text-light dark:text-text-dark"
-                  keyboardType="email-address"
-                ></TextInput>
-              </View>
-            </View>
+            <FormTextField
+              className="mb-5"
+              title="Email"
+              value={emailValue}
+              handleTextChange={(text) => {
+                setEmailValue(text);
+              }}
+            />
 
-            <View className="relative mb-5 h-[60] w-full rounded-xl border-2 border-black dark:border-white">
-              <View className="ml-2 flex-1 justify-center">
-                <ThemedText className="absolute left-0 top-0 text-xs text-text-light/50 dark:text-text-dark/70">
-                  Password
-                </ThemedText>
-                <TextInput
-                  ref={PasswordInputRef}
-                  className="text-lg text-text-light dark:text-text-dark"
-                  keyboardType="default"
-                  placeholder="Password"
-                ></TextInput>
-              </View>
-            </View>
+            <FormTextField
+              ref={PasswordInputRef}
+              className="mb-5"
+              title="Password"
+              value={passwordValue}
+              handleTextChange={(text) => {
+                setPasswordValue(text);
+              }}
+              isSecureText={true}
+            />
 
             <PrimaryButton
               handlePress={() => {
