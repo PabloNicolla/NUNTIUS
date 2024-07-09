@@ -34,7 +34,7 @@ export default function AppLayout() {
 
   console.log(session.isLoggedIn, "AppLayout");
 
-  if (session.isLoggedIn) {
+  if (!session.isLoggedIn) {
     return <Redirect href={"/landing"} />;
   }
 
@@ -42,6 +42,7 @@ export default function AppLayout() {
     <Tabs
       screenOptions={{
         tabBarLabelStyle: { fontSize: 12 },
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tabs.Screen

@@ -28,6 +28,7 @@
 //   );
 // }
 
+import FormTextField from "@/components/form/FormTextField";
 import { ThemedText } from "@/components/ThemedText";
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
@@ -107,6 +108,10 @@ const ChatList = ({ chats }: { chats: ChatType[] }) => {
 
 const App = () => {
   const { chats, addOrUpdateChat } = useChat();
+
+  const [value1, setValue1] = useState("");
+  const [value2, setValue2] = useState("");
+
   // useWebSocket();
   return (
     <View className="">
