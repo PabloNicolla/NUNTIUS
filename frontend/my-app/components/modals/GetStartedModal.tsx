@@ -7,13 +7,13 @@ import {
   useColorScheme,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect, useRef } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { ThemedView } from "@/components/ThemedView";
-import { useEffect, useRef } from "react";
 
 const CloseModalX = ({
   windowHeight,
@@ -106,7 +106,7 @@ export default function GetStartedModal({
               </View>
 
               <PrimaryButton
-                onPress={() => {
+                handlePress={() => {
                   // Check if email is valid
                   // Call db and check if email exits
                   let pathname = "/sign-up";

@@ -5,17 +5,17 @@ import {
   Image,
   useColorScheme,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import { useSession } from "@/providers/session-provider";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useRef } from "react";
-import { StatusBar } from "expo-status-bar";
 
 export default function SignInScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -81,12 +81,13 @@ export default function SignInScreen() {
                   className="text-lg text-text-light dark:text-text-dark"
                   keyboardType="default"
                   placeholder="Password"
-                ></TextInput>
+                  secureTextEntry={true}
+                />
               </View>
             </View>
 
             <PrimaryButton
-              onPress={() => {
+              handlePress={() => {
                 console.log(isLoggedIn, "before");
                 login();
                 console.log(isLoggedIn, "after");

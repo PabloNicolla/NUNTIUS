@@ -5,17 +5,17 @@ import {
   Image,
   useColorScheme,
 } from "react-native";
-import { router } from "expo-router";
+import { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 
 import { useSession } from "@/providers/session-provider";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useRef } from "react";
-import { StatusBar } from "expo-status-bar";
 
 export default function SignUpScreen() {
   const { login, isLoggedIn } = useSession();
@@ -103,7 +103,7 @@ export default function SignUpScreen() {
             </View>
 
             <PrimaryButton
-              onPress={() => {
+              handlePress={() => {
                 console.log(isLoggedIn, "before");
                 login();
                 console.log(isLoggedIn, "after");

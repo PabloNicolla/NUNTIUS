@@ -1,25 +1,43 @@
-import { Pressable } from "react-native";
-import { ThemedText } from "../ThemedText";
-
 import React from "react";
-import { TouchableRipple } from "react-native-paper";
+import { TouchableRipple, TouchableRippleProps } from "react-native-paper";
+import { ThemedText, ThemedTextProps } from "../ThemedText";
+import { View } from "react-native";
 
-interface Props {
-  onPress: () => void;
+export type PrimaryButtonProps = {
   title: string;
-}
+  handlePress: () => void;
+  isLoading?: boolean;
+  style?: TouchableRippleProps["style"];
+  rippleColor?: TouchableRippleProps["rippleColor"];
+  className?: TouchableRippleProps["className"];
+  titleClassName?: ThemedTextProps["className"];
+};
 
-const PrimaryButton = ({ onPress, title }: Props) => {
+const PrimaryButton = ({
+  title,
+  handlePress,
+  isLoading,
+  style,
+  rippleColor,
+  className,
+  titleClassName,
+}: PrimaryButtonProps) => {
   return (
-    <TouchableRipple
-      className="h-[68] w-full items-center justify-center rounded-xl bg-primary-light shadow-2xl shadow-black dark:shadow-white"
-      onPress={() => {
-        onPress();
-      }}
-      rippleColor="rgba(0, 0, 0, .32)"
-    >
-      <ThemedText className="text-xl font-bold text-white">{title}</ThemedText>
-    </TouchableRipple>
+    <View className="w-full overflow-hidden rounded-xl shadow-2xl shadow-black dark:shadow-white">
+      <TouchableRipple
+        onPress={handlePress}
+        style={style}
+        className={`${className} min-h-[68] w-full items-center justify-center bg-primary-light ${isLoading ? "opacity-50" : ""} `}
+        disabled={isLoading}
+        rippleColor={rippleColor ?? "rgba(0, 0, 0, .32)"}
+      >
+        <ThemedText
+          className={`${titleClassName ?? "text-xl font-bold text-white"}`}
+        >
+          {title}
+        </ThemedText>
+      </TouchableRipple>
+    </View>
   );
 };
 

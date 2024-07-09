@@ -8,11 +8,12 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { SvgProps } from "react-native-svg";
 import PagerView from "react-native-pager-view";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 
 import SomethingSVG from "@/assets/images/landing/exploring.svg";
 import LoveItSVG from "@/assets/images/landing/love_it.svg";
@@ -22,7 +23,6 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import GetStartedModal from "@/components/modals/GetStartedModal";
-import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -50,7 +50,7 @@ const PrimaryPage = ({
           <View className="mb-4">
             <CircleIndicator currentPage={currentPage} />
           </View>
-          <PrimaryButton onPress={() => onClick()} title="GET STARTED" />
+          <PrimaryButton handlePress={() => onClick()} title="GET STARTED" />
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -97,7 +97,7 @@ const SecondaryPageTemplate = ({
             <View className="mb-4">
               <CircleIndicator currentPage={currentPage} />
             </View>
-            <PrimaryButton onPress={() => onClick()} title="GET STARTED" />
+            <PrimaryButton handlePress={() => onClick()} title="GET STARTED" />
           </View>
         </SafeAreaView>
       </LinearGradient>
