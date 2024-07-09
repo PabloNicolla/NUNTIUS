@@ -34,7 +34,7 @@ export default function AppLayout() {
 
   console.log(session.isLoggedIn, "AppLayout");
 
-  if (!session.isLoggedIn) {
+  if (session.isLoggedIn) {
     return <Redirect href={"/landing"} />;
   }
 
@@ -60,7 +60,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="something"
+        name="groups"
         options={{
           title: "groups",
           headerShown: false,
@@ -75,7 +75,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="favorites"
+        name="chat"
         options={{
           title: "chat",
           headerShown: false,
