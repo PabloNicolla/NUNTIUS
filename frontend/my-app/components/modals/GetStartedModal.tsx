@@ -7,13 +7,14 @@ import {
   useColorScheme,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { ThemedView } from "@/components/ThemedView";
+import FormTextField from "../form/FormTextField";
 
 const CloseModalX = ({
   windowHeight,
@@ -41,17 +42,15 @@ const CloseModalX = ({
 export default function GetStartedModal({
   isVisible,
   onClose,
-  email,
-  setEmail,
 }: Readonly<{
   isVisible: boolean;
   onClose: () => void;
-  email: string;
-  setEmail: (email: string) => void;
 }>) {
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
   const theme = useColorScheme() ?? "light";
+
+  const [emailValue, setEmailValue] = useState("");
 
   const EmailInputRef = useRef<TextInput | null>(null);
 
@@ -89,37 +88,30 @@ export default function GetStartedModal({
                 Enter your email to create or sign in to your account
               </ThemedText>
 
-              <View className="relative mb-5 h-[60] w-full rounded-xl border-2 border-black dark:border-white">
-                <View className="mx-2 flex-1 justify-center">
-                  <ThemedText className="absolute left-0 top-0 text-xs text-text-light/50 dark:text-text-dark/70">
-                    Email
-                  </ThemedText>
-                  <TextInput
-                    ref={EmailInputRef}
-                    className="text-lg text-text-light dark:text-text-dark"
-                    // autoFocus={true}
-                    keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
-                  ></TextInput>
-                </View>
-              </View>
+              <FormTextField
+                ref={EmailInputRef}
+                className="mb-5"
+                title="Email"
+                value={emailValue}
+                handleTextChange={(text) => {
+                  setEmailValue(text);
+                }}
+              />
 
               <PrimaryButton
                 handlePress={() => {
                   // Check if email is valid
                   // Call db and check if email exits
                   let pathname = "/sign-up";
-                  const emailSearch = "test@test.com";
 
-                  if (!emailSearch) {
+                  if (emailValue) {
                     pathname = "/sign-in";
                   }
 
                   onClose();
                   router.push({
                     pathname: pathname,
-                    params: { email: email },
+                    params: { email: emailValue },
                   });
                 }}
                 title="GET STARTED"
