@@ -27,7 +27,7 @@ const PrimaryButton = ({
       <TouchableRipple
         onPress={handlePress}
         style={style}
-        className={`${className} min-h-[68] w-full items-center justify-center bg-primary-light ${isLoading ? "opacity-50" : ""} `}
+        className={`min-h-[68] w-full items-center justify-center bg-primary-light ${isLoading ? "opacity-50" : ""} ${className}`}
         disabled={isLoading}
         rippleColor={rippleColor ?? "rgba(0, 0, 0, .32)"}
       >
