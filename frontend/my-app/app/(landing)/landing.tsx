@@ -35,12 +35,12 @@ const PrimaryPage = ({
 }) => {
   return (
     <ImageBackground
-      source={require("@/assets/images/landing/background.jpeg")}
+      source={require("@/assets/images/landing/background-1.jpg")}
       className="flex-1"
       resizeMode="cover"
     >
       <LinearGradient
-        colors={["rgba(255,255,255,0.1)", "rgba(0,0,0,0.9)"]}
+        colors={["rgba(255,255,255,0.1)", "rgba(0,0,0,0.7)"]}
         locations={[0, 1]}
         start={[1, 0]}
         className="flex-1"
@@ -56,7 +56,11 @@ const PrimaryPage = ({
             <View className="mb-4">
               <CircleIndicator currentPage={currentPage} />
             </View>
-            <PrimaryButton handlePress={() => onClick()} title="GET STARTED" />
+            <PrimaryButton
+              handlePress={() => onClick()}
+              title="GET STARTED"
+              removeShadow={true}
+            />
           </View>
         </SafeAreaView>
       </LinearGradient>

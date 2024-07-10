@@ -11,6 +11,7 @@ export type PrimaryButtonProps = {
   rippleColor?: TouchableRippleProps["rippleColor"];
   className?: TouchableRippleProps["className"];
   titleClassName?: ThemedTextProps["className"];
+  removeShadow?: boolean;
 };
 
 const PrimaryButton = ({
@@ -21,9 +22,12 @@ const PrimaryButton = ({
   rippleColor,
   className,
   titleClassName,
+  removeShadow,
 }: PrimaryButtonProps) => {
   return (
-    <View className="w-full overflow-hidden rounded-xl shadow-2xl shadow-black dark:shadow-white">
+    <View
+      className={`w-full overflow-hidden rounded-xl ${removeShadow ? "" : "shadow-md shadow-black dark:shadow-white"}`}
+    >
       <TouchableRipple
         onPress={handlePress}
         style={style}
