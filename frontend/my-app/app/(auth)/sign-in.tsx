@@ -27,11 +27,17 @@ export default function SignInScreen() {
   const [passwordValue, setPasswordValue] = useState("");
 
   const PasswordInputRef = useRef<TextInput | null>(null);
+  const EmailInputRef = useRef<TextInput | null>(null);
 
   useEffect(() => {
-    if (PasswordInputRef.current) {
+    if (email && PasswordInputRef.current) {
       const timer = setTimeout(() => {
         PasswordInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => {
+        EmailInputRef.current?.focus();
       }, 100);
       return () => clearTimeout(timer);
     }
@@ -63,6 +69,7 @@ export default function SignInScreen() {
 
           <View className="mt-[10%] w-[80%]">
             <FormTextField
+              ref={EmailInputRef}
               className="mb-5"
               title="Email"
               value={emailValue}
