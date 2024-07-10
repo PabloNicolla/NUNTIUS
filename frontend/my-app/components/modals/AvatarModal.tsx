@@ -4,9 +4,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function AvatarModal({
   isVisible,
   onClose,
+  imageURL,
 }: Readonly<{
   isVisible: boolean;
   onClose: () => void;
+  imageURL: string;
 }>) {
   return (
     <Modal
@@ -25,7 +27,7 @@ export default function AvatarModal({
           <View className="h-[40%] w-[80%]">
             <Pressable className="h-full w-full">
               <Image
-                source={{ uri: "https://cataas.com/cat" }}
+                source={{ uri: imageURL }}
                 className="h-full w-full"
                 resizeMode="cover"
               />

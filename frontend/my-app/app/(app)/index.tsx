@@ -102,6 +102,7 @@ const ChatList = ({ chats }: { chats: ChatType[] }) => {
       data={chats}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}
+      stickyHeaderIndices={[0]}
     />
   );
 };

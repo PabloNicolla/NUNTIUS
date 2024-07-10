@@ -1,59 +1,35 @@
 // groups.tsx
 
-import React, { useState } from "react";
-import { View, FlatList, Pressable } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  FlatList,
+  Pressable,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  LayoutAnimation,
+  useColorScheme,
+  ScrollView,
+  Animated,
+  StyleSheet,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
   ChatListItemProps,
 } from "@/components/chat/ChatListItem";
 import { SelectionProvider, useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "@/components/ThemedText";
+import Header from "@/components/list/TempHeader";
+import { StatusBar } from "expo-status-bar";
+import { chats_data } from "@/test-data/chat-data";
+import ListWithDynamicHeader from "@/components/list/ListWithHeader";
+
+const { diffClamp } = Animated;
+const headerHeight = 50 * 2;
 
 const App = () => {
-  const { selectModeHandler, selectedChatItems } = useSelection();
-
-  const [chats, setChats] = useState<ChatListItemProps[]>([
-    {
-      id: 1,
-      username: "user1",
-      chatName: "user1",
-      lastMessageTime: Date.now(),
-      recentMessage: "hello",
-      imageURL: "https://cataas.com/cat",
-      isInSelectMode: false,
-      selectModeHandler: selectModeHandler,
-    },
-    {
-      id: 2,
-      username: "user2",
-      chatName: "user2",
-      lastMessageTime: Date.now() - 1000,
-      recentMessage: "bye",
-      imageURL: "https://cataas.com/cat",
-      isInSelectMode: false,
-      selectModeHandler: selectModeHandler,
-    },
-    {
-      id: 3,
-      username: "user3",
-      chatName: "user3",
-      lastMessageTime: Date.now() - 2000,
-      recentMessage: "Good",
-      imageURL: "https://cataas.com/cat",
-      isInSelectMode: false,
-      selectModeHandler: selectModeHandler,
-    },
-    {
-      id: 4,
-      username: "user4",
-      chatName: "user4",
-      lastMessageTime: Date.now() - 3000,
-      recentMessage: "what?",
-      imageURL: "https://cataas.com/cat",
-      isInSelectMode: false,
-      selectModeHandler: selectModeHandler,
-    },
-  ]);
+  const theme = useColorScheme();
+  const [chats, setChats] = useState<ChatListItemProps[]>(chats_data);
 
   const addOrUpdateChat = (chat: ChatListItemProps) => {
     setChats((prevChats: ChatListItemProps[]) => {
@@ -74,26 +50,105 @@ const App = () => {
   };
 
   const renderItem = ({ item }: { item: ChatListItemProps }) => (
-    <ChatListItem {...item} />
+    <ChatListItem key={item.id} {...item} />
   );
+
+  // // header
+  // const ref = useRef<FlatList>(null);
+
+  // const scrollY = useRef(new Animated.Value(0));
+  // const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
+
+  // const translateY = scrollYClamped.interpolate({
+  //   inputRange: [0, headerHeight],
+  //   outputRange: [0, -headerHeight],
+  // });
+
+  // const translateYNumber = useRef();
+
+  // translateY.addListener(({ value }) => {
+  //   translateYNumber.current = value;
+  // });
+
+  // const handleScroll = Animated.event(
+  //   [
+  //     {
+  //       nativeEvent: {
+  //         contentOffset: { y: scrollY.current },
+  //       },
+  //     },
+  //   ],
+  //   {
+  //     useNativeDriver: true,
+  //   },
+  // );
+
+  // const handleSnap = (nativeEvent: NativeSyntheticEvent<NativeScrollEvent>) => {
+  //   const offsetY = nativeEvent.nativeEvent.contentOffset.y;
+  //   if (
+  //     !(
+  //       translateYNumber.current === 0 ||
+  //       translateYNumber.current === -headerHeight / 2
+  //     )
+  //   ) {
+  //     if (ref.current) {
+  //       ref.current.scrollToOffset({
+  //         offset:
+  //           getCloser(translateYNumber.current, -headerHeight / 2, 0) ===
+  //           -headerHeight / 2
+  //             ? offsetY + headerHeight / 2
+  //             : offsetY - headerHeight / 2,
+  //       });
+  //     }
+  //   }
+  // };
 
   return (
     <View className="flex-1">
+      <StatusBar style="auto" />
+
       <SafeAreaView className="flex-1">
-        <FlatList
+        <ListWithDynamicHeader
           data={chats}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={HeaderComponent}
         />
 
-        <Pressable
-          onPress={() => {
-            console.log(selectedChatItems);
-          }}
-        >
-          <ThemedText>ASDSADASDSADASDASDASDSA</ThemedText>
-        </Pressable>
+        {/* <Animated.View
+            style={[styles.header, { transform: [{ translateY }] }]}
+          >
+            <Header {...{ headerHeight }} />
+          </Animated.View>
+          <Animated.FlatList
+            data={chats}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            scrollEventThrottle={16}
+            indicatorStyle={theme === "dark" ? "black" : "white"}
+            showsHorizontalScrollIndicator={true}
+            ListHeaderComponent={HeaderComponent}
+            onScroll={handleScroll}
+            ref={ref}
+            onMomentumScrollEnd={handleSnap}
+            contentContainerStyle={{ paddingTop: headerHeight }}
+          /> */}
       </SafeAreaView>
+    </View>
+  );
+};
+
+const HeaderComponent = () => {
+  const { selectedChatItems } = useSelection();
+
+  return (
+    <View className="h-20 w-20">
+      <Pressable
+        onPress={() => {
+          console.log(selectedChatItems);
+        }}
+      >
+        <ThemedText className="h-20">ASDSADASDSADASDASDASDSA</ThemedText>
+      </Pressable>
     </View>
   );
 };
