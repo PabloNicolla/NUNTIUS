@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type ChatType = {
   id: number;
@@ -6,7 +12,7 @@ type ChatType = {
 
 type SelectionContextType = {
   isSelectionActive: boolean;
-  selectedChatItems: ChatType[];
+  selectedChatItems: Set<number>;
   selectModeHandler: (id: number) => void;
 };
 
@@ -20,33 +26,36 @@ export const SelectionProvider = ({
   children: React.ReactNode;
 }) => {
   const [isSelectionActive, setIsSelectionActive] = useState(false);
-  const [selectedChatItems, setSelectedChatItems] = useState<ChatType[]>([]);
+  const [selectedChatItems, setSelectedChatItems] = useState<Set<number>>(
+    new Set(),
+  );
 
   useEffect(() => {
-    if (selectedChatItems.length === 0) {
+    if (selectedChatItems.size === 0) {
       setIsSelectionActive(false);
     }
   }, [selectedChatItems]);
 
   const selectModeHandler = (id: number) => {
-    if (!isSelectionActive) {
-      setIsSelectionActive(true);
-      setSelectedChatItems([{ id: id }]);
-    } else {
-      const chat = selectedChatItems.find((chat) => chat.id === id);
-      if (!chat) {
-        setSelectedChatItems([...selectedChatItems, { id: id }]);
+    setSelectedChatItems((prevSelectedChatItems) => {
+      const newSelectedChatItems = new Set(prevSelectedChatItems);
+      if (!newSelectedChatItems.has(id)) {
+        newSelectedChatItems.add(id);
+        setIsSelectionActive(true);
       } else {
-        const chats = selectedChatItems.filter((chat) => chat.id !== id);
-        setSelectedChatItems([...chats]);
+        newSelectedChatItems.delete(id);
       }
-    }
+      return newSelectedChatItems;
+    });
   };
 
+  const contextMemo = useMemo(
+    () => ({ isSelectionActive, selectedChatItems, selectModeHandler }),
+    [isSelectionActive, selectedChatItems],
+  );
+
   return (
-    <SelectionContext.Provider
-      value={{ isSelectionActive, selectedChatItems, selectModeHandler }}
-    >
+    <SelectionContext.Provider value={contextMemo}>
       {children}
     </SelectionContext.Provider>
   );

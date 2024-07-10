@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useMemo } from "react";
 
 type SessionContextType = {
   isLoggedIn: boolean;
@@ -24,8 +24,13 @@ export function SessionProvider({
   const login = () => setIsLoggedIn(true);
   const logout = () => setIsLoggedIn(false);
 
+  const contextMemo = useMemo(
+    () => ({ isLoggedIn, login, logout }),
+    [isLoggedIn],
+  );
+
   return (
-    <SessionContext.Provider value={{ isLoggedIn, login, logout }}>
+    <SessionContext.Provider value={contextMemo}>
       {children}
     </SessionContext.Provider>
   );
