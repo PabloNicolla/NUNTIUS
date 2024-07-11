@@ -38,10 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    "chat.apps.ChatConfig",
-
-    # 'channels',
-    # 'chat',
+    'chat.apps.ChatConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 # ASGI_APPLICATION = 'my_app.asgi.application'
