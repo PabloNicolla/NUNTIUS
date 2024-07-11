@@ -23,11 +23,13 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import GetStartedModal from "@/components/modals/GetStartedModal";
+import { ThemedView } from "@/components/ThemedView";
 
 const { width, height } = Dimensions.get("window");
 
 export default function LandingScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showKeyboardBackground, setShowKeyboardBackground] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalVisible(true);
@@ -61,6 +63,16 @@ export default function LandingScreen() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isModalVisible) {
+      setShowKeyboardBackground(false);
+    } else {
+      setTimeout(() => {
+        setShowKeyboardBackground(true);
+      }, 200);
+    }
+  }, [isModalVisible]);
+
   return (
     <View className="flex-1">
       <StatusBar style="light" />
@@ -76,23 +88,23 @@ export default function LandingScreen() {
           currentPage={2}
           Svg={SomethingSVG}
           onClick={handleOpenModal}
-          isModalVisible={isModalVisible}
         />
         <SecondaryPageTemplate
           key={3}
           currentPage={3}
           Svg={LoveItSVG}
           onClick={handleOpenModal}
-          isModalVisible={isModalVisible}
         />
         <SecondaryPageTemplate
           key={4}
           currentPage={4}
           Svg={UnlockSVG}
           onClick={handleOpenModal}
-          isModalVisible={isModalVisible}
         />
       </PagerView>
+      <ThemedView
+        className={`${showKeyboardBackground ? "" : "hidden"} absolute bottom-0 h-[50%] w-full`}
+      />
 
       <GetStartedModal isVisible={isModalVisible} onClose={handleCloseModal} />
     </View>
@@ -149,25 +161,11 @@ const SecondaryPageTemplate = ({
   currentPage,
   Svg,
   onClick,
-  isModalVisible,
 }: {
   currentPage: number;
   Svg: React.FC<SvgProps>;
   onClick: () => void;
-  isModalVisible: boolean;
 }) => {
-  const [isSvgVisible, setIsSvgVisible] = useState(true);
-
-  useEffect(() => {
-    if (isModalVisible) {
-      setTimeout(() => {
-        setIsSvgVisible(false);
-      }, 120);
-    } else {
-      setIsSvgVisible(true);
-    }
-  }, [isModalVisible]);
-
   return (
     <View className="flex-1">
       <LinearGradient
@@ -181,15 +179,13 @@ const SecondaryPageTemplate = ({
             <TopBar />
 
             <View className="mb-[10%] w-[80%] items-center justify-end">
-              {isSvgVisible && (
-                <View className="bg-transparent">
-                  <Svg
-                    width={width * 0.8}
-                    height={height * 0.4}
-                    className="mb-10"
-                  />
-                </View>
-              )}
+              <View className="bg-transparent">
+                <Svg
+                  width={width * 0.8}
+                  height={height * 0.4}
+                  className="mb-10"
+                />
+              </View>
 
               <ThemedText className="mb-5 text-6xl font-bold text-white">
                 Hello!

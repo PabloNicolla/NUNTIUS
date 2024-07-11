@@ -35,7 +35,7 @@ export default function GetStartedModal({
     if (isVisible && EmailInputRef.current) {
       const timer = setTimeout(() => {
         EmailInputRef.current?.focus();
-      }, 100);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [isVisible]);

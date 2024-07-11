@@ -35,12 +35,12 @@ export default function SignUpScreen() {
     if (email && PasswordInputRef.current) {
       const timer = setTimeout(() => {
         PasswordInputRef.current?.focus();
-      }, 100);
+      }, 400);
       return () => clearTimeout(timer);
     } else {
       const timer = setTimeout(() => {
         EmailInputRef.current?.focus();
-      }, 100);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, []);
