@@ -20,7 +20,9 @@ import FormTextField from "@/components/form/FormTextField";
 
 export default function SignInScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
+
   const { login, isLoggedIn } = useSession();
+
   const theme = useColorScheme() ?? "light";
 
   const [emailValue, setEmailValue] = useState(email);
@@ -48,7 +50,7 @@ export default function SignInScreen() {
       <StatusBar style="auto" />
 
       <SafeAreaView className="flex-1">
-        <View className="relative flex-1 items-center justify-start">
+        <View className="flex-1 items-center justify-start">
           <View className="w-full flex-row items-center px-2">
             <Pressable
               onPress={() => {

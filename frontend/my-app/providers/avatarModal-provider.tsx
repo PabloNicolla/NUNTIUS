@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
 type AvatarModelContextType = {

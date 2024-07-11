@@ -1,17 +1,19 @@
-import React, { useRef } from "react";
-import { Animated, StyleSheet, useColorScheme } from "react-native";
-import Header from "@/components/list/TempHeader";
+import React from "react";
+import { Animated, StyleSheet } from "react-native";
 
 const { diffClamp } = Animated;
-const headerHeight = 50 * 2;
 
 type DynamicHeaderProps = {
   scrollY: Animated.Value;
+  children: React.ReactNode;
+  headerHeight: number;
 };
 
-const DynamicHeader = ({ scrollY }: DynamicHeaderProps) => {
-  const theme = useColorScheme();
-
+const DynamicHeader = ({
+  scrollY,
+  children,
+  headerHeight,
+}: DynamicHeaderProps) => {
   const scrollYClamped = diffClamp(scrollY, 0, headerHeight);
   const translateY = scrollYClamped.interpolate({
     inputRange: [0, headerHeight],
@@ -20,7 +22,7 @@ const DynamicHeader = ({ scrollY }: DynamicHeaderProps) => {
 
   return (
     <Animated.View style={[styles.header, { transform: [{ translateY }] }]}>
-      <Header {...{ headerHeight }} />
+      {children}
     </Animated.View>
   );
 };

@@ -50,7 +50,7 @@ export default function SignUpScreen() {
       <StatusBar style="auto" />
 
       <SafeAreaView className="flex-1">
-        <View className="relative flex-1 items-center justify-start">
+        <View className="flex-1 items-center justify-start">
           <View className="w-full flex-row items-center justify-between px-2">
             <View className="flex-row items-center">
               <Pressable

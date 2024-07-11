@@ -1,25 +1,13 @@
 // groups.tsx
 
-import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  FlatList,
-  Pressable,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  LayoutAnimation,
-  useColorScheme,
-  ScrollView,
-  Animated,
-  StyleSheet,
-} from "react-native";
+import React, { useState } from "react";
+import { View, Pressable, useColorScheme, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
   ChatListItemProps,
 } from "@/components/chat/ChatListItem";
 import { SelectionProvider, useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "@/components/ThemedText";
-import Header from "@/components/list/TempHeader";
 import { StatusBar } from "expo-status-bar";
 import { chats_data } from "@/test-data/chat-data";
 import ListWithDynamicHeader from "@/components/list/ListWithHeader";
@@ -28,9 +16,11 @@ import {
   useAvatarModal,
 } from "@/providers/avatarModal-provider";
 import AvatarModal from "@/components/modals/AvatarModal";
+import { Ionicons } from "@expo/vector-icons";
+import { ThemedView } from "@/components/ThemedView";
+import { TouchableRipple } from "react-native-paper";
 
-const { diffClamp } = Animated;
-const headerHeight = 50 * 2;
+const headerHeight = 50;
 
 const App = () => {
   const theme = useColorScheme();
@@ -58,56 +48,6 @@ const App = () => {
     <ChatListItem key={item.id} {...item} />
   );
 
-  // // header
-  // const ref = useRef<FlatList>(null);
-
-  // const scrollY = useRef(new Animated.Value(0));
-  // const scrollYClamped = diffClamp(scrollY.current, 0, headerHeight);
-
-  // const translateY = scrollYClamped.interpolate({
-  //   inputRange: [0, headerHeight],
-  //   outputRange: [0, -headerHeight],
-  // });
-
-  // const translateYNumber = useRef();
-
-  // translateY.addListener(({ value }) => {
-  //   translateYNumber.current = value;
-  // });
-
-  // const handleScroll = Animated.event(
-  //   [
-  //     {
-  //       nativeEvent: {
-  //         contentOffset: { y: scrollY.current },
-  //       },
-  //     },
-  //   ],
-  //   {
-  //     useNativeDriver: true,
-  //   },
-  // );
-
-  // const handleSnap = (nativeEvent: NativeSyntheticEvent<NativeScrollEvent>) => {
-  //   const offsetY = nativeEvent.nativeEvent.contentOffset.y;
-  //   if (
-  //     !(
-  //       translateYNumber.current === 0 ||
-  //       translateYNumber.current === -headerHeight / 2
-  //     )
-  //   ) {
-  //     if (ref.current) {
-  //       ref.current.scrollToOffset({
-  //         offset:
-  //           getCloser(translateYNumber.current, -headerHeight / 2, 0) ===
-  //           -headerHeight / 2
-  //             ? offsetY + headerHeight / 2
-  //             : offsetY - headerHeight / 2,
-  //       });
-  //     }
-  //   }
-  // };
-
   const { hideModal, imageURL, isVisible } = useAvatarModal();
 
   return (
@@ -119,6 +59,8 @@ const App = () => {
           data={chats}
           renderItem={renderItem}
           ListHeaderComponent={HeaderComponent}
+          DynamicHeaderComponent={Header}
+          headerHeight={headerHeight}
         />
 
         <AvatarModal
@@ -128,42 +70,61 @@ const App = () => {
           }}
           imageURL={imageURL}
         />
-
-        {/* <Animated.View
-            style={[styles.header, { transform: [{ translateY }] }]}
-          >
-            <Header {...{ headerHeight }} />
-          </Animated.View>
-          <Animated.FlatList
-            data={chats}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-            scrollEventThrottle={16}
-            indicatorStyle={theme === "dark" ? "black" : "white"}
-            showsHorizontalScrollIndicator={true}
-            ListHeaderComponent={HeaderComponent}
-            onScroll={handleScroll}
-            ref={ref}
-            onMomentumScrollEnd={handleSnap}
-            contentContainerStyle={{ paddingTop: headerHeight }}
-          /> */}
       </SafeAreaView>
     </View>
   );
 };
 
+const Header = () => {
+  const theme = useColorScheme();
+
+  return (
+    <ThemedView
+      className={`h-[${headerHeight}] flex-row items-center justify-between px-2`}
+    >
+      <ThemedText>Conversations</ThemedText>
+      <View className="overflow-hidden rounded-full">
+        <TouchableRipple
+          onPress={() => {
+            console.log("config");
+          }}
+          rippleColor={
+            theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
+          }
+          className=""
+        >
+          <Ionicons
+            name="ellipsis-horizontal"
+            color={theme === "dark" ? "white" : "black"}
+            size={25}
+          />
+        </TouchableRipple>
+      </View>
+    </ThemedView>
+  );
+};
+
 const HeaderComponent = () => {
+  const theme = useColorScheme();
   const { selectedChatItems } = useSelection();
 
   return (
-    <View className="h-20 w-20">
-      <Pressable
-        onPress={() => {
-          console.log(selectedChatItems);
-        }}
-      >
-        <ThemedText className="h-20">ASDSADASDSADASDASDASDSA</ThemedText>
-      </Pressable>
+    <View className="w-full items-center justify-center">
+      <View className="my-2 h-12 w-[95%] rounded-3xl bg-background-light/80 px-6 dark:bg-white/10">
+        <Pressable
+          onPress={() => {
+            console.log(selectedChatItems);
+          }}
+          className="flex-1 justify-center"
+        >
+          <TextInput
+            className="flex-1 text-text-light dark:text-text-dark"
+            placeholder="Search..."
+            placeholderTextColor={theme === "dark" ? "white" : "black"}
+            numberOfLines={1}
+          />
+        </Pressable>
+      </View>
     </View>
   );
 };

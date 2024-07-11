@@ -5,20 +5,17 @@ import {
   FlatList,
   NativeSyntheticEvent,
   NativeScrollEvent,
-  StyleSheet,
   useColorScheme,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
 import DynamicHeader from "@/components/list/DynamicHeader";
 
-const headerHeight = 50 * 2;
-
-type ListWithDynamicHeaderProps = {
-  data: any[];
-  renderItem: ({ item }: { item: any }) => JSX.Element;
-  keyExtractor?: (item: any) => string;
+type ListWithDynamicHeaderProps<T> = {
+  data: T[];
+  renderItem: ({ item }: { item: T }) => JSX.Element;
+  keyExtractor?: (item: T) => string;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
+  DynamicHeaderComponent: React.ComponentType<any>;
+  headerHeight: number;
 };
 
 const ListWithDynamicHeader = ({
@@ -26,7 +23,9 @@ const ListWithDynamicHeader = ({
   renderItem,
   keyExtractor,
   ListHeaderComponent,
-}: ListWithDynamicHeaderProps) => {
+  DynamicHeaderComponent,
+  headerHeight,
+}: ListWithDynamicHeaderProps<any>) => {
   const theme = useColorScheme();
   const ref = useRef<FlatList>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -67,7 +66,9 @@ const ListWithDynamicHeader = ({
 
   return (
     <View style={{ overflow: "hidden" }}>
-      <DynamicHeader scrollY={scrollY} />
+      <DynamicHeader headerHeight={headerHeight} scrollY={scrollY}>
+        <DynamicHeaderComponent />
+      </DynamicHeader>
       <Animated.FlatList
         data={data}
         renderItem={renderItem}

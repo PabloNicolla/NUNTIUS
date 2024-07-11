@@ -30,6 +30,7 @@
 
 import FormTextField from "@/components/form/FormTextField";
 import { ThemedText } from "@/components/ThemedText";
+import { Redirect } from "expo-router";
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -164,9 +165,10 @@ const App = () => {
 };
 
 export default () => (
-  <ChatProvider>
-    <App />
-  </ChatProvider>
+  // <ChatProvider>
+  //   <App />
+  // </ChatProvider>
+  <Redirect href={"/groups"} />
 );
 
 // const socket = io('https://yourserver.com');

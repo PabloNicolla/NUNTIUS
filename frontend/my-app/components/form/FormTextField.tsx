@@ -52,7 +52,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
     return (
       <View
         {...rest}
-        className={`${isFocused ? "border-primary-light bg-primary-light/10 dark:border-primary-dark dark:bg-primary-dark/20" : "border-black dark:border-white"} relative min-h-[60] w-full rounded-xl border-2 ${className}`}
+        className={`${isFocused ? "border-primary-light bg-primary-light/10 dark:border-primary-dark dark:bg-primary-dark/20" : "border-black dark:border-white"} relative min-h-[60] w-full rounded-md border-2 ${className}`}
       >
         <View className="mx-2 flex-1 flex-row items-center">
           <ThemedText
@@ -85,7 +85,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
               onPress={() => {
                 setIsPasswordVisible(!isPasswordVisible);
               }}
-              className={`w-30 ml-2 justify-center`}
+              className={`ml-2 justify-center`}
               rippleColor={
                 theme === "dark"
                   ? "rgba(255, 255, 255, .32)"

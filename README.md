@@ -5,6 +5,15 @@
 ```
 npx expo install expo-dev-client
 npx expo run:android
+
+# upgrade
+
+npm install expo@latest
+npx expo install --fix
+
+# production
+
+npx expo start --no-dev --minify
 ```
 
 ## Backend

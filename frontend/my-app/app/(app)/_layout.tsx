@@ -4,7 +4,7 @@ import { useSession } from "@/providers/session-provider";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/build/FontAwesome";
 import { CommonActions } from "@react-navigation/native";
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, Stack, Tabs } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Easing,

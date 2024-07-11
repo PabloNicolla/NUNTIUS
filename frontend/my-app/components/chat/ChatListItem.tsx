@@ -2,13 +2,11 @@ import {
   Image,
   Pressable,
   StyleSheet,
-  Text,
   useColorScheme,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Avatar, TouchableRipple } from "react-native-paper";
-import AvatarModal from "../modals/AvatarModal";
 import { useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "../ThemedText";
 import { Ionicons } from "@expo/vector-icons";
@@ -96,7 +94,6 @@ const CustomAvatar = ({
   imageURl: string;
 }) => {
   const [imageError, setImageError] = useState(false);
-  // const [isAvatarImageOpen, setIsAvatarImageOpen] = useState(false);
   const { showModal } = useAvatarModal();
 
   const getInitials = (name: string) => {
@@ -136,14 +133,6 @@ const CustomAvatar = ({
           </View>
         )}
       </Pressable>
-
-      {/* <AvatarModal
-        isVisible={isAvatarImageOpen}
-        onClose={() => {
-          setIsAvatarImageOpen(false);
-        }}
-        imageURL={imageURl}
-      /> */}
     </View>
   );
 };

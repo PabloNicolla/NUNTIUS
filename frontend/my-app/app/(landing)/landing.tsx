@@ -26,129 +26,6 @@ import GetStartedModal from "@/components/modals/GetStartedModal";
 
 const { width, height } = Dimensions.get("window");
 
-const PrimaryPage = ({
-  currentPage,
-  onClick,
-}: {
-  currentPage: number;
-  onClick: () => void;
-}) => {
-  return (
-    <ImageBackground
-      source={require("@/assets/images/landing/background-1.jpg")}
-      className="flex-1"
-      resizeMode="cover"
-    >
-      <LinearGradient
-        colors={["rgba(255,255,255,0.1)", "rgba(0,0,0,0.7)"]}
-        locations={[0, 1]}
-        start={[1, 0]}
-        className="flex-1"
-      >
-        <SafeAreaView className="flex-1 items-center justify-end">
-          <View className="mb-[10%] w-[80%] items-center justify-end">
-            <ThemedText className="mb-5 text-6xl font-bold text-white">
-              Hello!
-            </ThemedText>
-            <ThemedText className="mb-20 text-xl text-white">
-              Let's improve your life style
-            </ThemedText>
-            <View className="mb-4">
-              <CircleIndicator currentPage={currentPage} />
-            </View>
-            <PrimaryButton
-              handlePress={() => onClick()}
-              title="GET STARTED"
-              removeShadow={true}
-            />
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
-    </ImageBackground>
-  );
-};
-
-const SecondaryPageTemplate = ({
-  currentPage,
-  Svg,
-  onClick,
-  isModalVisible,
-}: {
-  currentPage: number;
-  Svg: React.FC<SvgProps>;
-  onClick: () => void;
-  isModalVisible: boolean;
-}) => {
-  const [isSvgVisible, setIsSvgVisible] = useState(true);
-
-  useEffect(() => {
-    if (isModalVisible) {
-      setTimeout(() => {
-        setIsSvgVisible(false);
-      }, 120);
-    } else {
-      setIsSvgVisible(true);
-    }
-  }, [isModalVisible]);
-
-  return (
-    <View className="flex-1">
-      <LinearGradient
-        colors={["rgba(128,215,255,1)", "rgba(76,153,217,0.9)"]}
-        locations={[0, 1]}
-        start={[0, 1]}
-        className="flex-1"
-      >
-        <SafeAreaView className="flex-1 items-center justify-end">
-          <View className="mb-[10%] w-[80%] items-center justify-end">
-            {isSvgVisible && (
-              <View className="bg-transparent">
-                {/* <Image
-              source={require("@/assets/images/landing/background.jpg")}
-              className="mb-10 h-[300] w-[300]"
-              resizeMode="cover"
-            /> */}
-
-                <Svg
-                  width={width * 0.8}
-                  height={height * 0.4}
-                  className="mb-10"
-                />
-              </View>
-            )}
-
-            <ThemedText className="mb-5 text-6xl font-bold text-white">
-              Hello!
-            </ThemedText>
-            <ThemedText className="mb-20 text-xl text-white">
-              Let's improve your life style
-            </ThemedText>
-            <View className="mb-4">
-              <CircleIndicator currentPage={currentPage} />
-            </View>
-            <PrimaryButton handlePress={() => onClick()} title="GET STARTED" />
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
-    </View>
-  );
-};
-
-const CircleIndicator = ({ currentPage }: { currentPage: number }) => {
-  return (
-    <View className="flex-row justify-center">
-      {[1, 2, 3, 4].map((page) => (
-        <View
-          key={page}
-          className={`mx-1 h-3 w-3 rounded-full ${
-            currentPage === page ? "bg-primary-light" : "bg-gray-300"
-          }`}
-        />
-      ))}
-    </View>
-  );
-};
-
 export default function LandingScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -160,8 +37,10 @@ export default function LandingScreen() {
     setIsModalVisible(false);
   };
 
+  // Change NavBar color. When user leaves this screen, set it back to default color.
   useEffect(() => {
-    let defaultNavBarColor: ColorValue, defaultStyle: "light" | "dark";
+    let defaultNavBarColor: ColorValue;
+    let defaultStyle: "light" | "dark";
 
     (async () => {
       // Fetch the default values
@@ -185,26 +64,6 @@ export default function LandingScreen() {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
-
-      <View className="absolute z-10 mt-[7%] w-full flex-row items-center justify-between px-2">
-        <View className="flex-row items-center">
-          <Image
-            source={require("@/assets/images/brand/Logo.png")}
-            className="h-[60] w-[60]"
-          />
-        </View>
-        <View className="items-center">
-          <Pressable
-            onPress={() => {
-              router.push("/sign-in");
-            }}
-          >
-            <ThemedText className="text-lg font-bold text-white">
-              Log in
-            </ThemedText>
-          </Pressable>
-        </View>
-      </View>
 
       <PagerView
         className="flex-1"
@@ -239,3 +98,151 @@ export default function LandingScreen() {
     </View>
   );
 }
+
+const PrimaryPage = ({
+  currentPage,
+  onClick,
+}: {
+  currentPage: number;
+  onClick: () => void;
+}) => {
+  return (
+    <ImageBackground
+      source={require("@/assets/images/landing/background-1.jpg")}
+      className="flex-1"
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={["rgba(255,255,255,0.1)", "rgba(0,0,0,0.7)"]}
+        locations={[0, 1]}
+        start={[1, 0]}
+        className="flex-1"
+      >
+        <SafeAreaView className="flex-1">
+          <View className="relative flex-1 items-center justify-end">
+            <TopBar />
+
+            <View className="mb-[10%] w-[80%] items-center justify-end">
+              <ThemedText className="mb-5 text-6xl font-bold text-white">
+                Hello!
+              </ThemedText>
+              <ThemedText className="mb-20 text-xl text-white">
+                Let's improve your life style
+              </ThemedText>
+              <View className="mb-4">
+                <CircleIndicator currentPage={currentPage} />
+              </View>
+              <PrimaryButton
+                handlePress={() => onClick()}
+                title="GET STARTED"
+                removeShadow={true}
+              />
+            </View>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
+  );
+};
+
+const SecondaryPageTemplate = ({
+  currentPage,
+  Svg,
+  onClick,
+  isModalVisible,
+}: {
+  currentPage: number;
+  Svg: React.FC<SvgProps>;
+  onClick: () => void;
+  isModalVisible: boolean;
+}) => {
+  const [isSvgVisible, setIsSvgVisible] = useState(true);
+
+  useEffect(() => {
+    if (isModalVisible) {
+      setTimeout(() => {
+        setIsSvgVisible(false);
+      }, 120);
+    } else {
+      setIsSvgVisible(true);
+    }
+  }, [isModalVisible]);
+
+  return (
+    <View className="flex-1">
+      <LinearGradient
+        colors={["rgba(128,215,255,1)", "rgba(76,153,217,1)"]}
+        locations={[0, 1]}
+        start={[0, 1]}
+        className="flex-1"
+      >
+        <SafeAreaView className="flex-1">
+          <View className="flex-1 items-center justify-end">
+            <TopBar />
+
+            <View className="mb-[10%] w-[80%] items-center justify-end">
+              {isSvgVisible && (
+                <View className="bg-transparent">
+                  <Svg
+                    width={width * 0.8}
+                    height={height * 0.4}
+                    className="mb-10"
+                  />
+                </View>
+              )}
+
+              <ThemedText className="mb-5 text-6xl font-bold text-white">
+                Hello!
+              </ThemedText>
+              <ThemedText className="mb-20 text-xl text-white">
+                Let's improve your life style
+              </ThemedText>
+              <View className="mb-4">
+                <CircleIndicator currentPage={currentPage} />
+              </View>
+              <PrimaryButton
+                handlePress={() => onClick()}
+                title="GET STARTED"
+              />
+            </View>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    </View>
+  );
+};
+
+const CircleIndicator = ({ currentPage }: { currentPage: number }) => {
+  return (
+    <View className="flex-row justify-center">
+      {[1, 2, 3, 4].map((page) => (
+        <View
+          key={page}
+          className={`mx-1 h-3 w-3 rounded-full ${
+            currentPage === page ? "bg-primary-light" : "bg-gray-300"
+          }`}
+        />
+      ))}
+    </View>
+  );
+};
+
+const TopBar = () => (
+  <View className="absolute top-0 z-10 w-full flex-row items-center justify-between px-2">
+    <View className="flex-row items-center">
+      <Image
+        source={require("@/assets/images/brand/Logo.png")}
+        className="h-[60] w-[60]"
+      />
+    </View>
+    <View className="items-center">
+      <Pressable
+        onPress={() => {
+          router.push("/sign-in");
+        }}
+      >
+        <ThemedText className="text-lg font-bold text-white">Log in</ThemedText>
+      </Pressable>
+    </View>
+  </View>
+);

@@ -26,12 +26,12 @@ const PrimaryButton = ({
 }: PrimaryButtonProps) => {
   return (
     <View
-      className={`w-full overflow-hidden rounded-xl ${removeShadow ? "" : "shadow-md shadow-black dark:shadow-white"}`}
+      className={`min-h-[68] w-full overflow-hidden rounded-xl ${removeShadow ? "" : "shadow-md shadow-black dark:shadow-white"} ${className}`}
     >
       <TouchableRipple
         onPress={handlePress}
         style={style}
-        className={`min-h-[68] w-full items-center justify-center bg-primary-light ${isLoading ? "opacity-50" : ""} ${className}`}
+        className={`flex-1 items-center justify-center bg-primary-light ${isLoading ? "opacity-50" : ""}`}
         disabled={isLoading}
         rippleColor={rippleColor ?? "rgba(0, 0, 0, .32)"}
       >

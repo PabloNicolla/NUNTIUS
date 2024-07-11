@@ -16,29 +16,6 @@ import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { ThemedView } from "@/components/ThemedView";
 import FormTextField from "../form/FormTextField";
 
-const CloseModalX = ({
-  windowHeight,
-  windowWidth,
-  onClose,
-  color,
-}: {
-  windowHeight: number;
-  windowWidth: number;
-  onClose: () => void;
-  color: string;
-}) => {
-  return (
-    <View
-      className="absolute"
-      style={{ right: windowWidth * 0.1, top: windowHeight * 0.05 }}
-    >
-      <Pressable onPress={() => onClose()}>
-        <MaterialIcons name="close" size={25} color={color} />
-      </Pressable>
-    </View>
-  );
-};
-
 export default function GetStartedModal({
   isVisible,
   onClose,
@@ -123,3 +100,26 @@ export default function GetStartedModal({
     </Modal>
   );
 }
+
+const CloseModalX = ({
+  windowHeight,
+  windowWidth,
+  onClose,
+  color,
+}: {
+  windowHeight: number;
+  windowWidth: number;
+  onClose: () => void;
+  color: string;
+}) => {
+  return (
+    <View
+      className="absolute"
+      style={{ right: windowWidth * 0.1, top: windowHeight * 0.05 }}
+    >
+      <Pressable onPress={() => onClose()}>
+        <MaterialIcons name="close" size={25} color={color} />
+      </Pressable>
+    </View>
+  );
+};
