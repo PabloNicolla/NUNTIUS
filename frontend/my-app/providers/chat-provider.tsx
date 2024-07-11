@@ -6,9 +6,9 @@ import React, {
   useState,
 } from "react";
 
-type ChatType = {
-  id: number;
-};
+// type ChatType = {
+//   id: number;
+// };
 
 type SelectionContextType = {
   isSelectionActive: boolean;
@@ -19,6 +19,14 @@ type SelectionContextType = {
 const SelectionContext = createContext<SelectionContextType | undefined>(
   undefined,
 );
+
+export const useSelection = () => {
+  const context = useContext(SelectionContext);
+  if (context === undefined) {
+    throw new Error("useSelection must be used within a SelectionProvider");
+  }
+  return context;
+};
 
 export const SelectionProvider = ({
   children,
@@ -59,12 +67,4 @@ export const SelectionProvider = ({
       {children}
     </SelectionContext.Provider>
   );
-};
-
-export const useSelection = () => {
-  const context = useContext(SelectionContext);
-  if (context === undefined) {
-    throw new Error("useSelection must be used within a SelectionProvider");
-  }
-  return context;
 };

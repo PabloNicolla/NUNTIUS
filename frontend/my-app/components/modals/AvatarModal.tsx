@@ -1,7 +1,8 @@
+import React from "react";
 import { Modal, Pressable, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function AvatarModal({
+const AvatarModal = ({
   isVisible,
   onClose,
   imageURL,
@@ -9,7 +10,9 @@ export default function AvatarModal({
   isVisible: boolean;
   onClose: () => void;
   imageURL: string;
-}>) {
+}>) => {
+  console.log("AvatarModal");
+
   return (
     <Modal
       animationType="none"
@@ -37,4 +40,5 @@ export default function AvatarModal({
       </Pressable>
     </Modal>
   );
-}
+};
+export default AvatarModal;

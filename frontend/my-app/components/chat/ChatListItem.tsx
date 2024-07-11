@@ -12,6 +12,7 @@ import AvatarModal from "../modals/AvatarModal";
 import { useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "../ThemedText";
 import { Ionicons } from "@expo/vector-icons";
+import { useAvatarModal } from "@/providers/avatarModal-provider";
 
 export type ChatListItemProps = {
   id: number;
@@ -95,7 +96,8 @@ const CustomAvatar = ({
   imageURl: string;
 }) => {
   const [imageError, setImageError] = useState(false);
-  const [isAvatarImageOpen, setIsAvatarImageOpen] = useState(false);
+  // const [isAvatarImageOpen, setIsAvatarImageOpen] = useState(false);
+  const { showModal } = useAvatarModal();
 
   const getInitials = (name: string) => {
     const initials = name
@@ -109,7 +111,7 @@ const CustomAvatar = ({
     <View>
       <Pressable
         onPress={() => {
-          setIsAvatarImageOpen(true);
+          showModal(imageURl);
         }}
         disabled={isSelectionActive}
       >
@@ -135,61 +137,67 @@ const CustomAvatar = ({
         )}
       </Pressable>
 
-      <AvatarModal
+      {/* <AvatarModal
         isVisible={isAvatarImageOpen}
         onClose={() => {
           setIsAvatarImageOpen(false);
         }}
         imageURL={imageURl}
-      />
+      /> */}
     </View>
   );
 };
 
-const ChatDetails = ({
-  chatName,
-  lastMessageTime,
-}: {
-  chatName: string;
-  lastMessageTime: number;
-}) => {
-  return (
-    <View className="h-1/2 w-full flex-row justify-between">
-      <View className="flex-1 justify-center overflow-hidden">
-        <ThemedText
-          className="overflow-hidden"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {chatName}
-        </ThemedText>
+const ChatDetails = React.memo(
+  ({
+    chatName,
+    lastMessageTime,
+  }: {
+    chatName: string;
+    lastMessageTime: number;
+  }) => {
+    console.log("ChatDetails");
+    return (
+      <View className="h-1/2 w-full flex-row justify-between">
+        <View className="flex-1 justify-center overflow-hidden">
+          <ThemedText
+            className="overflow-hidden"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {chatName}
+          </ThemedText>
+        </View>
+        <View className="h-full w-[80] items-end justify-center overflow-hidden">
+          <ThemedText
+            className="overflow-hidden"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {new Date(lastMessageTime).toLocaleTimeString()}
+          </ThemedText>
+        </View>
       </View>
-      <View className="h-full w-[80] items-end justify-center overflow-hidden">
-        <ThemedText
-          className="overflow-hidden"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {new Date(lastMessageTime).toLocaleTimeString()}
-        </ThemedText>
-      </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
-const MostRecentMessage = ({ recentMessage }: { recentMessage: string }) => {
-  return (
-    <View className="h-1/2 w-full justify-center">
-      <ThemedText
-        className="overflow-hidden text-text-light/70 dark:text-text-dark/70"
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {recentMessage}
-      </ThemedText>
-    </View>
-  );
-};
+const MostRecentMessage = React.memo(
+  ({ recentMessage }: { recentMessage: string }) => {
+    console.log("MostRecentMessage");
+    return (
+      <View className="h-1/2 w-full justify-center">
+        <ThemedText
+          className="overflow-hidden text-text-light/70 dark:text-text-dark/70"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {recentMessage}
+        </ThemedText>
+      </View>
+    );
+  },
+);
 
 export default ChatListItem;
 

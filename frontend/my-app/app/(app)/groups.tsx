@@ -23,6 +23,11 @@ import Header from "@/components/list/TempHeader";
 import { StatusBar } from "expo-status-bar";
 import { chats_data } from "@/test-data/chat-data";
 import ListWithDynamicHeader from "@/components/list/ListWithHeader";
+import {
+  AvatarModalProvider,
+  useAvatarModal,
+} from "@/providers/avatarModal-provider";
+import AvatarModal from "@/components/modals/AvatarModal";
 
 const { diffClamp } = Animated;
 const headerHeight = 50 * 2;
@@ -103,6 +108,8 @@ const App = () => {
   //   }
   // };
 
+  const { hideModal, imageURL, isVisible } = useAvatarModal();
+
   return (
     <View className="flex-1">
       <StatusBar style="auto" />
@@ -112,6 +119,14 @@ const App = () => {
           data={chats}
           renderItem={renderItem}
           ListHeaderComponent={HeaderComponent}
+        />
+
+        <AvatarModal
+          isVisible={isVisible}
+          onClose={() => {
+            hideModal();
+          }}
+          imageURL={imageURL}
         />
 
         {/* <Animated.View
@@ -154,7 +169,9 @@ const HeaderComponent = () => {
 };
 
 export default () => (
-  <SelectionProvider>
-    <App />
-  </SelectionProvider>
+  <AvatarModalProvider>
+    <SelectionProvider>
+      <App />
+    </SelectionProvider>
+  </AvatarModalProvider>
 );

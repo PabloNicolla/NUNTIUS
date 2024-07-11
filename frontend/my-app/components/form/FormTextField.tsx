@@ -24,6 +24,8 @@ type FormTextFieldProps = ViewProps & {
   keyboardType?: TextInputProps["keyboardType"];
 };
 
+// TODO: Handle error messages. E.G. user typed invalid value -> make border red & display help message
+
 const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
   (
     {
