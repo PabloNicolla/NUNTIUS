@@ -83,7 +83,7 @@ const App = () => {
   );
 
   return (
-    <View className="flex-1">
+    <ThemedView className="flex-1">
       <StatusBar style="auto" />
       <SafeAreaView className="flex-1">
         <ListWithDynamicHeader
@@ -104,11 +104,11 @@ const App = () => {
         <FAB
           icon="plus"
           className="absolute bottom-0 right-0 m-4 bg-primary-light"
-          onPress={() => router.push("/sos")}
+          onPress={() => router.push("/chatOptions")}
           color="white"
         />
       </SafeAreaView>
-    </View>
+    </ThemedView>
   );
 };
 
@@ -162,7 +162,7 @@ const HeaderComponent = ({
 
   return (
     <View className="w-full items-center justify-center">
-      <View className="my-2 h-12 w-[95%] rounded-3xl bg-background-light/80 px-4 dark:bg-white/10">
+      <View className="my-2 h-12 w-[95%] rounded-3xl bg-black/5 px-4 dark:bg-white/10">
         <Pressable
           onPress={() => console.log(selectedChatItems)}
           className="flex-1 flex-row items-center"

@@ -50,7 +50,6 @@ export default function RootLayout() {
               <Stack.Screen name="(app)" options={{ headerShown: false }} />
               <Stack.Screen name="(landing)" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="sos" options={{ headerShown: false }} />
             </Stack>
           </SQLiteProvider>
         </ThemeProvider>
