@@ -5,6 +5,7 @@ import { useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "../ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
+import { router } from "expo-router";
 
 export type ChatListItemProps = {
   id: number;
@@ -39,6 +40,7 @@ const ChatListItem = ({
         onPress={() => {
           if (!isSelectionActive) {
             console.log("Pressed");
+            router.push({ pathname: `/chat/[id]`, params: { id: id } });
           } else {
             selectModeHandler(id);
           }
