@@ -14,6 +14,7 @@ type ListWithDynamicHeaderProps<T> = {
   renderItem: ({ item }: { item: T }) => JSX.Element;
   keyExtractor?: (item: T) => string;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
+  ListFooterComponent?: React.ComponentType<any> | React.ReactElement | null;
   DynamicHeaderComponent: React.ComponentType<any>;
   headerHeight: number;
 };
@@ -23,6 +24,7 @@ const ListWithDynamicHeader = ({
   renderItem,
   keyExtractor,
   ListHeaderComponent,
+  ListFooterComponent,
   DynamicHeaderComponent,
   headerHeight,
 }: ListWithDynamicHeaderProps<any>) => {
@@ -81,6 +83,7 @@ const ListWithDynamicHeader = ({
         ref={ref}
         onMomentumScrollEnd={handleSnap}
         contentContainerStyle={{ paddingTop: headerHeight }}
+        ListFooterComponent={ListFooterComponent}
       />
     </View>
   );

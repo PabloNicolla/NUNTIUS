@@ -12,7 +12,7 @@ export type ChatListItemProps = {
   chatName: string;
   lastMessageTime: number;
   recentMessage: string;
-  imageURL: string;
+  imageURL?: string;
 };
 
 const ChatListItem = ({
@@ -85,7 +85,7 @@ const CustomAvatar = ({
   username: string;
   isSelectionActive: boolean;
   isSelected: boolean;
-  imageURl: string;
+  imageURl?: string;
 }) => {
   const [imageError, setImageError] = useState(false);
   const { showModal } = useAvatarModal();
@@ -102,7 +102,7 @@ const CustomAvatar = ({
     <View>
       <Pressable
         onPress={() => {
-          showModal(imageURl);
+          showModal(imageURl ?? "");
         }}
         disabled={isSelectionActive}
       >
@@ -138,7 +138,6 @@ const ChatDetails = React.memo(function ChatDetails({
   chatName: string;
   lastMessageTime: number;
 }) {
-  console.log("ChatDetails");
   return (
     <View className="h-1/2 w-full flex-row justify-between">
       <View className="flex-1 justify-center overflow-hidden">
@@ -168,7 +167,6 @@ const MostRecentMessage = React.memo(function MostRecentMessage({
 }: {
   recentMessage: string;
 }) {
-  console.log("MostRecentMessage");
   return (
     <View className="h-1/2 w-full justify-center">
       <ThemedText

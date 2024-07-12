@@ -9,7 +9,7 @@ const AvatarModal = ({
 }: Readonly<{
   isVisible: boolean;
   onClose: () => void;
-  imageURL: string;
+  imageURL?: string;
 }>) => {
   console.log("AvatarModal");
 

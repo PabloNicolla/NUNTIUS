@@ -43,7 +43,7 @@ export default function SignInScreen() {
       }, 400);
       return () => clearTimeout(timer);
     }
-  });
+  }, []);
 
   return (
     <ThemedView className="flex-1">
