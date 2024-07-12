@@ -27,7 +27,7 @@ type FormTextFieldProps = ViewProps & {
 // TODO: Handle error messages. E.G. user typed invalid value -> make border red & display help message
 
 const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
-  (
+  function FormTextField(
     {
       title,
       value,
@@ -38,7 +38,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
       ...rest
     },
     ref,
-  ) => {
+  ) {
     const [isFocused, setIsFocused] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 

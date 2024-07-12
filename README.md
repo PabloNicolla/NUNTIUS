@@ -16,20 +16,10 @@ npx expo install --fix
 npx expo start --no-dev --minify
 ```
 
-## SQL LITE & DRIZZLE ORM
+## Linter
 
 ```
-# Schema updates
-npx drizzle-kit generate
-
-# Running migrations
-npx drizzle-kit migrate
-
-# Prototyping 
-npx drizzle-kit push
-
-# Open studio
-npx drizzle-kit studio
+npx eslint .
 ```
 
 ## Backend

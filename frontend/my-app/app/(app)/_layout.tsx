@@ -1,21 +1,11 @@
-import { Colors } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useSession } from "@/providers/session-provider";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import FontAwesome from "@expo/vector-icons/build/FontAwesome";
+import { Ionicons } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
-import { Redirect, Stack, Tabs } from "expo-router";
-import React, { useEffect, useState } from "react";
-import {
-  Easing,
-  Pressable,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from "react-native";
-import { BottomNavigation, shadow, TouchableRipple } from "react-native-paper";
+import { Redirect, Tabs } from "expo-router";
+import React from "react";
+import { useColorScheme, View } from "react-native";
+import { BottomNavigation, TouchableRipple } from "react-native-paper";
 
 const TabIcon = ({
   color,
@@ -38,12 +28,6 @@ const TabIcon = ({
 export default function AppLayout() {
   const session = useSession();
 
-  console.log(session.isLoggedIn, "AppLayout");
-
-  if (!session.isLoggedIn) {
-    return <Redirect href={"/landing"} />;
-  }
-
   const theme = useColorScheme() ?? "light";
 
   const navBgColor = useThemeColor({}, "background");
@@ -53,6 +37,12 @@ export default function AppLayout() {
     { dark: "#0062ff80", light: "#0062ff30" },
     "icon",
   );
+
+  console.log(session.isLoggedIn, "AppLayout");
+
+  if (!session.isLoggedIn) {
+    return <Redirect href={"/landing"} />;
+  }
 
   return (
     <Tabs

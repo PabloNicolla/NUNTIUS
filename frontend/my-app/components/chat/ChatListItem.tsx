@@ -1,10 +1,4 @@
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  useColorScheme,
-  View,
-} from "react-native";
+import { Image, Pressable, useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Avatar, TouchableRipple } from "react-native-paper";
 import { useSelection } from "@/providers/chat-provider";
@@ -36,7 +30,7 @@ const ChatListItem = ({
 
   useEffect(() => {
     setIsSelected(selectedChatItems.has(id));
-  }, [selectedChatItems]);
+  }, [selectedChatItems, id]);
 
   return (
     <View className="h-[80] w-full">
@@ -137,57 +131,55 @@ const CustomAvatar = ({
   );
 };
 
-const ChatDetails = React.memo(
-  ({
-    chatName,
-    lastMessageTime,
-  }: {
-    chatName: string;
-    lastMessageTime: number;
-  }) => {
-    console.log("ChatDetails");
-    return (
-      <View className="h-1/2 w-full flex-row justify-between">
-        <View className="flex-1 justify-center overflow-hidden">
-          <ThemedText
-            className="overflow-hidden"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {chatName}
-          </ThemedText>
-        </View>
-        <View className="h-full w-[80] items-end justify-center overflow-hidden">
-          <ThemedText
-            className="overflow-hidden"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {new Date(lastMessageTime).toLocaleTimeString()}
-          </ThemedText>
-        </View>
-      </View>
-    );
-  },
-);
-
-const MostRecentMessage = React.memo(
-  ({ recentMessage }: { recentMessage: string }) => {
-    console.log("MostRecentMessage");
-    return (
-      <View className="h-1/2 w-full justify-center">
+const ChatDetails = React.memo(function ChatDetails({
+  chatName,
+  lastMessageTime,
+}: {
+  chatName: string;
+  lastMessageTime: number;
+}) {
+  console.log("ChatDetails");
+  return (
+    <View className="h-1/2 w-full flex-row justify-between">
+      <View className="flex-1 justify-center overflow-hidden">
         <ThemedText
-          className="overflow-hidden text-text-light/70 dark:text-text-dark/70"
+          className="overflow-hidden"
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {recentMessage}
+          {chatName}
         </ThemedText>
       </View>
-    );
-  },
-);
+      <View className="h-full w-[80] items-end justify-center overflow-hidden">
+        <ThemedText
+          className="overflow-hidden"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {new Date(lastMessageTime).toLocaleTimeString()}
+        </ThemedText>
+      </View>
+    </View>
+  );
+});
+
+const MostRecentMessage = React.memo(function MostRecentMessage({
+  recentMessage,
+}: {
+  recentMessage: string;
+}) {
+  console.log("MostRecentMessage");
+  return (
+    <View className="h-1/2 w-full justify-center">
+      <ThemedText
+        className="overflow-hidden text-text-light/70 dark:text-text-dark/70"
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {recentMessage}
+      </ThemedText>
+    </View>
+  );
+});
 
 export default ChatListItem;
-
-const styles = StyleSheet.create({});

@@ -1,4 +1,3 @@
-import { StyleSheet } from "react-native";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
 type AvatarModelContextType = {
@@ -39,8 +38,13 @@ export const AvatarModalProvider = ({
   };
 
   const contextMemo = useMemo(
-    () => ({ isVisible, imageURL, showModal, hideModal }),
-    [isVisible, imageURL, showModal, hideModal],
+    () => ({
+      isVisible,
+      imageURL,
+      showModal,
+      hideModal,
+    }),
+    [isVisible, imageURL],
   );
 
   return (
@@ -49,5 +53,3 @@ export const AvatarModalProvider = ({
     </AvatarModelContext.Provider>
   );
 };
-
-const styles = StyleSheet.create({});
