@@ -1,7 +1,12 @@
-// groups.tsx
-
-import React, { useState } from "react";
-import { View, Pressable, useColorScheme, TextInput } from "react-native";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import {
+  View,
+  Pressable,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  useColorScheme,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
   ChatListItemProps,
@@ -9,7 +14,6 @@ import ChatListItem, {
 import { SelectionProvider, useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "@/components/ThemedText";
 import { StatusBar } from "expo-status-bar";
-import { chats_data } from "@/test-data/chat-data";
 import ListWithDynamicHeader from "@/components/list/ListWithHeader";
 import {
   AvatarModalProvider,
@@ -18,68 +22,90 @@ import {
 import AvatarModal from "@/components/modals/AvatarModal";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
-import { TouchableRipple } from "react-native-paper";
+import { FAB, TouchableRipple } from "react-native-paper";
+import { router } from "expo-router";
+import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
+import { getAllChat, insertChatStatement } from "@/db/statements";
 
 const headerHeight = 50;
 
 const App = () => {
+  const db = useSQLiteContext();
   const theme = useColorScheme();
-  const [chats, setChats] = useState<ChatListItemProps[]>(chats_data);
 
-  const [chatsToRender, setChatsToRender] =
-    useState<ChatListItemProps[]>(chats_data);
+  const { hideModal, imageURL, isVisible } = useAvatarModal();
 
-  const filterItems = (query: string) => {
-    const filtered = chats.filter((chat) => {
-      return chat.chatName.toLowerCase().includes(query.toLowerCase());
+  const [chats, setChats] = useState<ChatListItemProps[]>([]);
+  const [filteredChats, setFilteredChats] = useState<ChatListItemProps[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      const allChats = await getAllChat(db);
+      setChats(allChats);
+      setFilteredChats(allChats);
+    };
+    console.log("initial list db -------");
+    fetchChats();
+  }, [db]);
+
+  useEffect(() => {
+    console.log("db list check -------");
+    const listener = addDatabaseChangeListener(async (event) => {
+      console.log("db list update -------");
+      const allChats = await getAllChat(db);
+      setChats(allChats);
+      setFilteredChats(
+        allChats.filter((chat) =>
+          chat.chatName.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+      );
     });
-    setChatsToRender(filtered);
-    console.log(query);
-  };
 
-  const addOrUpdateChat = (chat: ChatListItemProps) => {
-    setChats((prevChats: ChatListItemProps[]) => {
-      const existingChatIndex = prevChats.findIndex((c) => c.id === chat.id);
-      if (existingChatIndex !== -1) {
-        const updatedChats = [...prevChats];
-        updatedChats[existingChatIndex] = chat;
-        return updatedChats.sort(
-          (a, b) => b.lastMessageTime - a.lastMessageTime,
-        );
-      } else {
-        const updatedChats = [...prevChats, chat];
-        return updatedChats.sort(
-          (a, b) => b.lastMessageTime - a.lastMessageTime,
-        );
-      }
-    });
-  };
+    return () => listener.remove();
+  }, [db, searchQuery]);
+
+  const handleSearch = useCallback(
+    (query: string) => {
+      console.log("useCallback ----------");
+      setSearchQuery(query);
+      setFilteredChats(
+        chats.filter((chat) =>
+          chat.chatName.toLowerCase().includes(query.toLowerCase()),
+        ),
+      );
+    },
+    [chats],
+  );
 
   const renderItem = ({ item }: { item: ChatListItemProps }) => (
     <ChatListItem key={item.id} {...item} />
   );
 
-  const { hideModal, imageURL, isVisible } = useAvatarModal();
-
   return (
     <View className="flex-1">
       <StatusBar style="auto" />
-
       <SafeAreaView className="flex-1">
         <ListWithDynamicHeader
-          data={chatsToRender}
+          data={filteredChats}
           renderItem={renderItem}
-          ListHeaderComponent={HeaderComponent({ handleSearch: filterItems })}
+          ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
           DynamicHeaderComponent={Header}
           headerHeight={headerHeight}
+          ListFooterComponent={ListFooterComponent}
         />
 
         <AvatarModal
           isVisible={isVisible}
-          onClose={() => {
-            hideModal();
-          }}
+          onClose={hideModal}
           imageURL={imageURL}
+        />
+
+        <FAB
+          icon="plus"
+          className="absolute bottom-0 right-0 m-4 bg-primary-light"
+          onPress={() => router.push("/sos")}
+          color="white"
         />
       </SafeAreaView>
     </View>
@@ -88,6 +114,7 @@ const App = () => {
 
 const Header = () => {
   const theme = useColorScheme();
+  const db = useSQLiteContext();
 
   return (
     <ThemedView
@@ -96,13 +123,22 @@ const Header = () => {
       <ThemedText>Conversations</ThemedText>
       <View className="overflow-hidden rounded-full">
         <TouchableRipple
-          onPress={() => {
+          onPress={async () => {
             console.log("config");
+            const insertChat = await insertChatStatement(db);
+
+            const result = await insertChat.executeAsync({
+              $id: 25,
+              $username: "first user name",
+              $chatName: "first user name",
+              $lastMessageTime: Date.now() + 1000,
+              $recentMessage: "nothing here",
+              $imageURL: "https://cataas.com/cat",
+            });
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
           }
-          className=""
         >
           <Ionicons
             name="ellipsis-horizontal"
@@ -123,21 +159,25 @@ const HeaderComponent = ({
   const theme = useColorScheme();
   const { selectedChatItems } = useSelection();
   const [searchQuery, setSearchQuery] = useState("");
-  console.log("issue");
 
   return (
     <View className="w-full items-center justify-center">
-      <View className="my-2 h-12 w-[95%] rounded-3xl bg-background-light/80 px-6 dark:bg-white/10">
+      <View className="my-2 h-12 w-[95%] rounded-3xl bg-background-light/80 px-4 dark:bg-white/10">
         <Pressable
-          onPress={() => {
-            console.log(selectedChatItems);
-          }}
-          className="flex-1 justify-center"
+          onPress={() => console.log(selectedChatItems)}
+          className="flex-1 flex-row items-center"
         >
+          <Ionicons
+            size={20}
+            name="search"
+            color={theme === "dark" ? "white" : "black"}
+          />
           <TextInput
-            className="flex-1 text-text-light dark:text-text-dark"
+            className="ml-2 flex-1 text-text-light dark:text-text-dark"
             placeholder="Search..."
-            placeholderTextColor={theme === "dark" ? "white" : "black"}
+            placeholderTextColor={
+              theme === "dark" ? "rgba(225,232,249,0.7)" : "rgba(6,13,30,0.7)"
+            }
             numberOfLines={1}
             value={searchQuery}
             onChangeText={(text) => {
@@ -148,6 +188,14 @@ const HeaderComponent = ({
         </Pressable>
       </View>
     </View>
+  );
+};
+
+const ListFooterComponent = () => {
+  return (
+    <ThemedView className="h-[80] w-max items-center justify-center border-t-[1px] border-primary-light/50">
+      <ThemedText>[APP-NAME]</ThemedText>
+    </ThemedView>
   );
 };
 
