@@ -26,6 +26,17 @@ const App = () => {
   const theme = useColorScheme();
   const [chats, setChats] = useState<ChatListItemProps[]>(chats_data);
 
+  const [chatsToRender, setChatsToRender] =
+    useState<ChatListItemProps[]>(chats_data);
+
+  const filterItems = (query: string) => {
+    const filtered = chats.filter((chat) => {
+      return chat.chatName.toLowerCase().includes(query.toLowerCase());
+    });
+    setChatsToRender(filtered);
+    console.log(query);
+  };
+
   const addOrUpdateChat = (chat: ChatListItemProps) => {
     setChats((prevChats: ChatListItemProps[]) => {
       const existingChatIndex = prevChats.findIndex((c) => c.id === chat.id);
@@ -56,9 +67,9 @@ const App = () => {
 
       <SafeAreaView className="flex-1">
         <ListWithDynamicHeader
-          data={chats}
+          data={chatsToRender}
           renderItem={renderItem}
-          ListHeaderComponent={HeaderComponent}
+          ListHeaderComponent={HeaderComponent({ handleSearch: filterItems })}
           DynamicHeaderComponent={Header}
           headerHeight={headerHeight}
         />
@@ -104,9 +115,15 @@ const Header = () => {
   );
 };
 
-const HeaderComponent = () => {
+const HeaderComponent = ({
+  handleSearch,
+}: {
+  handleSearch: (query: string) => void;
+}) => {
   const theme = useColorScheme();
   const { selectedChatItems } = useSelection();
+  const [searchQuery, setSearchQuery] = useState("");
+  console.log("issue");
 
   return (
     <View className="w-full items-center justify-center">
@@ -122,6 +139,11 @@ const HeaderComponent = () => {
             placeholder="Search..."
             placeholderTextColor={theme === "dark" ? "white" : "black"}
             numberOfLines={1}
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              handleSearch(text);
+            }}
           />
         </Pressable>
       </View>
