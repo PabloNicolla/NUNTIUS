@@ -11,6 +11,9 @@ import { PaperProvider } from "react-native-paper";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { SessionProvider } from "@/providers/session-provider";
+import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
+import { getAllChat, insertChatStatement } from "@/db/statements";
+import { chats_data } from "@/test-data/chat-data";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -32,72 +35,95 @@ export default function RootLayout() {
     return null;
   }
 
-  testing();
-
   return (
     <SessionProvider>
       <PaperProvider>
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <Stack>
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen name="(landing)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack>
+          <SQLiteProvider
+            databaseName="test.db"
+            onInit={migrateDbIfNeeded}
+            options={{ enableChangeListener: true }}
+          >
+            <Stack>
+              <Stack.Screen name="(app)" options={{ headerShown: false }} />
+              <Stack.Screen name="(landing)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="sos" options={{ headerShown: false }} />
+            </Stack>
+          </SQLiteProvider>
         </ThemeProvider>
       </PaperProvider>
     </SessionProvider>
   );
 }
 
-import * as SQLite from "expo-sqlite";
-
-type TestingType = {
-  id: number;
-  value: string;
-  intValue: number;
-};
-
-const testing = async () => {
-  const db = await SQLite.openDatabaseAsync("mydb1");
-
-  // `execAsync()` is useful for bulk queries when you want to execute altogether.
-  // Please note that `execAsync()` does not escape parameters and may lead to SQL injection.
-  await db.execAsync(`
-    PRAGMA journal_mode = WAL;
-    CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY NOT NULL, value TEXT NOT NULL, intValue INTEGER);
-    INSERT INTO test (value, intValue) VALUES ('test1', 123);
-    INSERT INTO test (value, intValue) VALUES ('test2', 456);
-    INSERT INTO test (value, intValue) VALUES ('test3', 789);
-`);
-
-  // `runAsync()` is useful when you want to execute some write operations.
-  const result = await db.runAsync(
-    "INSERT INTO test (value, intValue) VALUES (?, ?)",
-    "aaa",
-    100,
+async function migrateDbIfNeeded(db: SQLiteDatabase) {
+  const DATABASE_VERSION = 2;
+  let version = await db.getFirstAsync<{ user_version: number }>(
+    "PRAGMA user_version",
   );
-  console.log(result.lastInsertRowId, result.changes);
-  await db.runAsync("UPDATE test SET intValue = ? WHERE value = ?", 999, "aaa"); // Binding unnamed parameters from variadic arguments
-  await db.runAsync("UPDATE test SET intValue = ? WHERE value = ?", [
-    999,
-    "aaa",
-  ]); // Binding unnamed parameters from array
-  await db.runAsync("DELETE FROM test WHERE value = $value", { $value: "aaa" }); // Binding named parameters from object
+  let currentDbVersion = version?.user_version ?? 0;
 
-  // `getFirstAsync()` is useful when you want to get a single row from the database.
-  const firstRow = await db.getFirstAsync<TestingType>("SELECT * FROM test");
-  console.log(firstRow?.id, firstRow?.value, firstRow?.intValue);
+  const allChats = await getAllChat(db);
 
-  // `getAllAsync()` is useful when you want to get all results as an array of objects.
-  const allRows = await db.getAllAsync<TestingType>("SELECT * FROM test");
-  for (const row of allRows) {
-    console.log(row?.id, row?.value, row?.intValue);
+  // console.log("hel", currentDbVersion, allChats, 22);
+
+  if (currentDbVersion >= DATABASE_VERSION) {
+    return;
   }
+  if (currentDbVersion === 0) {
+    console.log("----------------------------------------------------1v");
 
-  // `getEachAsync()` is useful when you want to iterate SQLite query cursor.
-  for await (const row of db.getEachAsync<TestingType>("SELECT * FROM test")) {
-    console.log(row.id, row.value, row.intValue);
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS chat (
+        id INTEGER PRIMARY KEY NOT NULL,
+        username TEXT NOT NULL,
+        chatName TEXT NOT NULL,
+        lastMessageTime INTEGER NOT NULL,
+        recentMessage TEXT NOT NULL,
+        imageURL TEXT NOT NULL
+      );
+    `);
+
+    const insertChat = await insertChatStatement(db);
+
+    const result = await insertChat.executeAsync({
+      $id: 0,
+      $username: "first user name",
+      $chatName: "first user name",
+      $lastMessageTime: Date.now() + 1000,
+      $recentMessage: "nothing here",
+      $imageURL: "https://cataas.com/cat",
+    });
+
+    console.log("first user name:", result.lastInsertRowId, result.changes);
+
+    currentDbVersion = 1;
   }
-};
+  if (currentDbVersion === 1) {
+    console.log("----------------------------------------------------2v");
+
+    const insertChat = await insertChatStatement(db);
+
+    chats_data.forEach(async (chat) => {
+      const result = await insertChat.executeAsync({
+        $id: chat.id,
+        $username: chat.username,
+        $chatName: chat.chatName,
+        $lastMessageTime: chat.lastMessageTime,
+        $recentMessage: chat.recentMessage,
+        $imageURL: chat.imageURL,
+      });
+      console.log(result.lastInsertRowId, result.changes);
+    });
+
+    currentDbVersion = 2;
+  }
+  if (currentDbVersion === 3) {
+    // TODO
+  }
+  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+}
