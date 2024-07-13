@@ -7,9 +7,10 @@ import { Ionicons } from "@expo/vector-icons";
 export type ChatOptionProps = {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
+  handlePress: () => void;
 };
 
-const ChatOption = ({ title, icon }: ChatOptionProps) => {
+const ChatOption = ({ title, icon, handlePress }: ChatOptionProps) => {
   const theme = useColorScheme() ?? "light";
 
   return (
@@ -18,6 +19,7 @@ const ChatOption = ({ title, icon }: ChatOptionProps) => {
         className={`z-20 flex-1`}
         onPress={() => {
           console.log("Pressed");
+          handlePress();
         }}
         rippleColor={
           theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"

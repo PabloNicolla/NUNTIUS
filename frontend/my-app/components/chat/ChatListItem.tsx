@@ -5,6 +5,7 @@ import { useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "../ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
+import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
 
 export type ChatListItemProps = {
@@ -151,13 +152,13 @@ const ChatDetails = React.memo(function ChatDetails({
           {chatName}
         </ThemedText>
       </View>
-      <View className="h-full w-[80] items-end justify-center overflow-hidden">
+      <View className="h-full w-[100] items-end justify-center">
         <ThemedText
-          className="overflow-hidden"
+          className="overflow-ellipsis text-xs"
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {new Date(lastMessageTime).toLocaleTimeString()}
+          {formatDate(lastMessageTime)}
         </ThemedText>
       </View>
     </View>
@@ -181,5 +182,23 @@ const MostRecentMessage = React.memo(function MostRecentMessage({
     </View>
   );
 });
+
+const formatDate = (lastMessageTime: number) => {
+  const now = new Date();
+  const messageDate = new Date(lastMessageTime);
+
+  const diffInMinutes = (now.getTime() - messageDate.getTime()) / 60000;
+  const diffInDays = differenceInDays(now, messageDate);
+
+  if (diffInMinutes < 1440) {
+    // less than 1 day
+    return format(messageDate, "hh:mm");
+  } else if (diffInDays === 1) {
+    // yesterday
+    return "yesterday";
+  } else {
+    return format(messageDate, "yyyy-MM-dd");
+  }
+};
 
 export default ChatListItem;
