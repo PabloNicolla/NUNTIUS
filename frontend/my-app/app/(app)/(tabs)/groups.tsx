@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useReducer,
+} from "react";
 import {
   View,
   Pressable,
@@ -25,69 +31,59 @@ import { ThemedView } from "@/components/ThemedView";
 import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import { getAllChat, insertChatStatement } from "@/db/statements";
+import { getAllVisibleChats, insertChatStatement } from "@/db/statements";
+import useChatReducer from "@/hooks/useChatReducer";
 
 const headerHeight = 50;
 
 const App = () => {
   const db = useSQLiteContext();
-  const theme = useColorScheme();
 
   const { hideModal, imageURL, isVisible } = useAvatarModal();
 
-  const [chats, setChats] = useState<ChatListItemProps[]>([]);
-  const [filteredChats, setFilteredChats] = useState<ChatListItemProps[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [state, dispatch] = useChatReducer();
 
   useEffect(() => {
+    console.log("----- db chat initial load -----");
     const fetchChats = async () => {
-      const allChats = await getAllChat(db);
-      setChats(allChats);
-      setFilteredChats(allChats);
+      const allChats = await getAllVisibleChats(db);
+      dispatch({ type: "SET_CHATS", payload: allChats });
     };
-    console.log("initial list db -------");
     fetchChats();
-  }, [db]);
+  }, [db, dispatch]);
 
   useEffect(() => {
-    console.log("db list check -------");
+    console.log("----- db chat add Listener -----");
     const listener = addDatabaseChangeListener(async (event) => {
-      console.log("db list update -------");
-      const allChats = await getAllChat(db);
-      setChats(allChats);
-      setFilteredChats(
-        allChats.filter((chat) =>
-          chat.chatName.toLowerCase().includes(searchQuery.toLowerCase()),
-        ),
-      );
+      console.log("----- db chat run Listener -----");
+      const allChats = await getAllVisibleChats(db);
+      dispatch({ type: "SET_CHATS", payload: allChats });
     });
 
     return () => listener.remove();
-  }, [db, searchQuery]);
+  }, [db, dispatch]);
 
   const handleSearch = useCallback(
     (query: string) => {
-      console.log("useCallback ----------");
-      setSearchQuery(query);
-      setFilteredChats(
-        chats.filter((chat) =>
-          chat.chatName.toLowerCase().includes(query.toLowerCase()),
-        ),
-      );
+      dispatch({ type: "SET_SEARCH_QUERY", payload: query });
     },
-    [chats],
+    [dispatch],
   );
 
-  const renderItem = ({ item }: { item: ChatListItemProps }) => (
-    <ChatListItem key={item.id} {...item} />
-  );
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: ChatListItemProps;
+    index: number;
+  }) => <ChatListItem key={item.id} {...item} test-index={index} />;
 
   return (
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
       <SafeAreaView className="flex-1">
         <ListWithDynamicHeader
-          data={filteredChats}
+          data={state.filteredChats}
           renderItem={renderItem}
           ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
           DynamicHeaderComponent={Header}
