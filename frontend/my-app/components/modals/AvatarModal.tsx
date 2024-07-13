@@ -11,8 +11,6 @@ const AvatarModal = ({
   onClose: () => void;
   imageURL?: string;
 }>) => {
-  console.log("AvatarModal");
-
   return (
     <Modal
       animationType="none"

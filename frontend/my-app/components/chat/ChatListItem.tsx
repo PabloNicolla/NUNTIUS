@@ -12,8 +12,8 @@ export type ChatListItemProps = {
   id: number;
   username: string;
   chatName: string;
-  lastMessageTime: number;
-  recentMessage: string;
+  lastMessageTime?: number;
+  recentMessage?: string;
   imageURL?: string;
 };
 
@@ -139,7 +139,7 @@ const ChatDetails = React.memo(function ChatDetails({
   lastMessageTime,
 }: {
   chatName: string;
-  lastMessageTime: number;
+  lastMessageTime?: number;
 }) {
   return (
     <View className="h-1/2 w-full flex-row justify-between">
@@ -158,7 +158,7 @@ const ChatDetails = React.memo(function ChatDetails({
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {formatDate(lastMessageTime)}
+          {lastMessageTime && formatDate(lastMessageTime)}
         </ThemedText>
       </View>
     </View>
@@ -168,7 +168,7 @@ const ChatDetails = React.memo(function ChatDetails({
 const MostRecentMessage = React.memo(function MostRecentMessage({
   recentMessage,
 }: {
-  recentMessage: string;
+  recentMessage?: string;
 }) {
   return (
     <View className="h-1/2 w-full justify-center">

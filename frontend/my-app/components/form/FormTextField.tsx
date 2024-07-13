@@ -36,7 +36,6 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
       value,
       handleTextChange,
       isSecureText,
-      className,
       keyboardType,
       titleTransformX = 10,
       ...rest
@@ -74,7 +73,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
     return (
       <View
         {...rest}
-        className={`${isFocused ? "border-primary-light bg-primary-light/10 dark:border-primary-dark dark:bg-primary-dark/20" : "border-black dark:border-white"} relative min-h-[60] w-full rounded-md border-2 ${className}`}
+        className={`${isFocused ? "border-primary-light bg-primary-light/10 dark:border-primary-dark dark:bg-primary-dark/20" : "border-black dark:border-white"} relative min-h-[60] w-full rounded-md border-2`}
       >
         <View className="mx-2 flex-1 flex-row items-center">
           <Animated.View

@@ -31,7 +31,6 @@ const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
       title,
       value,
       handleTextChange,
-      className,
       keyboardType,
       titleTransformX = 10,
       ...rest
@@ -65,7 +64,7 @@ const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
     return (
       <View
         {...rest}
-        className={` ${isFocused ? "border-primary-light bg-primary-light/10" : "border-black bg-black/5 dark:border-white dark:bg-white/5"} relative min-h-[60] w-full rounded-md border-b-2 ${className}`}
+        className={` ${isFocused ? "border-primary-light bg-primary-light/10" : "border-black bg-black/5 dark:border-white dark:bg-white/5"} relative min-h-[60] w-full rounded-md border-b-2`}
       >
         <View className="mx-2 flex-1 justify-end">
           <Animated.View

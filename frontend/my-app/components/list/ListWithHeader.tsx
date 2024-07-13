@@ -11,7 +11,7 @@ import DynamicHeader from "@/components/list/DynamicHeader";
 
 type ListWithDynamicHeaderProps<T> = {
   data: T[];
-  renderItem: ({ item }: { item: T }) => JSX.Element;
+  renderItem: ({ item, index }: { item: T; index: number }) => JSX.Element;
   keyExtractor?: (item: T) => string;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
   ListFooterComponent?: React.ComponentType<any> | React.ReactElement | null;
@@ -66,8 +66,5 @@ const ListWithDynamicHeader = ({
     </View>
   );
 };
-
-const getCloser = (value: number, checkOne: number, checkTwo: number) =>
-  Math.abs(value - checkOne) < Math.abs(value - checkTwo) ? checkOne : checkTwo;
 
 export default ListWithDynamicHeader;
