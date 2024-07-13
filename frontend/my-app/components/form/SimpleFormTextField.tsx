@@ -20,13 +20,22 @@ export type SimpleFormTextFieldProps = ViewProps & {
   handleTextChange: (text: string) => void;
   value?: string;
   keyboardType?: TextInputProps["keyboardType"];
+  titleTransformX?: number;
 };
 
 // TODO: Handle error messages. E.G. user typed invalid value -> make border red & display help message
 
 const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
   function FormTextField(
-    { title, value, handleTextChange, className, keyboardType, ...rest },
+    {
+      title,
+      value,
+      handleTextChange,
+      className,
+      keyboardType,
+      titleTransformX = 10,
+      ...rest
+    },
     ref,
   ) {
     const [isFocused, setIsFocused] = useState(false);
@@ -34,7 +43,7 @@ const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
     const animationValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-      if (isFocused) {
+      if (isFocused || value) {
         Animated.timing(animationValue, {
           toValue: 1,
           duration: 200,
@@ -69,12 +78,6 @@ const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
                     outputRange: [0, -30],
                   }),
                 },
-                {
-                  translateX: animationValue.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -8],
-                  }),
-                },
               ],
             }}
           >
@@ -87,9 +90,15 @@ const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
                       outputRange: [1, 0.8],
                     }),
                   },
+                  {
+                    translateX: animationValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, -titleTransformX], // Adjust this value based on the text size
+                    }),
+                  },
                 ],
               }}
-              className={`${isFocused || value ? "text-primary-light" : "text-text-light/70 dark:text-text-dark/70"} text-lg`}
+              className={`${isFocused ? "text-primary-light" : "text-text-light/70 dark:text-text-dark/70"} text-lg`}
             >
               {title}
             </Animated.Text>

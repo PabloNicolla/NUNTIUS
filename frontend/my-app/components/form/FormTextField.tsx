@@ -3,8 +3,10 @@ import React, {
   useState,
   forwardRef,
   useImperativeHandle,
+  useEffect,
 } from "react";
 import {
+  Animated,
   LayoutAnimation,
   TextInput,
   TextInputProps,
@@ -22,6 +24,7 @@ export type FormTextFieldProps = ViewProps & {
   value?: string;
   isSecureText?: boolean;
   keyboardType?: TextInputProps["keyboardType"];
+  titleTransformX?: number;
 };
 
 // TODO: Handle error messages. E.G. user typed invalid value -> make border red & display help message
@@ -35,6 +38,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
       isSecureText,
       className,
       keyboardType,
+      titleTransformX = 10,
       ...rest
     },
     ref,
@@ -43,6 +47,24 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     const theme = useColorScheme() ?? "light";
+
+    const animationValue = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+      if (isFocused || value) {
+        Animated.timing(animationValue, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      } else if (!isFocused && !value) {
+        Animated.timing(animationValue, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    }, [isFocused, animationValue, value]);
 
     const inputRef = useRef<TextInput>(null);
 
@@ -55,11 +77,42 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
         className={`${isFocused ? "border-primary-light bg-primary-light/10 dark:border-primary-dark dark:bg-primary-dark/20" : "border-black dark:border-white"} relative min-h-[60] w-full rounded-md border-2 ${className}`}
       >
         <View className="mx-2 flex-1 flex-row items-center">
-          <ThemedText
-            className={`${isFocused || value ? "left-0 top-0 text-xs" : "bottom-auto left-0 top-auto"} absolute text-text-light/50 dark:text-text-dark/70`}
+          <Animated.View
+            className={"absolute"}
+            style={{
+              transform: [
+                {
+                  translateY: animationValue.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -20],
+                  }),
+                },
+              ],
+            }}
           >
-            {title}
-          </ThemedText>
+            <Animated.Text
+              style={{
+                transform: [
+                  {
+                    scale: animationValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 0.7],
+                    }),
+                  },
+                  {
+                    translateX: animationValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, -titleTransformX], // Adjust this value based on the text size
+                    }),
+                  },
+                ],
+              }}
+              className={`${isFocused ? "text-primary-light" : "text-text-light/70 dark:text-text-dark/70"} text-lg`}
+            >
+              {title}
+            </Animated.Text>
+          </Animated.View>
+
           <TextInput
             ref={inputRef}
             className="flex-auto text-lg text-text-light dark:text-text-dark"
@@ -77,7 +130,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
             onChangeText={(text) => {
               handleTextChange(text);
             }}
-            secureTextEntry={isSecureText ? isPasswordVisible : false}
+            secureTextEntry={isSecureText ? !isPasswordVisible : false}
           ></TextInput>
 
           {isSecureText && (
@@ -93,7 +146,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
               }
             >
               <Ionicons
-                name={`${isPasswordVisible ? "eye" : "eye-off"}`}
+                name={`${isPasswordVisible ? "eye-off" : "eye"}`}
                 size={30}
                 color={theme === "dark" ? "white" : "black"}
               />

@@ -89,6 +89,7 @@ export default function SignInScreen() {
                 setPasswordValue(text);
               }}
               isSecureText={true}
+              titleTransformX={16}
             />
 
             <PrimaryButton

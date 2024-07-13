@@ -107,6 +107,7 @@ export default function SignUpScreen() {
                 setPasswordValue(text);
               }}
               isSecureText={true}
+              titleTransformX={16}
             />
 
             <PrimaryButton

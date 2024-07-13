@@ -28,6 +28,7 @@ const AddContact = (props: Props) => {
               handleTextChange={(text) => {
                 setName(text);
               }}
+              titleTransformX={5}
             />
             <SimpleFormTextField
               className=""
@@ -36,6 +37,7 @@ const AddContact = (props: Props) => {
               handleTextChange={(text) => {
                 setPhoneNumber(text);
               }}
+              titleTransformX={16}
             />
           </View>
         </View>
