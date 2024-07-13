@@ -145,7 +145,7 @@ const ChatDetails = React.memo(function ChatDetails({
     <View className="h-1/2 w-full flex-row justify-between">
       <View className="flex-1 justify-center overflow-hidden">
         <ThemedText
-          className="overflow-hidden"
+          className="overflow-ellipsis"
           numberOfLines={1}
           ellipsizeMode="tail"
         >
@@ -173,7 +173,7 @@ const MostRecentMessage = React.memo(function MostRecentMessage({
   return (
     <View className="h-1/2 w-full justify-center">
       <ThemedText
-        className="overflow-hidden text-text-light/70 dark:text-text-dark/70"
+        className="overflow-ellipsis text-text-light/70 dark:text-text-dark/70"
         numberOfLines={1}
         ellipsizeMode="tail"
       >

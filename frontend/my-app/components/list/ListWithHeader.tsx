@@ -31,7 +31,6 @@ const ListWithDynamicHeader = ({
   const theme = useColorScheme();
   const ref = useRef<FlatList>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const translateYNumber = useRef(0);
 
   const handleScroll = Animated.event(
     [
@@ -45,26 +44,6 @@ const ListWithDynamicHeader = ({
       useNativeDriver: true,
     },
   );
-
-  const handleSnap = (nativeEvent: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetY = nativeEvent.nativeEvent.contentOffset.y;
-    if (
-      !(
-        translateYNumber.current === 0 ||
-        translateYNumber.current === -headerHeight / 2
-      )
-    ) {
-      if (ref.current) {
-        ref.current.scrollToOffset({
-          offset:
-            getCloser(translateYNumber.current, -headerHeight / 2, 0) ===
-            -headerHeight / 2
-              ? offsetY + headerHeight / 2
-              : offsetY - headerHeight / 2,
-        });
-      }
-    }
-  };
 
   return (
     <View style={{ overflow: "hidden" }}>
@@ -81,7 +60,6 @@ const ListWithDynamicHeader = ({
         ListHeaderComponent={ListHeaderComponent}
         onScroll={handleScroll}
         ref={ref}
-        onMomentumScrollEnd={handleSnap}
         contentContainerStyle={{ paddingTop: headerHeight }}
         ListFooterComponent={ListFooterComponent}
       />

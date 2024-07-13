@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TouchableRipple } from "react-native-paper";
 import { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
 
-type FormTextFieldProps = ViewProps & {
+export type FormTextFieldProps = ViewProps & {
   title: string;
   handleTextChange: (text: string) => void;
   value?: string;

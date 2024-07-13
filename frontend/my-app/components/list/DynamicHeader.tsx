@@ -16,8 +16,8 @@ const DynamicHeader = ({
 }: DynamicHeaderProps) => {
   const scrollYClamped = diffClamp(scrollY, 0, headerHeight);
   const translateY = scrollYClamped.interpolate({
-    inputRange: [0, headerHeight],
-    outputRange: [0, -headerHeight],
+    inputRange: [-headerHeight, 0, headerHeight],
+    outputRange: [headerHeight, 0, -headerHeight],
   });
 
   return (
