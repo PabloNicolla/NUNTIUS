@@ -11,8 +11,12 @@ import { PaperProvider } from "react-native-paper";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { SessionProvider } from "@/providers/session-provider";
-import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
-import { getAllChat, insertChatStatement } from "@/db/statements";
+import {
+  deleteDatabaseSync,
+  SQLiteDatabase,
+  SQLiteProvider,
+} from "expo-sqlite";
+import { insertChatStatement } from "@/db/statements";
 import { chats_data } from "@/test-data/chat-data";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -65,15 +69,13 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
   );
   let currentDbVersion = version?.user_version ?? 0;
 
-  const allChats = await getAllChat(db);
-
-  // console.log("hel", currentDbVersion, allChats, 22);
+  console.log("DB VERSION", currentDbVersion);
 
   if (currentDbVersion >= DATABASE_VERSION) {
     return;
   }
   if (currentDbVersion === 0) {
-    console.log("----------------------------------------------------1v");
+    console.log("----------------------------------------------------0v");
 
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
@@ -81,9 +83,10 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
         id INTEGER PRIMARY KEY NOT NULL,
         username TEXT NOT NULL,
         chatName TEXT NOT NULL,
-        lastMessageTime INTEGER NOT NULL,
-        recentMessage TEXT NOT NULL,
-        imageURL TEXT NOT NULL
+        isVisible BOOLEAN,
+        lastMessageTime INTEGER,
+        recentMessage TEXT,
+        imageURL TEXT
       );
     `);
 
@@ -93,6 +96,7 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
       $id: 0,
       $username: "first user name",
       $chatName: "first user name",
+      $isVisible: 1,
       $lastMessageTime: Date.now() + 1000,
       $recentMessage: "nothing here",
       $imageURL: "https://cataas.com/cat",
@@ -103,7 +107,7 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
     currentDbVersion = 1;
   }
   if (currentDbVersion === 1) {
-    console.log("----------------------------------------------------2v");
+    console.log("----------------------------------------------------1v");
 
     const insertChat = await insertChatStatement(db);
 
@@ -112,6 +116,7 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
         $id: chat.id,
         $username: chat.username,
         $chatName: chat.chatName,
+        $isVisible: 1,
         $lastMessageTime: chat.lastMessageTime,
         $recentMessage: chat.recentMessage,
         $imageURL: chat.imageURL,
@@ -121,8 +126,9 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
 
     currentDbVersion = 2;
   }
-  if (currentDbVersion === 3) {
-    // TODO
+  if (currentDbVersion === 2) {
+    console.log("----------------------------------------------------2v");
+    //TODO
   }
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
 }

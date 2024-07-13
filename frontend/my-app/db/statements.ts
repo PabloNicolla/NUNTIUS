@@ -7,6 +7,7 @@ export const insertChatStatement = async (db: SQLiteDatabase) => {
             id,
             username,
             chatName,
+            isVisible,
             lastMessageTime,
             recentMessage,
             imageURL
@@ -15,6 +16,7 @@ export const insertChatStatement = async (db: SQLiteDatabase) => {
             $id,
             $username,
             $chatName,
+            $isVisible,
             $lastMessageTime,
             $recentMessage,
             $imageURL
@@ -22,6 +24,12 @@ export const insertChatStatement = async (db: SQLiteDatabase) => {
   );
 };
 
-export const getAllChat = async (db: SQLiteDatabase) => {
+export const getAllChats = async (db: SQLiteDatabase) => {
   return await db.getAllAsync<ChatListItemProps>(`SELECT * FROM chat`);
+};
+
+export const getAllVisibleChats = async (db: SQLiteDatabase) => {
+  return await db.getAllAsync<ChatListItemProps>(
+    `SELECT * FROM chat WHERE isVisible = 1`,
+  );
 };
