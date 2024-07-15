@@ -1,15 +1,15 @@
-import { ChatListItemProps } from "@/components/chat/ChatListItem";
+import { Contact } from "@/db/schemaTypes";
 import { useReducer } from "react";
 
 export type ContactState = {
-  contacts: ChatListItemProps[];
-  filteredContacts: ChatListItemProps[];
+  contacts: Contact[];
+  filteredContacts: Contact[];
   searchQuery: string;
 };
 
 export type SetContactsAction = {
   type: "SET_CONTACTS";
-  payload: ChatListItemProps[];
+  payload: Contact[];
 };
 
 export type SetSearchQueryAction = {
@@ -28,16 +28,16 @@ const contactReducer = (
       return {
         ...state,
         contacts: action.payload,
-        filteredContacts: action.payload.filter((chat) =>
-          chat.chatName.toLowerCase().includes(state.searchQuery.toLowerCase()),
+        filteredContacts: action.payload.filter((contact) =>
+          contact.name.toLowerCase().includes(state.searchQuery.toLowerCase()),
         ),
       };
     case "SET_SEARCH_QUERY":
       return {
         ...state,
         searchQuery: action.payload,
-        filteredContacts: state.contacts.filter((chat) =>
-          chat.chatName.toLowerCase().includes(action.payload.toLowerCase()),
+        filteredContacts: state.contacts.filter((contact) =>
+          contact.name.toLowerCase().includes(action.payload.toLowerCase()),
         ),
       };
     default:
@@ -45,7 +45,7 @@ const contactReducer = (
   }
 };
 
-export default function useChatReducer() {
+export default function useContactReducer() {
   const initialState: ContactState = {
     contacts: [],
     filteredContacts: [],

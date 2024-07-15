@@ -11,19 +11,20 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
-import ChatListItem, {
-  ChatListItemProps,
-} from "@/components/chat/ChatListItem";
+
 import { useSQLiteContext } from "expo-sqlite";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
-import { getAllChats } from "@/db/statements";
 import AvatarModal from "@/components/modals/AvatarModal";
 import { Ionicons } from "@expo/vector-icons";
 import useContactReducer from "@/providers/useContactReducer";
+import { getAllContacts } from "@/db/statements";
+import { Contact } from "@/db/schemaTypes";
+import ContactListItem from "@/components/chat/ContactListItem";
 
 type Props = {};
 
 const ChatOptions = (props: Props) => {
+  const theme = useColorScheme();
   const db = useSQLiteContext();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useContactReducer();
@@ -31,7 +32,7 @@ const ChatOptions = (props: Props) => {
   useEffect(() => {
     console.log("----- db chat initial load -----");
     const fetchChats = async () => {
-      const allChats = await getAllChats(db);
+      const allChats = await getAllContacts(db);
       dispatch({ type: "SET_CONTACTS", payload: allChats });
     };
     fetchChats();
@@ -44,13 +45,9 @@ const ChatOptions = (props: Props) => {
     [dispatch],
   );
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: ChatListItemProps;
-    index: number;
-  }) => <ChatListItem key={item.id} {...item} test-index={index} />;
+  const renderItem = ({ item, index }: { item: Contact; index: number }) => (
+    <ContactListItem key={item.id} {...item} test-index={index} />
+  );
 
   return (
     <ThemedView className="flex-1">
@@ -72,6 +69,8 @@ const ChatOptions = (props: Props) => {
           renderItem={renderItem}
           // ListFooterComponent={ListFooterComponent}
           ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
+          indicatorStyle={theme === "dark" ? "white" : "black"}
+          showsHorizontalScrollIndicator={true}
         />
 
         <AvatarModal

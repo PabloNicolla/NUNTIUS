@@ -41,7 +41,7 @@ export default function RootLayout() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <SQLiteProvider
-            databaseName="local.db"
+            databaseName="local3.db"
             onInit={migrateDbIfNeeded}
             options={{ enableChangeListener: true }}
           >

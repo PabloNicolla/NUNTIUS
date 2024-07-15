@@ -12,8 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import TopNavBar from "@/components/TopNavBar";
 import SimpleFormTextField from "@/components/form/SimpleFormTextField";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
-import { insertChatStatement, insertChat } from "@/db/statements";
 import { router } from "expo-router";
+import { insertContact } from "@/db/statements";
 
 type Props = {};
 
@@ -72,14 +72,11 @@ const AddContact = (props: Props) => {
                 } else {
                   console.log(phone);
 
-                  await insertChat(db, {
+                  await insertContact(db, {
                     id: phone,
+                    name: name,
                     username: name,
-                    chatName: name,
-                    isVisible: false,
-                    lastMessageTime: Date.now(),
-                    recentMessage: "added new user",
-                    imageURL: "https://cataas.com/cat",
+                    imageUrl: "",
                   });
 
                   router.back();
