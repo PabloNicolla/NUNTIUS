@@ -18,6 +18,7 @@ import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/providers/useChatReducer";
 import {
   getAllPrivateChats,
+  getAllPrivateChatsJoinContacts,
   getFirstPrivateChat,
   insertMessage,
   insertPrivateChat,
@@ -36,27 +37,15 @@ const App = () => {
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useChatReducer();
 
+  const fetchAllPrivateChats = useCallback(async () => {
+    const allChats = await getAllPrivateChatsJoinContacts(db);
+    dispatch({ type: "SET_CHATS_FULL", payload: allChats });
+  }, [db, dispatch]);
+
   useEffect(() => {
     console.log("----- db chat initial load -----");
-    const fetchPrivateChats = async () => {
-      const testing = await db.getAllAsync<PrivateChatJoinContact>(`
-          SELECT 
-              pc.id,
-              pc.contactId,
-              pc.lastMessageId,
-              pc.lastMessageValue,
-              pc.lastMessageTimestamp,
-              c.imageURL,
-              c.name,
-              c.username
-          FROM private_chat pc
-              JOIN contact c ON pc.contactId = c.id
-        `);
-
-      dispatch({ type: "SET_CHATS_FULL", payload: testing });
-    };
-    fetchPrivateChats();
-  }, [db, dispatch]);
+    fetchAllPrivateChats();
+  }, [db, dispatch, fetchAllPrivateChats]);
 
   const useDebounce = (callback: () => void, delay: number) => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -74,24 +63,7 @@ const App = () => {
     return debouncedFunction;
   };
 
-  const fetchAllChats = async () => {
-    const allChats = await db.getAllAsync<PrivateChatJoinContact>(`
-      SELECT 
-          pc.id,
-          pc.contactId,
-          pc.lastMessageId,
-          pc.lastMessageValue,
-          pc.lastMessageTimestamp,
-          c.imageURL,
-          c.name,
-          c.username
-      FROM private_chat pc
-          JOIN contact c ON pc.contactId = c.id
-    `);
-    dispatch({ type: "SET_CHATS_FULL", payload: allChats });
-  };
-
-  const debouncedFetchAllChats = useDebounce(fetchAllChats, 100);
+  const debouncedFetchAllChats = useDebounce(fetchAllPrivateChats, 100);
 
   useEffect(() => {
     console.log("----- db chat add Listener -----");

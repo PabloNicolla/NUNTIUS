@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 
-import { useSQLiteContext } from "expo-sqlite";
+import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import AvatarModal from "@/components/modals/AvatarModal";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,13 +30,30 @@ const ChatOptions = (props: Props) => {
   const [state, dispatch] = useContactReducer();
 
   useEffect(() => {
-    console.log("----- db chat initial load -----");
+    console.log("----- db contact initial load -----");
     const fetchChats = async () => {
-      const allChats = await getAllContacts(db);
-      dispatch({ type: "SET_CONTACTS", payload: allChats });
+      const allContacts = await getAllContacts(db);
+      dispatch({ type: "SET_CONTACTS", payload: allContacts });
     };
     fetchChats();
   }, [db, dispatch]);
+
+  useEffect(() => {
+    console.log("----- db contact add listener -----");
+
+    const listener = addDatabaseChangeListener((event) => {
+      console.log("----- db contact run Listener -----", event);
+      if (event.tableName === "contact") {
+        const fetchChats = async () => {
+          const allContacts = await getAllContacts(db);
+          dispatch({ type: "SET_CONTACTS", payload: allContacts });
+        };
+        fetchChats();
+      }
+    });
+
+    return () => listener.remove();
+  });
 
   const handleSearch = useCallback(
     (query: string) => {

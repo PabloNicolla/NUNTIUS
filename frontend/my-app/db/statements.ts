@@ -1,5 +1,10 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Contact, Message, PrivateChat } from "./schemaTypes";
+import {
+  Contact,
+  Message,
+  PrivateChat,
+  PrivateChatJoinContact,
+} from "./schemaTypes";
 
 export const insertPrivateChat = async (
   db: SQLiteDatabase,
@@ -118,4 +123,20 @@ export const getFirstPrivateChat = async (
       $id: privateChatId,
     },
   );
+};
+
+export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
+  return await db.getAllAsync<PrivateChatJoinContact>(`
+    SELECT 
+        pc.id,
+        pc.contactId,
+        pc.lastMessageId,
+        pc.lastMessageValue,
+        pc.lastMessageTimestamp,
+        c.imageURL,
+        c.name,
+        c.username
+    FROM private_chat pc
+        JOIN contact c ON pc.contactId = c.id
+  `);
 };
