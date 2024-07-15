@@ -1,2 +1,6 @@
 test.sqlite
 test1.session.sql
+test.sqlite-shm
+test.sqlite-wal
+test2.session.sql
+diagram.drawio
