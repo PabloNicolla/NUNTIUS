@@ -12,6 +12,7 @@ export type ChatListItemProps = {
   id: number;
   username: string;
   chatName: string;
+  isVisible?: boolean;
   lastMessageTime?: number;
   recentMessage?: string;
   imageURL?: string;

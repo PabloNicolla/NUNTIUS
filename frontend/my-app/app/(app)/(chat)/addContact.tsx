@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import TopNavBar from "@/components/TopNavBar";
 import SimpleFormTextField from "@/components/form/SimpleFormTextField";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
-import { insertChatStatement } from "@/db/statements";
+import { insertChatStatement, insertChat } from "@/db/statements";
 import { router } from "expo-router";
 
 type Props = {};
@@ -63,18 +63,27 @@ const AddContact = (props: Props) => {
               handlePress={async () => {
                 console.log("pressed");
 
-                const insertChat = await insertChatStatement(db);
-                const restult = await insertChat.executeAsync({
-                  $id: phoneNumber,
-                  $username: name,
-                  $chatName: name,
-                  $isVisible: 0,
-                  $lastMessageTime: Date.now() + 1000,
-                  $recentMessage: "added new user",
-                  $imageURL: "https://cataas.com/cat",
-                });
+                const phone = parseInt(phoneNumber, 10);
 
-                router.back();
+                if (isNaN(phone)) {
+                  console.warn(
+                    "The phoneNumber string cannot be converted to a number.",
+                  );
+                } else {
+                  console.log(phone);
+
+                  await insertChat(db, {
+                    id: phone,
+                    username: name,
+                    chatName: name,
+                    isVisible: false,
+                    lastMessageTime: Date.now(),
+                    recentMessage: "added new user",
+                    imageURL: "https://cataas.com/cat",
+                  });
+
+                  router.back();
+                }
               }}
             />
           </View>
