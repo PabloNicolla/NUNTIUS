@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/providers/useChatReducer";
 import { getAllPrivateChats } from "@/db/statements";
+import { Contact, PrivateChat } from "@/db/schemaTypes";
 
 const headerHeight = 50;
 
@@ -24,6 +25,7 @@ const App = () => {
   const db = useSQLiteContext();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useChatReducer();
+  const [privateChats, setPrivateChats] = useState<PrivateChat[]>([]);
 
   // useEffect(() => {
   //   console.log("----- db chat initial load -----");
@@ -59,22 +61,36 @@ const App = () => {
     item,
     index,
   }: {
-    item: ChatListItemProps;
+    item: PrivateChat;
     index: number;
-  }) => <ChatListItem key={item.id} {...item} test-index={index} />;
+  }) => {
+    console.log(item);
+
+    return <ChatListItem key={item.id} {...item} test-index={index} />;
+  };
+
+  useEffect(() => {
+    async function getPrivateChats() {
+      const PrivateChats = await getAllPrivateChats(db);
+      setPrivateChats(PrivateChats);
+    }
+    getPrivateChats();
+  }, []);
+
+  // console.log(privateChats);
 
   return (
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
       <SafeAreaView className="flex-1">
-        {/* <ListWithDynamicHeader
-          data={state.filteredChats}
+        <ListWithDynamicHeader
+          data={privateChats}
           renderItem={renderItem}
           ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
           DynamicHeaderComponent={Header}
           headerHeight={headerHeight}
           ListFooterComponent={ListFooterComponent}
-        /> */}
+        />
 
         <AvatarModal
           isVisible={isVisible}

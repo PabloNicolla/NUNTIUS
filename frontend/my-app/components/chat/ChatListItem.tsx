@@ -7,33 +7,53 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
+import { Contact, Message, PrivateChat } from "@/db/schemaTypes";
+import { getFirstContact, getFirstMessage } from "@/db/statements";
+import { useSQLiteContext } from "expo-sqlite";
 
-export type ChatListItemProps = {
-  id: number;
-  username: string;
-  chatName: string;
-  isVisible?: boolean;
-  lastMessageTime?: number;
-  recentMessage?: string;
-  imageURL?: string;
-};
+export type ChatListItemProps = PrivateChat;
 
-const ChatListItem = ({
-  id,
-  username,
-  chatName,
-  lastMessageTime,
-  recentMessage,
-  imageURL,
-}: ChatListItemProps) => {
+const ChatListItem = ({ id, contactId, lastMessageId }: ChatListItemProps) => {
   const theme = useColorScheme() ?? "light";
   const { isSelectionActive, selectedChatItems, selectModeHandler } =
     useSelection();
   const [isSelected, setIsSelected] = useState(false);
+  const [message, setMessage] = useState<Message | undefined>();
+  const [contact, setContact] = useState<Contact>({
+    id: 0,
+    name: "",
+    username: "",
+    imageURL: undefined,
+  });
+
+  const db = useSQLiteContext();
+  console.log("++++++++++=");
 
   useEffect(() => {
     setIsSelected(selectedChatItems.has(id));
   }, [selectedChatItems, id]);
+
+  useEffect(() => {
+    async function getMessage() {
+      if (lastMessageId) {
+        const message = await getFirstMessage(db, lastMessageId);
+        if (message) {
+          setMessage(message);
+        }
+      }
+    }
+    getMessage();
+  }, []);
+
+  useEffect(() => {
+    async function getContact() {
+      const contact = await getFirstContact(db, contactId);
+      if (contact) {
+        setContact(contact);
+      }
+    }
+    getContact();
+  }, []);
 
   return (
     <View className="h-[80] w-full">
@@ -42,7 +62,10 @@ const ChatListItem = ({
         onPress={() => {
           if (!isSelectionActive) {
             console.log("Pressed");
-            router.push({ pathname: `/chat/[id]`, params: { id: id } });
+            router.push({
+              pathname: `/chat/[id]`,
+              params: { id: id },
+            });
           } else {
             selectModeHandler(id);
           }
@@ -60,19 +83,19 @@ const ChatListItem = ({
         <View className="flex-1 flex-row items-center gap-x-2 px-2">
           <View className="relative">
             <CustomAvatar
-              username={username}
+              username={contact.name}
               isSelectionActive={isSelectionActive}
               isSelected={isSelected}
-              imageURl={imageURL}
+              imageURl={contact.imageURL}
             />
           </View>
 
           <View className="h-[50] flex-1 flex-col">
             <ChatDetails
-              chatName={chatName}
-              lastMessageTime={lastMessageTime}
+              chatName={contact.name}
+              lastMessageTime={message?.timestamp}
             />
-            <MostRecentMessage recentMessage={recentMessage} />
+            <MostRecentMessage recentMessage={message?.value} />
           </View>
         </View>
       </TouchableRipple>
@@ -106,11 +129,13 @@ const CustomAvatar = ({
     <View>
       <Pressable
         onPress={() => {
-          showModal(imageURl ?? "");
+          if (imageURl) {
+            showModal(imageURl ?? "");
+          }
         }}
         disabled={isSelectionActive}
       >
-        {imageError ? (
+        {imageError || !imageURl ? (
           <Avatar.Text label={getInitials(username)} size={50} />
         ) : (
           <Image

@@ -1,8 +1,8 @@
 export type Contact = {
   id: number;
-  name: string;
-  imageUrl?: string;
   username: string;
+  name: string;
+  imageURL?: string;
 };
 
 export type PrivateChat = {

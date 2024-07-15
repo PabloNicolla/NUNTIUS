@@ -16,7 +16,6 @@ import ChatListItem, {
 } from "@/components/chat/ChatListItem";
 import { useSQLiteContext } from "expo-sqlite";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
-import { getAllChats } from "@/db/statements";
 import AvatarModal from "@/components/modals/AvatarModal";
 import { Ionicons } from "@expo/vector-icons";
 import useContactReducer from "@/providers/useContactReducer";
@@ -28,29 +27,29 @@ const ChatOptions = (props: Props) => {
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useContactReducer();
 
-  useEffect(() => {
-    console.log("----- db chat initial load -----");
-    const fetchChats = async () => {
-      const allChats = await getAllChats(db);
-      dispatch({ type: "SET_CONTACTS", payload: allChats });
-    };
-    fetchChats();
-  }, [db, dispatch]);
+  // useEffect(() => {
+  //   console.log("----- db chat initial load -----");
+  //   const fetchChats = async () => {
+  //     const allChats = await getAllChats(db);
+  //     dispatch({ type: "SET_CONTACTS", payload: allChats });
+  //   };
+  //   fetchChats();
+  // }, [db, dispatch]);
 
-  const handleSearch = useCallback(
-    (query: string) => {
-      dispatch({ type: "SET_SEARCH_QUERY", payload: query });
-    },
-    [dispatch],
-  );
+  // const handleSearch = useCallback(
+  //   (query: string) => {
+  //     dispatch({ type: "SET_SEARCH_QUERY", payload: query });
+  //   },
+  //   [dispatch],
+  // );
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: ChatListItemProps;
-    index: number;
-  }) => <ChatListItem key={item.id} {...item} test-index={index} />;
+  // const renderItem = ({
+  //   item,
+  //   index,
+  // }: {
+  //   item: ChatListItemProps;
+  //   index: number;
+  // }) => <ChatListItem key={item.id} {...item} test-index={index} />;
 
   return (
     <ThemedView className="flex-1">
@@ -67,12 +66,12 @@ const ChatOptions = (props: Props) => {
           <ChatOption icon="people" title="New Group" handlePress={() => {}} />
         </View>
 
-        <FlatList
+        {/* <FlatList
           data={state.filteredContacts}
           renderItem={renderItem}
           // ListFooterComponent={ListFooterComponent}
           ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
-        />
+        /> */}
 
         <AvatarModal
           isVisible={isVisible}

@@ -4,12 +4,12 @@ import { Contact, Message, PrivateChat } from "./schemaTypes";
 export const insertPrivateChatStmt = async (db: SQLiteDatabase) => {
   return await db.prepareAsync(`
     INSERT INTO private_chat (
-            contact_id,
-            last_message_id
+            contactId,
+            lastMessageId
         ) 
         VALUES (
-            $contact_id,
-            $last_message_id
+            $contactId,
+            $lastMessageId
         )
     `);
 };
@@ -20,16 +20,16 @@ export const insertPrivateChat = async (
 ) => {
   return await db.runAsync(
     `INSERT INTO private_chat (
-            contact_id,
-            last_message_id
+            contactId,
+            lastMessageId
         ) 
         VALUES (
-            $contact_id,
-            $last_message_id
+            $contactId,
+            $lastMessageId
         )`,
     {
-      $contact_id: chat.contactId,
-      $last_message_id: chat.lastMessageId ?? null,
+      $contactId: chat.contactId,
+      $lastMessageId: chat.lastMessageId ?? null,
     },
   );
 };
@@ -52,7 +52,7 @@ export const insertContact = async (db: SQLiteDatabase, contact: Contact) => {
       $id: contact.id,
       $username: contact.username,
       $name: contact.name,
-      $imageURL: contact.imageUrl ?? null,
+      $imageURL: contact.imageURL ?? null,
     },
   );
 };
@@ -60,31 +60,31 @@ export const insertContact = async (db: SQLiteDatabase, contact: Contact) => {
 export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
   return await db.runAsync(
     `INSERT INTO message (
-            sender_id,
-            receiver_id,
+            senderId,
+            receiverId,
             value,
             timestamp,
             type,
             status,
-            sort_id
+            sortId
         ) 
         VALUES (
-            $sender_id,
-            $receiver_id,
+            $senderId,
+            $receiverId,
             $value,
             $timestamp,
             $type,
             $status,
-            $sort_id
+            $sortId
         )`,
     {
-      $sender_id: message.senderId,
-      $receiver_id: message.senderId,
+      $senderId: message.senderId,
+      $receiverId: message.senderId,
       $value: message.value,
       $timestamp: message.timestamp,
       $type: message.type,
       $status: message.status,
-      $sort_id: message.sortId,
+      $sortId: message.sortId,
     },
   );
 };
@@ -93,8 +93,25 @@ export const getAllPrivateChats = async (db: SQLiteDatabase) => {
   return await db.getAllAsync<PrivateChat>(`SELECT * FROM private_chat`);
 };
 export const getAllContacts = async (db: SQLiteDatabase) => {
-  return await db.getAllAsync<PrivateChat>(`SELECT * FROM contact`);
+  return await db.getAllAsync<Contact>(`SELECT * FROM contact`);
 };
 export const getAllMessages = async (db: SQLiteDatabase) => {
-  return await db.getAllAsync<PrivateChat>(`SELECT * FROM message`);
+  return await db.getAllAsync<Message>(`SELECT * FROM message`);
+};
+
+export const getFirstContact = async (
+  db: SQLiteDatabase,
+  contactId: number,
+) => {
+  return await db.getFirstAsync<Contact>(`SELECT * FROM contact WHERE $id`, {
+    $id: contactId,
+  });
+};
+export const getFirstMessage = async (
+  db: SQLiteDatabase,
+  messageId: number,
+) => {
+  return await db.getFirstAsync<Message>(`SELECT * FROM message WHERE $id`, {
+    $id: messageId,
+  });
 };
