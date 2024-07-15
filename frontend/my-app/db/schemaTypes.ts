@@ -1,14 +1,27 @@
 export type Contact = {
   id: number;
-  name: string;
-  imageUrl?: string;
   username: string;
+  name: string;
+  imageURL?: string;
 };
 
 export type PrivateChat = {
   id: number;
   contactId: number;
   lastMessageId?: number;
+  lastMessageValue?: string;
+  lastMessageTimestamp?: number;
+};
+
+export type PrivateChatJoinContact = {
+  id: number;
+  contactId: number;
+  lastMessageId?: number;
+  lastMessageValue?: string;
+  lastMessageTimestamp?: number;
+  username: string;
+  name: string;
+  imageURL?: string;
 };
 
 export enum MessageType {

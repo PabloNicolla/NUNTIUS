@@ -13,19 +13,21 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
 
     CREATE TABLE IF NOT EXISTS private_chat (
         id INTEGER PRIMARY KEY,
-        contact_id INTEGER NOT NULL,
-        last_message_id INTEGER
+        contactId INTEGER NOT NULL,
+        lastMessageId INTEGER,
+        lastMessageValue TEXT,
+        lastMessageTimestamp INTEGER
     );
     
     CREATE TABLE IF NOT EXISTS message (
         id INTEGER PRIMARY KEY,
-        sender_id INTEGER NOT NULL,
-        receiver_id INTEGER NOT NULL,
+        senderId INTEGER NOT NULL,
+        receiverId INTEGER NOT NULL,
         value TEXT NOT NULL,
         timestamp INTEGER NOT NULL,
         type INTEGER NOT NULL,
         status INTEGER NOT NULL,
-        sort_id INTEGER NOT NULL
+        sortId INTEGER NOT NULL
     );
     `);
 };
