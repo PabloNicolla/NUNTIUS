@@ -55,7 +55,7 @@ const ListWithDynamicHeader = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         scrollEventThrottle={16}
-        indicatorStyle={theme === "dark" ? "black" : "white"}
+        indicatorStyle={theme === "dark" ? "white" : "black"}
         showsHorizontalScrollIndicator={true}
         ListHeaderComponent={ListHeaderComponent}
         onScroll={handleScroll}

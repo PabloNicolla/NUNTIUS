@@ -26,7 +26,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         chats: sortChatsByLastMessageTime(action.payload),
         filteredChats: action.payload.filter((chat) =>
-          chat.chatName.toLowerCase().includes(state.searchQuery.toLowerCase()),
+          chat.name.toLowerCase().includes(state.searchQuery.toLowerCase()),
         ),
       };
     case "SET_SEARCH_QUERY":
@@ -34,7 +34,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         searchQuery: action.payload,
         filteredChats: state.chats.filter((chat) =>
-          chat.chatName.toLowerCase().includes(action.payload.toLowerCase()),
+          chat.name.toLowerCase().includes(action.payload.toLowerCase()),
         ),
       };
     default:
@@ -54,6 +54,6 @@ export default function useChatReducer() {
 
 const sortChatsByLastMessageTime = (chats: ChatListItemProps[]) => {
   return chats.sort(
-    (a, b) => (b.lastMessageTime || 0) - (a.lastMessageTime || 0),
+    (a, b) => (b.lastMessageTimestamp || 0) - (a.lastMessageTimestamp || 0),
   );
 };

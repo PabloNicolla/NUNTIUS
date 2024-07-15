@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/providers/useChatReducer";
 import { getAllPrivateChats } from "@/db/statements";
+import { PrivateChatJoinContact } from "@/db/schemaTypes";
 
 const headerHeight = 50;
 
@@ -25,28 +26,50 @@ const App = () => {
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useChatReducer();
 
-  // useEffect(() => {
-  //   console.log("----- db chat initial load -----");
-  //   const fetchPrivateChats = async () => {
-  //     const allPrivateChats = await db.getAllAsync(`
-  //       SELECT
+  useEffect(() => {
+    console.log("----- db chat initial load -----");
+    const fetchPrivateChats = async () => {
+      const testing = await db.getAllAsync<PrivateChatJoinContact>(`
+          SELECT 
+              pc.id,
+              pc.contactId,
+              pc.lastMessageId,
+              pc.lastMessageValue,
+              pc.lastMessageTimestamp,
+              c.imageURL,
+              c.name,
+              c.username
+          FROM private_chat pc
+              JOIN contact c ON pc.contactId = c.id
+        `);
 
-  //       `);
+      dispatch({ type: "SET_CHATS", payload: testing });
+    };
+    fetchPrivateChats();
+  }, [db, dispatch]);
 
-  //     dispatch({ type: "SET_CHATS", payload: allChats });
-  //   };
-  //   fetchPrivateChats();
-  // }, [db, dispatch]);
+  useEffect(() => {
+    console.log("----- db chat add Listener -----");
+    const listener = addDatabaseChangeListener(async (event) => {
+      console.log("----- db chat run Listener -----", event);
+      const allChats = await db.getAllAsync<PrivateChatJoinContact>(`
+        SELECT 
+            pc.id,
+            pc.contactId,
+            pc.lastMessageId,
+            pc.lastMessageValue,
+            pc.lastMessageTimestamp,
+            c.imageURL,
+            c.name,
+            c.username
+        FROM private_chat pc
+            JOIN contact c ON pc.contactId = c.id
+      `);
 
-  // useEffect(() => {
-  //   console.log("----- db chat add Listener -----");
-  //   const listener = addDatabaseChangeListener(async (event) => {
-  //     console.log("----- db chat run Listener -----", event);
-  //     const allChats = await getAllVisibleChats(db);
-  //     dispatch({ type: "SET_CHATS", payload: allChats });
-  //   });
-  //   return () => listener.remove();
-  // }, [db, dispatch]);
+      dispatch({ type: "SET_CHATS", payload: allChats });
+    });
+    return () => listener.remove();
+  }, [db, dispatch]);
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -67,14 +90,14 @@ const App = () => {
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
       <SafeAreaView className="flex-1">
-        {/* <ListWithDynamicHeader
+        <ListWithDynamicHeader
           data={state.filteredChats}
           renderItem={renderItem}
           ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
           DynamicHeaderComponent={Header}
           headerHeight={headerHeight}
           ListFooterComponent={ListFooterComponent}
-        /> */}
+        />
 
         <AvatarModal
           isVisible={isVisible}

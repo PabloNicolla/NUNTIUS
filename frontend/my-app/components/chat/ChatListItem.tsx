@@ -10,22 +10,27 @@ import { router } from "expo-router";
 
 export type ChatListItemProps = {
   id: number;
+  contactId: number;
+  lastMessageId?: number;
+  lastMessageValue?: string;
+  lastMessageTimestamp?: number;
   username: string;
-  chatName: string;
-  isVisible?: boolean;
-  lastMessageTime?: number;
-  recentMessage?: string;
+  name: string;
   imageURL?: string;
+
+  // isVisible?: boolean;
 };
 
-const ChatListItem = ({
+const ChatListItem = React.memo(function ChatListItem({
   id,
+  contactId,
+  lastMessageId,
+  lastMessageValue,
+  lastMessageTimestamp,
   username,
-  chatName,
-  lastMessageTime,
-  recentMessage,
+  name,
   imageURL,
-}: ChatListItemProps) => {
+}: ChatListItemProps) {
   const theme = useColorScheme() ?? "light";
   const { isSelectionActive, selectedChatItems, selectModeHandler } =
     useSelection();
@@ -34,6 +39,8 @@ const ChatListItem = ({
   useEffect(() => {
     setIsSelected(selectedChatItems.has(id));
   }, [selectedChatItems, id]);
+
+  console.log("-----------------------------------", id);
 
   return (
     <View className="h-[80] w-full">
@@ -69,16 +76,16 @@ const ChatListItem = ({
 
           <View className="h-[50] flex-1 flex-col">
             <ChatDetails
-              chatName={chatName}
-              lastMessageTime={lastMessageTime}
+              chatName={name}
+              lastMessageTime={lastMessageTimestamp}
             />
-            <MostRecentMessage recentMessage={recentMessage} />
+            <MostRecentMessage recentMessage={lastMessageValue} />
           </View>
         </View>
       </TouchableRipple>
     </View>
   );
-};
+});
 
 const CustomAvatar = ({
   username,
@@ -106,11 +113,11 @@ const CustomAvatar = ({
     <View>
       <Pressable
         onPress={() => {
-          showModal(imageURl ?? "");
+          if (imageURl) showModal(imageURl ?? "");
         }}
         disabled={isSelectionActive}
       >
-        {imageError ? (
+        {imageError || !imageURl ? (
           <Avatar.Text label={getInitials(username)} size={50} />
         ) : (
           <Image
@@ -135,13 +142,13 @@ const CustomAvatar = ({
   );
 };
 
-const ChatDetails = React.memo(function ChatDetails({
+const ChatDetails = ({
   chatName,
   lastMessageTime,
 }: {
   chatName: string;
   lastMessageTime?: number;
-}) {
+}) => {
   return (
     <View className="h-1/2 w-full flex-row justify-between">
       <View className="flex-1 justify-center overflow-hidden">
@@ -164,13 +171,9 @@ const ChatDetails = React.memo(function ChatDetails({
       </View>
     </View>
   );
-});
+};
 
-const MostRecentMessage = React.memo(function MostRecentMessage({
-  recentMessage,
-}: {
-  recentMessage?: string;
-}) {
+const MostRecentMessage = ({ recentMessage }: { recentMessage?: string }) => {
   return (
     <View className="h-1/2 w-full justify-center">
       <ThemedText
@@ -182,7 +185,7 @@ const MostRecentMessage = React.memo(function MostRecentMessage({
       </ThemedText>
     </View>
   );
-});
+};
 
 const formatDate = (lastMessageTime: number) => {
   const now = new Date();
