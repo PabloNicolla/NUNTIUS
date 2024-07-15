@@ -27,7 +27,6 @@ const ChatListItem = ({ id, contactId, lastMessageId }: ChatListItemProps) => {
   });
 
   const db = useSQLiteContext();
-  console.log("++++++++++=");
 
   useEffect(() => {
     setIsSelected(selectedChatItems.has(id));
@@ -48,6 +47,8 @@ const ChatListItem = ({ id, contactId, lastMessageId }: ChatListItemProps) => {
   useEffect(() => {
     async function getContact() {
       const contact = await getFirstContact(db, contactId);
+      console.log("++++", contact);
+
       if (contact) {
         setContact(contact);
       }

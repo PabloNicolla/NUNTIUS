@@ -24,38 +24,9 @@ const headerHeight = 50;
 const App = () => {
   const db = useSQLiteContext();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
-  const [state, dispatch] = useChatReducer();
   const [privateChats, setPrivateChats] = useState<PrivateChat[]>([]);
 
-  // useEffect(() => {
-  //   console.log("----- db chat initial load -----");
-  //   const fetchPrivateChats = async () => {
-  //     const allPrivateChats = await db.getAllAsync(`
-  //       SELECT
-
-  //       `);
-
-  //     dispatch({ type: "SET_CHATS", payload: allChats });
-  //   };
-  //   fetchPrivateChats();
-  // }, [db, dispatch]);
-
-  // useEffect(() => {
-  //   console.log("----- db chat add Listener -----");
-  //   const listener = addDatabaseChangeListener(async (event) => {
-  //     console.log("----- db chat run Listener -----", event);
-  //     const allChats = await getAllVisibleChats(db);
-  //     dispatch({ type: "SET_CHATS", payload: allChats });
-  //   });
-  //   return () => listener.remove();
-  // }, [db, dispatch]);
-
-  const handleSearch = useCallback(
-    (query: string) => {
-      dispatch({ type: "SET_SEARCH_QUERY", payload: query });
-    },
-    [dispatch],
-  );
+  const handleSearch = () => {};
 
   const renderItem = ({
     item,
@@ -64,8 +35,6 @@ const App = () => {
     item: PrivateChat;
     index: number;
   }) => {
-    console.log(item);
-
     return <ChatListItem key={item.id} {...item} test-index={index} />;
   };
 

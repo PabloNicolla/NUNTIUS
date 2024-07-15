@@ -103,15 +103,21 @@ export const getFirstContact = async (
   db: SQLiteDatabase,
   contactId: number,
 ) => {
-  return await db.getFirstAsync<Contact>(`SELECT * FROM contact WHERE $id`, {
-    $id: contactId,
-  });
+  return await db.getFirstAsync<Contact>(
+    `SELECT * FROM contact WHERE $id = id`,
+    {
+      $id: contactId,
+    },
+  );
 };
 export const getFirstMessage = async (
   db: SQLiteDatabase,
   messageId: number,
 ) => {
-  return await db.getFirstAsync<Message>(`SELECT * FROM message WHERE $id`, {
-    $id: messageId,
-  });
+  return await db.getFirstAsync<Message>(
+    `SELECT * FROM message WHERE $id = id`,
+    {
+      $id: messageId,
+    },
+  );
 };
