@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { View, Pressable, TextInput, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
@@ -16,8 +16,18 @@ import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/providers/useChatReducer";
-import { getAllPrivateChats } from "@/db/statements";
-import { PrivateChatJoinContact } from "@/db/schemaTypes";
+import {
+  getAllPrivateChats,
+  getFirstPrivateChat,
+  insertMessage,
+  insertPrivateChat,
+} from "@/db/statements";
+import {
+  Message,
+  MessageStatus,
+  MessageType,
+  PrivateChatJoinContact,
+} from "@/db/schemaTypes";
 
 const headerHeight = 50;
 
@@ -43,33 +53,58 @@ const App = () => {
               JOIN contact c ON pc.contactId = c.id
         `);
 
-      dispatch({ type: "SET_CHATS", payload: testing });
+      dispatch({ type: "SET_CHATS_FULL", payload: testing });
     };
     fetchPrivateChats();
   }, [db, dispatch]);
 
+  const useDebounce = (callback: () => void, delay: number) => {
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const debouncedFunction = useCallback(() => {
+      if (timeoutRef.current === null) {
+        timeoutRef.current = setTimeout(() => {
+          console.log("(((()))) useDebounce");
+          callback();
+          timeoutRef.current = null;
+        }, delay);
+      }
+    }, [callback, delay]);
+
+    return debouncedFunction;
+  };
+
+  const fetchAllChats = async () => {
+    const allChats = await db.getAllAsync<PrivateChatJoinContact>(`
+      SELECT 
+          pc.id,
+          pc.contactId,
+          pc.lastMessageId,
+          pc.lastMessageValue,
+          pc.lastMessageTimestamp,
+          c.imageURL,
+          c.name,
+          c.username
+      FROM private_chat pc
+          JOIN contact c ON pc.contactId = c.id
+    `);
+    dispatch({ type: "SET_CHATS_FULL", payload: allChats });
+  };
+
+  const debouncedFetchAllChats = useDebounce(fetchAllChats, 100);
+
   useEffect(() => {
     console.log("----- db chat add Listener -----");
-    const listener = addDatabaseChangeListener(async (event) => {
-      console.log("----- db chat run Listener -----", event);
-      const allChats = await db.getAllAsync<PrivateChatJoinContact>(`
-        SELECT 
-            pc.id,
-            pc.contactId,
-            pc.lastMessageId,
-            pc.lastMessageValue,
-            pc.lastMessageTimestamp,
-            c.imageURL,
-            c.name,
-            c.username
-        FROM private_chat pc
-            JOIN contact c ON pc.contactId = c.id
-      `);
 
-      dispatch({ type: "SET_CHATS", payload: allChats });
+    const listener = addDatabaseChangeListener((event) => {
+      console.log("----- db chat run Listener -----", event);
+      if (event.tableName === "contact" || event.tableName === "private_chat") {
+        debouncedFetchAllChats();
+      }
     });
+
     return () => listener.remove();
-  }, [db, dispatch]);
+  }, [db, dispatch, debouncedFetchAllChats]);
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -120,6 +155,8 @@ const Header = () => {
   const theme = useColorScheme();
   const db = useSQLiteContext();
 
+  const [Count, setCount] = useState(0);
+
   return (
     <ThemedView
       className={`h-[${headerHeight}] flex-row items-center justify-between px-2`}
@@ -128,7 +165,34 @@ const Header = () => {
       <View className="overflow-hidden rounded-full">
         <TouchableRipple
           onPress={async () => {
-            console.log("config");
+            console.log("config", Count);
+            setCount(Count + 1);
+            // await insertMessage(db, {
+            //   id: Count,
+            //   receiverId: 1,
+            //   senderId: 2,
+            //   sortId: Count,
+            //   status: MessageStatus.PENDING,
+            //   timestamp: Date.now(),
+            //   type: MessageType.TEXT,
+            //   value: "asd",
+            // });
+
+            await db.runAsync(
+              `
+              UPDATE private_chat
+                SET 
+                  lastMessageTimestamp = $lastMessageTimestamp,
+                  lastMessageValue = $lastMessageValue
+                WHERE
+                  id = $id;
+              `,
+              {
+                $lastMessageTimestamp: Date.now(),
+                $lastMessageValue: `test ${Count}`,
+                $id: (Count % 3) + 1,
+              },
+            );
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
@@ -161,11 +225,6 @@ const HeaderComponent = ({
       <View className="my-2 h-12 w-[95%] rounded-3xl bg-black/5 px-4 dark:bg-white/10">
         <Pressable
           onPress={async () => {
-            const chats = await db.getFirstAsync(
-              "SELECT * FROM chat WHERE id = 0",
-            );
-            console.log(chats);
-
             console.log(selectedChatItems);
           }}
           className="flex-1 flex-row items-center"

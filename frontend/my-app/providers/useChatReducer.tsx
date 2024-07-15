@@ -1,15 +1,15 @@
-import { ChatListItemProps } from "@/components/chat/ChatListItem";
+import { PrivateChat, PrivateChatJoinContact } from "@/db/schemaTypes";
 import { useReducer } from "react";
 
 export type ChatState = {
-  chats: ChatListItemProps[];
-  filteredChats: ChatListItemProps[];
+  chats: PrivateChatJoinContact[];
+  filteredChats: PrivateChatJoinContact[];
   searchQuery: string;
 };
 
 export type SetChatsAction = {
-  type: "SET_CHATS";
-  payload: ChatListItemProps[];
+  type: "SET_CHATS_FULL";
+  payload: PrivateChatJoinContact[];
 };
 
 export type SetSearchQueryAction = {
@@ -21,7 +21,7 @@ export type ChatAction = SetChatsAction | SetSearchQueryAction;
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
-    case "SET_CHATS":
+    case "SET_CHATS_FULL":
       return {
         ...state,
         chats: sortChatsByLastMessageTime(action.payload),
@@ -52,7 +52,7 @@ export default function useChatReducer() {
   return useReducer(chatReducer, initialState);
 }
 
-const sortChatsByLastMessageTime = (chats: ChatListItemProps[]) => {
+const sortChatsByLastMessageTime = (chats: PrivateChatJoinContact[]) => {
   return chats.sort(
     (a, b) => (b.lastMessageTimestamp || 0) - (a.lastMessageTimestamp || 0),
   );

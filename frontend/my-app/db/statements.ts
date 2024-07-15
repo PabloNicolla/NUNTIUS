@@ -108,3 +108,14 @@ export const getFirstMessage = async (
     $id: messageId,
   });
 };
+export const getFirstPrivateChat = async (
+  db: SQLiteDatabase,
+  privateChatId: number,
+) => {
+  return await db.getFirstAsync<PrivateChat>(
+    `SELECT * FROM private_chat WHERE $id`,
+    {
+      $id: privateChatId,
+    },
+  );
+};
