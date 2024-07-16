@@ -6,10 +6,6 @@ import React, {
   useState,
 } from "react";
 
-// type ChatType = {
-//   id: number;
-// };
-
 type SelectionContextType = {
   isSelectionActive: boolean;
   selectedChatItems: Set<number>;

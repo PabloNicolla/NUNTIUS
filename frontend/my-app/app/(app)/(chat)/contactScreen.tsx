@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import ChatOption from "@/components/chat/ChatOption";
-import { ThemedView } from "@/components/ThemedView";
+import ChatOption from "@/components/contacts/contact-options";
+import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TopNavBar from "@/components/TopNavBar";
+import TopNavBar from "@/components/top-nav-bar";
 import {
   FlatList,
   Pressable,
@@ -14,12 +14,12 @@ import { router } from "expo-router";
 
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
-import AvatarModal from "@/components/modals/AvatarModal";
+import AvatarModal from "@/components/modals/avatar-modal";
 import { Ionicons } from "@expo/vector-icons";
-import useContactReducer from "@/providers/useContactReducer";
+import useContactReducer from "@/hooks/useContactReducer";
 import { getAllContacts } from "@/db/statements";
 import { Contact } from "@/db/schemaTypes";
-import ContactListItem from "@/components/chat/ContactListItem";
+import ContactListItem from "@/components/contacts/contact-list-item";
 
 type Props = {};
 

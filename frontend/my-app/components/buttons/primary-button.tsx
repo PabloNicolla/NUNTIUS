@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableRipple, TouchableRippleProps } from "react-native-paper";
-import { ThemedText, ThemedTextProps } from "../ThemedText";
+import { ThemedText, ThemedTextProps } from "../themed-text";
 import { View } from "react-native";
 import { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
 

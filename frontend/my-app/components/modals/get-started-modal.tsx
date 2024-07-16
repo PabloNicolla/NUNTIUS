@@ -11,10 +11,10 @@ import { useEffect, useRef, useState } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { ThemedText } from "@/components/ThemedText";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
-import { ThemedView } from "@/components/ThemedView";
-import FormTextField from "../form/FormTextField";
+import { ThemedText } from "@/components/themed-text";
+import PrimaryButton from "@/components/buttons/primary-button";
+import { ThemedView } from "@/components/themed-view";
+import FormTextField from "../form/form-text-field";
 
 export default function GetStartedModal({
   isVisible,

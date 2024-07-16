@@ -1,7 +1,7 @@
 import { SafeAreaView, Pressable } from "react-native";
 import { router } from "expo-router";
 
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText } from "@/components/themed-text";
 
 export default function SomethingScreen() {
   return (

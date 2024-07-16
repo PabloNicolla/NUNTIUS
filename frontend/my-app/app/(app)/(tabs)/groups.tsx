@@ -3,19 +3,19 @@ import { View, Pressable, TextInput, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
   ChatListItemProps,
-} from "@/components/chat/ChatListItem";
+} from "@/components/chat/chat-list-item";
 import { useSelection } from "@/providers/chat-provider";
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText } from "@/components/themed-text";
 import { StatusBar } from "expo-status-bar";
-import ListWithDynamicHeader from "@/components/list/ListWithHeader";
+import ListWithDynamicHeader from "@/components/list/list-with-dynamic-header";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
-import AvatarModal from "@/components/modals/AvatarModal";
+import AvatarModal from "@/components/modals/avatar-modal";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedView } from "@/components/themed-view";
 import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import useChatReducer from "@/providers/useChatReducer";
+import useChatReducer from "@/hooks/useChatReducer";
 import {
   getAllPrivateChats,
   getAllPrivateChatsJoinContacts,
@@ -115,7 +115,7 @@ const App = () => {
         <FAB
           icon="plus"
           className="absolute bottom-0 right-0 m-4 bg-primary-light"
-          onPress={() => router.push("/chatOptions")}
+          onPress={() => router.push("/contactScreen")}
           color="white"
         />
       </SafeAreaView>

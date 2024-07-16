@@ -1,7 +1,7 @@
 import { useColorScheme, View } from "react-native";
 import React from "react";
 import { TouchableRipple } from "react-native-paper";
-import { ThemedText } from "../ThemedText";
+import { ThemedText } from "../themed-text";
 import { Ionicons } from "@expo/vector-icons";
 
 export type ChatOptionProps = {

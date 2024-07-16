@@ -2,7 +2,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
-import { Redirect, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import React from "react";
 import { useColorScheme, View } from "react-native";
 import { BottomNavigation, TouchableRipple } from "react-native-paper";
@@ -36,12 +36,6 @@ export default function TabsLayout() {
     { dark: "#0062ff80", light: "#0062ff30" },
     "icon",
   );
-
-  // console.log(session.isLoggedIn, "TabsLayout");
-
-  // if (session.isLoggedIn) {
-  //   return <Redirect href={"/landing"} />;
-  // }
 
   return (
     <Tabs

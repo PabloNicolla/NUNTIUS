@@ -7,7 +7,7 @@ import {
   NativeScrollEvent,
   useColorScheme,
 } from "react-native";
-import DynamicHeader from "@/components/list/DynamicHeader";
+import DynamicHeader from "@/components/list/dynamic-header";
 
 type ListWithDynamicHeaderProps<T> = {
   data: T[];

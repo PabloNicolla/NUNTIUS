@@ -20,10 +20,10 @@ import LoveItSVG from "@/assets/images/landing/love_it.svg";
 import UnlockSVG from "@/assets/images/landing/unlock.svg";
 
 import { Colors } from "@/constants/Colors";
-import { ThemedText } from "@/components/ThemedText";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
-import GetStartedModal from "@/components/modals/GetStartedModal";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/themed-text";
+import PrimaryButton from "@/components/buttons/primary-button";
+import GetStartedModal from "@/components/modals/get-started-modal";
+import { ThemedView } from "@/components/themed-view";
 
 const { width, height } = Dimensions.get("window");
 

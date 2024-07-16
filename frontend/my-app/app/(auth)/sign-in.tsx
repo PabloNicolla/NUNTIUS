@@ -13,10 +13,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { useSession } from "@/providers/session-provider";
 
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
-import FormTextField from "@/components/form/FormTextField";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import PrimaryButton from "@/components/buttons/primary-button";
+import FormTextField from "@/components/form/form-text-field";
 
 export default function SignInScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();

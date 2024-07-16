@@ -7,11 +7,11 @@ import {
   ScrollView,
 } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TopNavBar from "@/components/TopNavBar";
-import SimpleFormTextField from "@/components/form/SimpleFormTextField";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
+import TopNavBar from "@/components/top-nav-bar";
+import SimpleFormTextField from "@/components/form/simple-form-text-field";
+import PrimaryButton from "@/components/buttons/primary-button";
 import { router } from "expo-router";
 import { insertContact } from "@/db/statements";
 
@@ -76,7 +76,7 @@ const AddContact = (props: Props) => {
                     id: phone,
                     name: name,
                     username: name,
-                    imageUrl: "",
+                    imageURL: "",
                   });
 
                   router.back();
