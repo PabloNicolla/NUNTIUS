@@ -29,8 +29,8 @@ const PrimaryButton = ({
 }: PrimaryButtonProps) => {
   return (
     <View
-      style={style}
-      className={`min-h-[${minHeight ?? 68}] w-full overflow-hidden rounded-xl ${removeShadow ? "" : "shadow-md shadow-black dark:shadow-white"}`}
+      style={[{ minHeight: minHeight ?? 68 }, style]}
+      className={`w-full overflow-hidden rounded-xl ${removeShadow ? "" : "shadow-md shadow-black dark:shadow-white"}`}
     >
       <TouchableRipple
         onPress={handlePress}

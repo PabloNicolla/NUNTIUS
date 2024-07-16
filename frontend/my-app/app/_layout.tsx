@@ -4,14 +4,14 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useEffect } from "react";
+import { PaperProvider } from "react-native-paper";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { PaperProvider } from "react-native-paper";
+import { SQLiteProvider } from "expo-sqlite";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { SessionProvider } from "@/providers/session-provider";
-import { SQLiteProvider } from "expo-sqlite";
 import { migrateDbIfNeeded } from "@/db/migration";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
