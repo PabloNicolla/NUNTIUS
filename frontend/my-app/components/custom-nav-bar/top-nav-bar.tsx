@@ -1,9 +1,9 @@
 import { Pressable, useColorScheme } from "react-native";
 import React from "react";
-import { ThemedView } from "./themed-view";
+import { ThemedView } from "../themed-view";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import { ThemedText } from "./themed-text";
+import { ThemedText } from "../themed-text";
 
 type Props = {
   title: string;

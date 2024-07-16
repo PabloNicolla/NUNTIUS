@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ChatOption from "@/components/contacts/contact-options";
 import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TopNavBar from "@/components/top-nav-bar";
+import TopNavBar from "@/components/custom-nav-bar/top-nav-bar";
 import {
   FlatList,
   Pressable,
@@ -53,7 +53,7 @@ const ChatOptions = (props: Props) => {
     });
 
     return () => listener.remove();
-  });
+  }, [db, dispatch]);
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -111,7 +111,7 @@ const HeaderComponent = ({
   return (
     <View className="w-full items-center justify-center">
       <View className="my-2 h-12 w-[95%] rounded-3xl bg-black/5 px-4 dark:bg-white/10">
-        <Pressable className="flex-1 flex-row items-center">
+        <Pressable className="flex-1 flex-row items-center" onPress={() => {}}>
           <Ionicons
             size={20}
             name="search"

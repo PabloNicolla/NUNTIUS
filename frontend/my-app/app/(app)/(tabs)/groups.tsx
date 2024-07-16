@@ -29,7 +29,8 @@ import {
   MessageType,
   PrivateChatJoinContact,
 } from "@/db/schemaTypes";
-
+import * as NavigationBar from "expo-navigation-bar";
+import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 const headerHeight = 50;
 
 const App = () => {
@@ -96,6 +97,7 @@ const App = () => {
   return (
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
+
       <SafeAreaView className="flex-1">
         <ListWithDynamicHeader
           data={state.filteredChats}

@@ -24,10 +24,15 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
+import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
+import { Colors } from "@/constants/Colors";
 
 const formSchema = z.object({
   email: z.string().email("Invalid Email format").min(1, "Email is required"),
-  password: z.string().min(8, "Password too short"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password too short"),
 });
 
 export default function SignUpScreen() {
@@ -79,6 +84,7 @@ export default function SignUpScreen() {
   return (
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
+      <BottomNavbar bgColor={Colors.light.primary} styleColor="light" />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}

@@ -9,7 +9,7 @@ import {
 import { useSQLiteContext } from "expo-sqlite";
 import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TopNavBar from "@/components/top-nav-bar";
+import TopNavBar from "@/components/custom-nav-bar/top-nav-bar";
 import SimpleFormTextField from "@/components/form/simple-form-text-field";
 import PrimaryButton from "@/components/buttons/primary-button";
 import { router } from "expo-router";

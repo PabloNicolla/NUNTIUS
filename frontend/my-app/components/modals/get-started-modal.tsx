@@ -13,11 +13,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useRef, useState } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as z from "zod";
 
 import { ThemedText } from "@/components/themed-text";
 import PrimaryButton from "@/components/buttons/primary-button";
 import { ThemedView } from "@/components/themed-view";
 import FormTextField from "@/components/form/form-text-field";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid Email format"),
+});
 
 export default function GetStartedModal({
   isVisible,
@@ -30,9 +37,35 @@ export default function GetStartedModal({
   const windowHeight = useWindowDimensions().height;
   const theme = useColorScheme() ?? "light";
 
-  const [emailValue, setEmailValue] = useState("");
-
   const EmailInputRef = useRef<TextInput | null>(null);
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const isLoading = form.formState.isSubmitting;
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      console.log("SUBMITTING GET STARTED FORM", values);
+      form.reset();
+
+      let pathname = "/sign-up";
+      if (values.email) {
+        pathname = "/sign-in";
+      }
+      onClose();
+      router.push({
+        pathname: pathname,
+        params: { email: values.email },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     if (isVisible && EmailInputRef.current) {
@@ -79,33 +112,33 @@ export default function GetStartedModal({
                     Enter your email to create or sign in to your account
                   </ThemedText>
 
-                  <FormTextField
-                    ref={EmailInputRef}
-                    className="mb-5"
-                    title="Email"
-                    value={emailValue}
-                    handleTextChange={(text) => {
-                      setEmailValue(text);
-                    }}
+                  <Controller
+                    control={form.control}
+                    name="email"
+                    disabled={isLoading}
+                    render={({
+                      field: { value, onChange, onBlur },
+                      fieldState: { error },
+                    }) => (
+                      <FormTextField
+                        ref={EmailInputRef}
+                        className="mb-5"
+                        handleTextChange={onChange}
+                        title="Email"
+                        value={value}
+                        error={error}
+                        isLoading={isLoading}
+                        keyboardType="email-address"
+                        onBlur={onBlur}
+                      />
+                    )}
                   />
 
                   <PrimaryButton
                     className="mb-20"
-                    handlePress={() => {
-                      // Check if email is valid
-                      // Call db and check if email exits
-                      let pathname = "/sign-up";
-
-                      if (emailValue) {
-                        pathname = "/sign-in";
-                      }
-
-                      onClose();
-                      router.push({
-                        pathname: pathname,
-                        params: { email: emailValue },
-                      });
-                    }}
+                    handlePress={form.handleSubmit((data: any) =>
+                      onSubmit(data),
+                    )}
                     title="GET STARTED"
                   />
                 </View>

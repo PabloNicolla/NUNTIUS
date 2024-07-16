@@ -24,10 +24,15 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
+import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
+import { Colors } from "@/constants/Colors";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid Email format").min(1, "Email is required"),
-  password: z.string().min(8, "Password too short"),
+  email: z.string().min(1, "Email is required").email("Invalid Email format"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password too short"),
 });
 
 export default function SignUpScreen() {
@@ -47,7 +52,7 @@ export default function SignUpScreen() {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log("SUBMITTING SIGN IN FORM", values);
       form.reset();
@@ -79,6 +84,7 @@ export default function SignUpScreen() {
   return (
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
+      <BottomNavbar bgColor={Colors.light.primary} styleColor="light" />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -129,6 +135,7 @@ export default function SignUpScreen() {
                       error={error}
                       isLoading={isLoading}
                       keyboardType="email-address"
+                      onBlur={onBlur}
                     />
                   )}
                 />

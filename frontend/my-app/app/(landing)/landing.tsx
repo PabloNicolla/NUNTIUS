@@ -1,7 +1,6 @@
 import {
   ImageBackground,
   View,
-  ColorValue,
   Dimensions,
   Pressable,
   Image,
@@ -11,7 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { SvgProps } from "react-native-svg";
 import PagerView from "react-native-pager-view";
 import { StatusBar } from "expo-status-bar";
-import * as NavigationBar from "expo-navigation-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 
@@ -24,6 +22,7 @@ import { ThemedText } from "@/components/themed-text";
 import PrimaryButton from "@/components/buttons/primary-button";
 import GetStartedModal from "@/components/modals/get-started-modal";
 import { ThemedView } from "@/components/themed-view";
+import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,30 +38,6 @@ export default function LandingScreen() {
     setIsModalVisible(false);
   };
 
-  // Change NavBar color. When user leaves this screen, set it back to default color.
-  useEffect(() => {
-    let defaultNavBarColor: ColorValue;
-    let defaultStyle: "light" | "dark";
-
-    (async () => {
-      // Fetch the default values
-      defaultNavBarColor = await NavigationBar.getBackgroundColorAsync();
-      defaultStyle = await NavigationBar.getButtonStyleAsync();
-
-      // Set the new values
-      await NavigationBar.setBackgroundColorAsync(Colors.light.primary);
-      await NavigationBar.setButtonStyleAsync("light");
-    })();
-
-    // Cleanup function to restore the default values
-    return () => {
-      (async () => {
-        await NavigationBar.setBackgroundColorAsync(defaultNavBarColor);
-        await NavigationBar.setButtonStyleAsync(defaultStyle);
-      })();
-    };
-  }, []);
-
   useEffect(() => {
     if (!isModalVisible) {
       setShowKeyboardBackground(false);
@@ -76,6 +51,7 @@ export default function LandingScreen() {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
+      <BottomNavbar bgColor={Colors.light.primary} styleColor="light" />
 
       <PagerView className="flex-1" initialPage={0}>
         <PrimaryPage key={1} currentPage={1} onClick={handleOpenModal} />
