@@ -77,11 +77,7 @@ export default function LandingScreen() {
     <View className="flex-1">
       <StatusBar style="light" />
 
-      <PagerView
-        className="flex-1"
-        initialPage={0}
-        // onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
-      >
+      <PagerView className="flex-1" initialPage={0}>
         <PrimaryPage key={1} currentPage={1} onClick={handleOpenModal} />
         <SecondaryPageTemplate
           key={2}
