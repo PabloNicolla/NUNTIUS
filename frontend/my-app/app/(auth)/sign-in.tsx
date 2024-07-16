@@ -4,12 +4,19 @@ import {
   TextInput,
   Image,
   useColorScheme,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Controller, useForm } from "react-hook-form";
 import { router, useLocalSearchParams } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { MaterialIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useSession } from "@/providers/session-provider";
 
@@ -18,15 +25,39 @@ import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
 
-export default function SignInScreen() {
-  const { email } = useLocalSearchParams<{ email: string }>();
+const formSchema = z.object({
+  email: z.string().email("Invalid Email format").min(1, "Email is required"),
+  password: z.string().min(8, "Password too short"),
+});
 
-  const { login, isLoggedIn } = useSession();
-
+export default function SignUpScreen() {
   const theme = useColorScheme() ?? "light";
 
-  const [emailValue, setEmailValue] = useState(email);
-  const [passwordValue, setPasswordValue] = useState("");
+  const { email } = useLocalSearchParams<{ email: string }>();
+
+  const { login } = useSession();
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: email ?? "",
+      password: "",
+    },
+  });
+
+  const isLoading = form.formState.isSubmitting;
+
+  const onSubmit = async (values: any) => {
+    try {
+      console.log("SUBMITTING SIGN IN FORM", values);
+      form.reset();
+      login();
+      router.dismissAll();
+      router.replace("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const PasswordInputRef = useRef<TextInput | null>(null);
   const EmailInputRef = useRef<TextInput | null>(null);
@@ -49,78 +80,108 @@ export default function SignInScreen() {
     <ThemedView className="flex-1">
       <StatusBar style="auto" />
 
-      <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-start">
-          <View className="w-full flex-row items-center px-2">
-            <Pressable
-              onPress={() => {
-                router.back();
-              }}
-            >
-              <MaterialIcons
-                name="arrow-back"
-                size={30}
-                color={theme === "light" ? "black" : "white"}
-              />
-            </Pressable>
-            <Image
-              source={require("@/assets/images/brand/Logo.png")}
-              className="ml-4 h-[60] w-[60]"
-            />
-          </View>
-
-          <View className="mt-[10%] w-[80%]">
-            <FormTextField
-              ref={EmailInputRef}
-              className="mb-5"
-              title="Email"
-              value={emailValue}
-              handleTextChange={(text) => {
-                setEmailValue(text);
-              }}
-            />
-
-            <FormTextField
-              ref={PasswordInputRef}
-              className="mb-5"
-              title="Password"
-              value={passwordValue}
-              handleTextChange={(text) => {
-                setPasswordValue(text);
-              }}
-              isSecureText={true}
-              titleTransformX={16}
-            />
-
-            <PrimaryButton
-              handlePress={() => {
-                console.log(isLoggedIn, "before");
-                login();
-                console.log(isLoggedIn, "after");
-
-                router.dismissAll();
-                router.replace("/");
-              }}
-              title="Sign in"
-            />
-
-            <View className="mt-10 items-center">
-              <ThemedText className="mb-10 text-lg font-bold text-text-light/70 dark:text-text-dark/70">
-                Forgot Password?
-              </ThemedText>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        className=""
+      >
+        <SafeAreaView className="flex-1">
+          <View className="flex-1">
+            <View className="w-full flex-row items-center px-2">
               <Pressable
                 onPress={() => {
-                  router.replace("/sign-up");
+                  router.back();
                 }}
               >
-                <ThemedText className="text-lg font-bold text-text-light/70 dark:text-text-dark/70">
-                  New to [THIS APP]? Sign up now.
-                </ThemedText>
+                <MaterialIcons
+                  name="arrow-back"
+                  size={30}
+                  color={theme === "light" ? "black" : "white"}
+                />
               </Pressable>
+              <Image
+                source={require("@/assets/images/brand/Logo.png")}
+                className="ml-4 h-[60] w-[60]"
+              />
             </View>
+
+            <ScrollView
+              contentContainerStyle={{
+                alignItems: "center",
+              }}
+              className=""
+            >
+              <View className="mt-[10%] w-[80%]">
+                <Controller
+                  control={form.control}
+                  name="email"
+                  disabled={isLoading}
+                  render={({
+                    field: { value, onChange, onBlur },
+                    fieldState: { error },
+                  }) => (
+                    <FormTextField
+                      ref={EmailInputRef}
+                      className="mb-5"
+                      handleTextChange={onChange}
+                      title="Email"
+                      value={value}
+                      error={error}
+                      isLoading={isLoading}
+                      keyboardType="email-address"
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={form.control}
+                  name="password"
+                  disabled={isLoading}
+                  render={({
+                    field: { value, onChange, onBlur },
+                    fieldState: { error },
+                  }) => (
+                    <FormTextField
+                      ref={PasswordInputRef}
+                      className="mb-5"
+                      handleTextChange={onChange}
+                      title="Password"
+                      value={value}
+                      isSecureText={true}
+                      titleTransformX={16}
+                      onBlur={onBlur}
+                      error={error}
+                      isLoading={isLoading}
+                      keyboardType="default"
+                    />
+                  )}
+                />
+
+                <PrimaryButton
+                  handlePress={form.handleSubmit((data: any) => onSubmit(data))}
+                  title="Sign in"
+                  isLoading={isLoading}
+                />
+
+                <View className="mb-20 mt-10 items-center">
+                  <ThemedText className="mb-10 text-lg font-bold text-text-light/70 dark:text-text-dark/70">
+                    Forgot Password?
+                  </ThemedText>
+                  <Pressable
+                    onPress={() => {
+                      router.replace("/sign-up");
+                    }}
+                  >
+                    <ThemedText className="text-lg font-bold text-text-light/70 dark:text-text-dark/70">
+                      New to [THIS APP]? Sign up now.
+                    </ThemedText>
+                  </Pressable>
+                </View>
+              </View>
+            </ScrollView>
           </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </ThemedView>
   );
 }
