@@ -32,33 +32,31 @@ const ChatListItem = React.memo(function ChatListItem({
   imageURL,
 }: ChatListItemProps) {
   const theme = useColorScheme() ?? "light";
-  const { isSelectionActive, selectedChatItems, selectModeHandler } =
-    useSelection();
+  const { isSelectionActive, selectModeHandler } = useSelection();
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
-    setIsSelected(selectedChatItems.has(id));
-  }, [selectedChatItems, id]);
+    selectModeHandler(id, isSelected);
+  }, [isSelected, selectModeHandler, id]);
 
-  console.log("-----------------------------------", id);
+  console.log("-----------------------------------", id, isSelectionActive);
 
   return (
     <View className="h-[80] w-full">
       <TouchableRipple
-        className={` ${isSelected && "bg-primary-light/30 dark:bg-primary-light/40"} z-20 flex-1`}
+        className={`${isSelected && "bg-primary-light/30 dark:bg-primary-light/40"} z-20 flex-1`}
         onPress={() => {
           if (!isSelectionActive) {
             console.log("Pressed");
             router.push({ pathname: `/chat/[id]`, params: { id: id } });
           } else {
-            selectModeHandler(id);
+            setIsSelected(!isSelected);
           }
           return true;
         }}
         onLongPress={() => {
           console.log("loong");
           setIsSelected(!isSelected);
-          selectModeHandler(id);
         }}
         rippleColor={
           theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
