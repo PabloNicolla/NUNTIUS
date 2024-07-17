@@ -15,7 +15,7 @@ import { ThemedView } from "@/components/themed-view";
 import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import useChatReducer from "@/hooks/useChatReducer";
+import useChatReducer from "@/reducers/useChatReducer";
 import { getAllPrivateChatsJoinContacts } from "@/db/statements";
 const headerHeight = 50;
 

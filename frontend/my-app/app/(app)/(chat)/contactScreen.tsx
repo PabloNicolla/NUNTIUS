@@ -16,7 +16,7 @@ import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import AvatarModal from "@/components/modals/avatar-modal";
 import { Ionicons } from "@expo/vector-icons";
-import useContactReducer from "@/hooks/useContactReducer";
+import useContactReducer from "@/reducers/useContactReducer";
 import { getAllContacts } from "@/db/statements";
 import { Contact } from "@/db/schemaTypes";
 import ContactListItem from "@/components/contacts/contact-list-item";
