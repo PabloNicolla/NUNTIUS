@@ -10,6 +10,8 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   TextInput,
@@ -39,33 +41,49 @@ export default function ChatScreen() {
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return (
-      <View className={`w-full ${item.id % 2 === 0 ? "items-end" : ""}`}>
-        <ThemedText>{item.value}</ThemedText>
+      <View
+        className={`mb-4 ${item.id % 2 === 0 ? "items-end" : "items-start"}`}
+      >
+        <View
+          className={`max-w-[80%] items-start rounded-md bg-gray-500/40 p-2 ${item.id % 2 === 0 ? "items-end bg-blue-500/40" : "items-start bg-gray-500/40"}`}
+        >
+          <ThemedText>{item.value}</ThemedText>
+        </View>
       </View>
     );
   };
 
   return (
     <ThemedView className="flex-1">
-      <SafeAreaView className="flex-1">
-        <TopNavBarChat contactId={chat?.contactId} />
-        <View className="relative flex-1">
-          <FlatList
-            data={messages}
-            renderItem={renderItem}
-            // ListFooterComponent={ListFooterComponent}
-            ListHeaderComponent={
-              <HeaderComponent handleSendMessage={() => {}} />
-            }
-            indicatorStyle={theme === "dark" ? "white" : "black"}
-            showsHorizontalScrollIndicator={true}
-            inverted={true}
-          />
-        </View>
-      </SafeAreaView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+        className=""
+      >
+        <SafeAreaView className="flex-1">
+          <TopNavBarChat contactId={chat?.contactId} />
+          <View className="relative flex-1">
+            <FlatList
+              data={messages}
+              renderItem={renderItem}
+              // ListFooterComponent={ListFooterComponent}
+              ListHeaderComponent={
+                <HeaderComponent handleSendMessage={() => {}} />
+              }
+              indicatorStyle={theme === "dark" ? "white" : "black"}
+              showsHorizontalScrollIndicator={true}
+              inverted={true}
+              initialNumToRender={20} // Number of items to render initially
+              maxToRenderPerBatch={20} // Number of items to render in each batch
+              windowSize={10} // Number of items to keep in memory outside of the visible area
+            />
+          </View>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </ThemedView>
   );
 }
+
 const HeaderComponent = ({
   handleSendMessage,
 }: {
@@ -100,3 +118,9 @@ const HeaderComponent = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
