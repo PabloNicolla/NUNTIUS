@@ -30,7 +30,7 @@ export default function RootLayout() {
     <SessionProvider>
       <PaperProvider>
         <SQLiteProvider
-          databaseName="local3.db"
+          databaseName="local4.db"
           onInit={migrateDbIfNeeded}
           options={{ enableChangeListener: true }}
         >

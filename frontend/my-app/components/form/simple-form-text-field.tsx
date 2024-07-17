@@ -5,14 +5,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from "react";
-import {
-  Animated,
-  LayoutAnimation,
-  TextInput,
-  TextInputProps,
-  useColorScheme,
-  View,
-} from "react-native";
+import { Animated, TextInput, TextInputProps, View } from "react-native";
 import { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
 
 export type SimpleFormTextFieldProps = ViewProps & {

@@ -64,7 +64,7 @@ export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
             timestamp,
             type,
             status,
-            sortId
+            privateChatId
         ) 
         VALUES (
             $senderId,
@@ -73,7 +73,7 @@ export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
             $timestamp,
             $type,
             $status,
-            $sortId
+            $privateChatId
         )`,
     {
       $senderId: message.senderId,
@@ -82,7 +82,7 @@ export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
       $timestamp: message.timestamp,
       $type: message.type,
       $status: message.status,
-      $sortId: message.sortId,
+      $privateChatId: message.privateChatId,
     },
   );
 };

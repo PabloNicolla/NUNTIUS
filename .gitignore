@@ -1,6 +1,5 @@
 test.db
-test1.session.sql
-test.sqlite-shm
-test.sqlite-wal
-test2.session.sql
+test.db-shm
+test.db-wal
+test.session.sql
 diagram.drawio

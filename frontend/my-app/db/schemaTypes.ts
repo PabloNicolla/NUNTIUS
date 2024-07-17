@@ -46,5 +46,5 @@ export type Message = {
   timestamp: number;
   type: MessageType;
   status: MessageStatus;
-  sortId: number;
+  privateChatId: number;
 };

@@ -1,11 +1,8 @@
 import { Image, Pressable, useColorScheme, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Avatar, TouchableRipple } from "react-native-paper";
-import { useSelection } from "@/providers/chat-provider";
 import { ThemedText } from "../themed-text";
-import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
-import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
 
 export type ContactListItemProps = {

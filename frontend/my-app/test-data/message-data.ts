@@ -1,6 +1,6 @@
 import { Message, MessageStatus, MessageType } from "@/db/schemaTypes";
 
-const messages: Message[] = [
+export const messages: Message[] = [
   {
     id: 0,
     privateChatId: 10,

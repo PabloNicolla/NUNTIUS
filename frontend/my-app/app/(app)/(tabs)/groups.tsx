@@ -16,21 +16,7 @@ import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/hooks/useChatReducer";
-import {
-  getAllPrivateChats,
-  getAllPrivateChatsJoinContacts,
-  getFirstPrivateChat,
-  insertMessage,
-  insertPrivateChat,
-} from "@/db/statements";
-import {
-  Message,
-  MessageStatus,
-  MessageType,
-  PrivateChatJoinContact,
-} from "@/db/schemaTypes";
-import * as NavigationBar from "expo-navigation-bar";
-import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
+import { getAllPrivateChatsJoinContacts } from "@/db/statements";
 const headerHeight = 50;
 
 const App = () => {

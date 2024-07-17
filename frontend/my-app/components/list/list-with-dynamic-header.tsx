@@ -1,12 +1,5 @@
 import React, { useRef } from "react";
-import {
-  View,
-  Animated,
-  FlatList,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  useColorScheme,
-} from "react-native";
+import { View, Animated, FlatList, useColorScheme } from "react-native";
 import DynamicHeader from "@/components/list/dynamic-header";
 
 type ListWithDynamicHeaderProps<T> = {

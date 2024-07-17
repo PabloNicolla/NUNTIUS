@@ -27,7 +27,15 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
         timestamp INTEGER NOT NULL,
         type INTEGER NOT NULL,
         status INTEGER NOT NULL,
-        sortId INTEGER NOT NULL
+        privateChatId INTEGER NOT NULL
     );
+    `);
+};
+
+export const addMessageTableIndexes = async (db: SQLiteDatabase) => {
+  await db.execAsync(`
+        CREATE INDEX idx_status ON message(status);
+        CREATE INDEX idx_timestamp ON message(timestamp);
+        CREATE INDEX idx_privateChatId ON message(privateChatId);
     `);
 };
