@@ -1,9 +1,10 @@
 import TopNavBarChat from "@/components/custom-nav-bar/top-nav-bar-chat";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Colors } from "@/constants/Colors";
 import { Message, PrivateChat } from "@/db/schemaTypes";
-import { getFirstPrivateChat } from "@/db/statements";
-import { messages } from "@/test-data/message-data";
+import { getAllMessagesByChatId, getFirstPrivateChat } from "@/db/statements";
+import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
@@ -13,39 +14,52 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   useColorScheme,
   View,
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatScreen() {
-  const { id } = useLocalSearchParams();
   const [chat, setChat] = useState<PrivateChat | null>(null);
-  const theme = useColorScheme();
+  const [messages, setMessages] = useState<Message[]>([]);
 
+  const { id } = useLocalSearchParams();
+  const theme = useColorScheme();
   const db = useSQLiteContext();
+  const { user } = useSession();
 
   useEffect(() => {
-    console.log("ChatScreen", Number(id));
-    async function getChatAndContact() {
+    console.log("ChatScreen get chat", Number(id));
+    async function getChat() {
       const chat = await getFirstPrivateChat(db, Number(id));
       if (!chat) {
         console.log("TopNavBarChat ERROR invalid chatId");
       }
       setChat(chat);
     }
-    getChatAndContact();
+    getChat();
+  }, []);
+
+  useEffect(() => {
+    console.log("ChatScreen get messages -- initial load", Number(id));
+    async function getMessages() {
+      const messages = await getAllMessagesByChatId(db, Number(id));
+      setMessages(messages);
+    }
+    getMessages();
   }, []);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return (
       <View
-        className={`mb-4 ${item.id % 2 === 0 ? "items-end" : "items-start"}`}
+        className={`mb-4 ${item.senderId === user.id ? "items-end" : "items-start"}`}
       >
         <View
-          className={`max-w-[80%] items-start rounded-md bg-gray-500/40 p-2 ${item.id % 2 === 0 ? "items-end bg-blue-500/40" : "items-start bg-gray-500/40"}`}
+          className={`max-w-[80%] items-start rounded-md bg-gray-500/40 p-2 ${item.senderId === user.id ? "items-end bg-blue-500/40" : "items-start bg-gray-500/40"}`}
         >
           <ThemedText>{item.value}</ThemedText>
         </View>
@@ -59,23 +73,25 @@ export default function ChatScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
         className=""
+        keyboardVerticalOffset={0}
       >
         <SafeAreaView className="flex-1">
           <TopNavBarChat contactId={chat?.contactId} />
-          <View className="relative flex-1">
+          <View className="flex-1">
             <FlatList
               data={messages}
               renderItem={renderItem}
               // ListFooterComponent={ListFooterComponent}
-              ListHeaderComponent={
-                <HeaderComponent handleSendMessage={() => {}} />
-              }
               indicatorStyle={theme === "dark" ? "white" : "black"}
               showsHorizontalScrollIndicator={true}
               inverted={true}
               initialNumToRender={20} // Number of items to render initially
               maxToRenderPerBatch={20} // Number of items to render in each batch
               windowSize={10} // Number of items to keep in memory outside of the visible area
+              nestedScrollEnabled={true}
+              ListHeaderComponent={
+                <HeaderComponent handleSendMessage={() => {}} />
+              }
             />
           </View>
         </SafeAreaView>
@@ -93,27 +109,62 @@ const HeaderComponent = ({
   const [messageValue, setMessageValue] = useState("");
 
   return (
-    <View className="w-full items-center justify-center">
-      <View className="my-2 h-12 w-[95%] rounded-3xl bg-black/5 px-4 dark:bg-white/10">
-        <Pressable className="flex-1 flex-row items-center" onPress={() => {}}>
+    <View className="flex-row bg-slate-700">
+      <View className="mx-2 mb-2 justify-end bg-green-400">
+        <View className="rounded-full bg-black p-3">
           <Ionicons
-            size={20}
+            size={18}
             name="send"
-            color={theme === "dark" ? "white" : "black"}
-          />
-          <TextInput
-            className="ml-2 flex-1 text-text-light dark:text-text-dark"
-            placeholder="Message..."
-            placeholderTextColor={
-              theme === "dark" ? "rgba(225,232,249,0.7)" : "rgba(6,13,30,0.7)"
+            color={
+              messageValue
+                ? Colors.dark.primary
+                : theme === "dark"
+                  ? "white"
+                  : "black"
             }
-            numberOfLines={1}
-            value={messageValue}
-            onChangeText={(text) => {
-              setMessageValue(text);
-            }}
           />
-        </Pressable>
+        </View>
+      </View>
+      <View className="mb-2 flex-1 flex-row bg-white">
+        <View className="w-10 items-center justify-end bg-red-400">
+          <View className="rounded-full bg-black p-2">
+            <Ionicons
+              size={25}
+              name="attach"
+              color={
+                messageValue
+                  ? Colors.dark.primary
+                  : theme === "dark"
+                    ? "white"
+                    : "black"
+              }
+            />
+          </View>
+        </View>
+        <View className="max-h-40 flex-1 justify-center bg-blue-400">
+          <View className="justify-end bg-indigo-500">
+            <TextInput
+              className="text-lg"
+              multiline={true}
+              scrollEnabled={true}
+            ></TextInput>
+          </View>
+        </View>
+        <View className="w-10 items-center justify-end bg-red-400">
+          <View className="rounded-full bg-black p-2">
+            <Ionicons
+              size={25}
+              name="happy-outline"
+              color={
+                messageValue
+                  ? Colors.dark.primary
+                  : theme === "dark"
+                    ? "white"
+                    : "black"
+              }
+            />
+          </View>
+        </View>
       </View>
     </View>
   );
