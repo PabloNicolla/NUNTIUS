@@ -146,3 +146,13 @@ export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
         JOIN contact c ON pc.contactId = c.id
   `);
 };
+
+export const getAllMessagesByChatId = async (
+  db: SQLiteDatabase,
+  chatId: number,
+) => {
+  return await db.getAllAsync<Message>(
+    `SELECT * FROM message WHERE $privateChatId = privateChatId`,
+    { $privateChatId: chatId },
+  );
+};
