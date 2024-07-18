@@ -11,7 +11,6 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   FlatList,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
@@ -22,6 +21,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 export default function ChatScreen() {
   const [chat, setChat] = useState<PrivateChat | null>(null);
@@ -70,7 +70,7 @@ export default function ChatScreen() {
   return (
     <ThemedView className="flex-1">
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
         className=""
         keyboardVerticalOffset={0}
