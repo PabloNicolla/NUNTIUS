@@ -26,9 +26,13 @@ npx eslint .
 ## Backend
 
 ```sh
+django-admin startproject <>
 python manage.py runserver
-django-admin startapp <chat>
 
+django-admin  startapp <>
+python manage.py startapp <>
+
+daphne -p 8000 core.asgi # for HTTP2, WebSocket. (ASGI SERVER)
 
 pip install psycopg[binary]
 
