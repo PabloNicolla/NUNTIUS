@@ -33,7 +33,10 @@ const AddContact = (props: Props) => {
           <TopNavBar title="New Contact" />
 
           <View className="flex-1 items-center">
-            <ScrollView className="w-full max-w-[80%] pt-4">
+            <ScrollView
+              className="w-full max-w-[80%] pt-4"
+              keyboardShouldPersistTaps="handled"
+            >
               <SimpleFormTextField
                 className="mb-5"
                 title="Name"

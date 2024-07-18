@@ -116,6 +116,7 @@ export default function SignUpScreen() {
                 alignItems: "center",
               }}
               className=""
+              keyboardShouldPersistTaps="handled"
             >
               <View className="mt-[10%] w-[80%]">
                 <Controller

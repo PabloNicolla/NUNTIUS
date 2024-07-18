@@ -127,6 +127,7 @@ export default function SignUpScreen() {
                 alignItems: "center",
               }}
               className=""
+              keyboardShouldPersistTaps="handled"
             >
               <View className="w-[80%] pt-[10%]">
                 <ThemedText className="mb-5 text-3xl font-bold">
