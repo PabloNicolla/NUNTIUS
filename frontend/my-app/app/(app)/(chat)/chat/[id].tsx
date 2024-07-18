@@ -70,7 +70,7 @@ export default function ChatScreen() {
   return (
     <ThemedView className="flex-1">
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.container}
         className=""
         keyboardVerticalOffset={0}
@@ -89,11 +89,12 @@ export default function ChatScreen() {
               maxToRenderPerBatch={20} // Number of items to render in each batch
               windowSize={10} // Number of items to keep in memory outside of the visible area
               nestedScrollEnabled={true}
-              ListHeaderComponent={
-                <HeaderComponent handleSendMessage={() => {}} />
-              }
+              // ListHeaderComponent={
+              //   <HeaderComponent handleSendMessage={() => {}} />
+              // }
             />
           </View>
+          <HeaderComponent handleSendMessage={() => {}} />
         </SafeAreaView>
       </KeyboardAvoidingView>
     </ThemedView>
@@ -141,8 +142,8 @@ const HeaderComponent = ({
             />
           </View>
         </View>
-        <View className="max-h-40 flex-1 justify-center bg-blue-400">
-          <View className="justify-end bg-indigo-500">
+        <View className="max-h-40 flex-1 justify-end bg-blue-400">
+          <View className="min-h-[44] justify-end bg-indigo-500 px-2">
             <TextInput
               className="text-lg"
               multiline={true}
