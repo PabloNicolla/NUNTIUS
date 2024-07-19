@@ -12,6 +12,8 @@ services:
       PGDATA: /var/lib/postgresql/data
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   pgadmin:
     image: dpage/pgadmin4:8.9
@@ -25,6 +27,15 @@ services:
       - pgadmin:/var/lib/pgadmin
     depends_on:
       - postgres-db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
 
   # web:
   #   build: .
@@ -35,7 +46,14 @@ services:
   #     - "8000:8000"
   #   depends_on:
   #     - db
+  #     - redis
+  #   networks:
+  #     - app-network
 
 volumes:
   postgres_data:
   pgadmin:
+
+networks:
+  app-network:
+    driver: bridge
