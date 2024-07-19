@@ -7,7 +7,7 @@ import { getAllMessagesByChatId, getFirstPrivateChat } from "@/db/statements";
 import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
+import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -52,6 +52,23 @@ export default function ChatScreen() {
     }
     getMessages();
   }, []);
+
+  useEffect(() => {
+    console.log("----- db ChatScreen add Listener -----");
+
+    const listener = addDatabaseChangeListener((event) => {
+      console.log("----- db ChatScreen run Listener -----", event);
+      if (event.tableName === "message") {
+        async function getMessages() {
+          const messages = await getAllMessagesByChatId(db, Number(id));
+          setMessages(messages);
+        }
+        getMessages();
+      }
+    });
+
+    return () => listener.remove();
+  }, [db, id]);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return (

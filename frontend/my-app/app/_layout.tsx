@@ -29,13 +29,13 @@ export default function RootLayout() {
   }
 
   return (
-    <SessionProvider>
-      <PaperProvider>
-        <SQLiteProvider
-          databaseName="local4.db"
-          onInit={migrateDbIfNeeded}
-          options={{ enableChangeListener: true }}
-        >
+    <SQLiteProvider
+      databaseName="local4.db"
+      onInit={migrateDbIfNeeded}
+      options={{ enableChangeListener: true }}
+    >
+      <SessionProvider>
+        <PaperProvider>
           <KeyboardProvider statusBarTranslucent={true}>
             <WebSocketProvider>
               <Stack>
@@ -48,8 +48,8 @@ export default function RootLayout() {
               </Stack>
             </WebSocketProvider>
           </KeyboardProvider>
-        </SQLiteProvider>
-      </PaperProvider>
-    </SessionProvider>
+        </PaperProvider>
+      </SessionProvider>
+    </SQLiteProvider>
   );
 }

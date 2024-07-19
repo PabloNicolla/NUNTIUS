@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import NetInfo from "@react-native-community/netinfo";
+import { routeMessage } from "@/handlers/ws-routeHandler";
 
 enum ConnectionStatus {
   CONNECTED,
@@ -42,7 +43,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const socket = useRef<WebSocket | null>(null);
 
   const connect = () => {
-    socket.current = new WebSocket(`ws://localhost/ws/user/${123}/`);
+    socket.current = new WebSocket(
+      `ws://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/ws/user/${123}/`,
+    );
 
     socket.current.onopen = () => {
       setConnectionStatus(ConnectionStatus.CONNECTED);
@@ -62,6 +65,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     socket.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
       // Handle incoming messages
+      routeMessage(message);
       console.log("Message from server:", message);
     };
   };
@@ -88,13 +92,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     setTimeout(checkNetworkAndReconnect, retryInterval);
   };
 
-  //   useEffect(() => {
-  //     connect();
+  useEffect(() => {
+    connect();
 
-  //     return () => {
-  //       socket.current?.close();
-  //     };
-  //   }, []);
+    return () => {
+      socket.current?.close();
+    };
+  }, []);
 
   const contextMemo = useMemo(
     () => ({ socket: socket.current, sendMessage, connectionStatus }),
