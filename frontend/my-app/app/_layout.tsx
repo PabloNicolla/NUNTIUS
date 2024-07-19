@@ -8,6 +8,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { SessionProvider } from "@/providers/session-provider";
 import { migrateDbIfNeeded } from "@/db/migration";
+import { WebSocketProvider } from "@/providers/websocket-provider";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -36,11 +37,16 @@ export default function RootLayout() {
           options={{ enableChangeListener: true }}
         >
           <KeyboardProvider statusBarTranslucent={true}>
-            <Stack>
-              <Stack.Screen name="(app)" options={{ headerShown: false }} />
-              <Stack.Screen name="(landing)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            </Stack>
+            <WebSocketProvider>
+              <Stack>
+                <Stack.Screen name="(app)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="(landing)"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              </Stack>
+            </WebSocketProvider>
           </KeyboardProvider>
         </SQLiteProvider>
       </PaperProvider>
