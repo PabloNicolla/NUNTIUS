@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 import {
   Text,
@@ -22,7 +23,14 @@ export default function KeyboardAvoidingViewExample() {
           <TextInput placeholder="Username" style={styles.textInput} />
           <TextInput placeholder="Password" style={styles.textInput} />
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            console.log("pressed");
+            const res = await axios.get("http://000.000.000:8000/test/");
+            console.log(res);
+          }}
+        >
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
       </View>
