@@ -32,19 +32,33 @@ export enum MessageType {
   AUDIO,
 }
 export enum MessageStatus {
-  PENDING,
-  SENT,
-  RECEIVED,
-  READ,
+  PENDING, // ...
+  SENT, // v
+  RECEIVED, // vv
+  READ, // VV
+}
+export enum ReceiverType {
+  PRIVATE_CHAT,
+  GROUP_CHAT,
+}
+export enum Condition {
+  NORMAL,
+  DELETED,
+  EDITED,
 }
 
 export type Message = {
   id: number;
   senderId: number;
   receiverId: number;
+
   value: string;
   timestamp: number;
   type: MessageType;
   status: MessageStatus;
-  privateChatId: number;
+
+  receiverType: ReceiverType;
+  chatId: number;
+  senderReferenceId: number;
+  condition: Condition;
 };

@@ -4,6 +4,7 @@ import {
   Message,
   PrivateChat,
   PrivateChatJoinContact,
+  ReceiverType,
 } from "./schemaTypes";
 
 export const insertPrivateChat = async (
@@ -60,29 +61,44 @@ export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
     `INSERT INTO message (
             senderId,
             receiverId,
+
             value,
             timestamp,
             type,
             status,
-            privateChatId
+
+            receiverType,
+            chatId,
+            senderReferenceId,
+            condition
         ) 
         VALUES (
             $senderId,
             $receiverId,
+
             $value,
             $timestamp,
             $type,
             $status,
-            $privateChatId
+
+            $receiverType,
+            $chatId,
+            $senderReferenceId,
+            $condition
         )`,
     {
       $senderId: message.senderId,
       $receiverId: message.senderId,
+
       $value: message.value,
       $timestamp: message.timestamp,
       $type: message.type,
       $status: message.status,
-      $privateChatId: message.privateChatId,
+
+      $receiverType: message.receiverType,
+      $chatId: message.chatId,
+      $senderReferenceId: message.senderReferenceId,
+      $condition: message.condition,
     },
   );
 };
@@ -150,9 +166,11 @@ export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
 export const getAllMessagesByChatId = async (
   db: SQLiteDatabase,
   chatId: number,
+  receiverType: ReceiverType,
+  sort?: boolean,
 ) => {
   return await db.getAllAsync<Message>(
-    `SELECT * FROM message WHERE $privateChatId = privateChatId`,
-    { $privateChatId: chatId },
+    `SELECT * FROM message WHERE $chatId = chatId AND $receiverType = receiverType ${sort ? "ORDER BY timestamp DESC" : ""}`,
+    { $chatId: chatId, $receiverType: receiverType },
   );
 };
