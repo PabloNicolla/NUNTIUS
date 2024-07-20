@@ -37,8 +37,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
     });
 
     messages.forEach(async (msg) => {
-      const ret = await insertMessage(db, msg);
-      console.log(ret);
+      await insertMessage(db, msg);
     });
 
     currentDbVersion = 2;

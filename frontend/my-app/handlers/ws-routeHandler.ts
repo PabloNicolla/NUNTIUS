@@ -1,3 +1,4 @@
+import { MessageType, ReceiverType } from "@/db/schemaTypes";
 import {
   handleAcknowledgment,
   handleGroupMessage,
@@ -6,21 +7,12 @@ import {
 } from "./ws-message";
 
 export function routeMessage(message: any) {
-  switch (message.type) {
-    case "private_message":
+  switch (message.receiverType) {
+    case ReceiverType.PRIVATE_CHAT:
       handlePrivateMessage(message);
       break;
-    case "group_message":
+    case ReceiverType.GROUP_CHAT:
       handleGroupMessage(message);
-      break;
-    case "status_update":
-      handleStatusUpdate(message);
-      break;
-    case "acknowledgment":
-      handleAcknowledgment(message);
-      break;
-    case "connection_established":
-      console.log("WebSocket temporary success acknowledgment");
       break;
     default:
       console.error("Unknown message type:", message.type);

@@ -30,7 +30,7 @@ export default function RootLayout() {
 
   return (
     <SQLiteProvider
-      databaseName="local4.db"
+      databaseName="local56.db"
       onInit={migrateDbIfNeeded}
       options={{ enableChangeListener: true }}
     >
