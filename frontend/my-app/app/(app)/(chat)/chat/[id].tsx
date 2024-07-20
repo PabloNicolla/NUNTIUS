@@ -2,7 +2,7 @@ import TopNavBarChat from "@/components/custom-nav-bar/top-nav-bar-chat";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/Colors";
-import { Message, PrivateChat } from "@/db/schemaTypes";
+import { Message, PrivateChat, ReceiverType } from "@/db/schemaTypes";
 import { getAllMessagesByChatId, getFirstPrivateChat } from "@/db/statements";
 import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
@@ -39,6 +39,7 @@ export default function ChatScreen() {
       if (!chat) {
         console.log("TopNavBarChat ERROR invalid chatId");
       }
+
       setChat(chat);
     }
     getChat();
@@ -47,7 +48,12 @@ export default function ChatScreen() {
   useEffect(() => {
     console.log("ChatScreen get messages -- initial load", Number(id));
     async function getMessages() {
-      const messages = await getAllMessagesByChatId(db, Number(id));
+      const messages = await getAllMessagesByChatId(
+        db,
+        Number(id),
+        ReceiverType.PRIVATE_CHAT,
+        true,
+      );
       setMessages(messages);
     }
     getMessages();
@@ -60,7 +66,11 @@ export default function ChatScreen() {
       console.log("----- db ChatScreen run Listener -----", event);
       if (event.tableName === "message") {
         async function getMessages() {
-          const messages = await getAllMessagesByChatId(db, Number(id));
+          const messages = await getAllMessagesByChatId(
+            db,
+            Number(id),
+            ReceiverType.PRIVATE_CHAT,
+          );
           setMessages(messages);
         }
         getMessages();
@@ -127,59 +137,56 @@ const HeaderComponent = ({
   const [messageValue, setMessageValue] = useState("");
 
   return (
-    <View className="flex-row bg-slate-700">
-      <View className="mx-2 mb-2 justify-end bg-green-400">
-        <View className="rounded-full bg-black p-3">
+    <View className="flex-row">
+      <View className="mx-2 mb-2 justify-end">
+        <View className="rounded-full bg-primary-light/50 p-3 dark:bg-primary-light">
           <Ionicons
             size={18}
-            name="send"
-            color={
-              messageValue
-                ? Colors.dark.primary
-                : theme === "dark"
-                  ? "white"
-                  : "black"
-            }
+            name={`${messageValue ? "send" : "mic"}`}
+            color={theme === "dark" ? "white" : "black"}
           />
         </View>
       </View>
-      <View className="mb-2 flex-1 flex-row bg-white">
-        <View className="w-10 items-center justify-end bg-red-400">
-          <View className="rounded-full bg-black p-2">
+      <View className="mb-2 flex-1 flex-row rounded-lg bg-background-dark/10 dark:bg-background-light/20">
+        {!messageValue && (
+          <View className="w-10 items-center justify-end">
+            <View className="rounded-full p-2">
+              <Ionicons
+                size={25}
+                name="camera-outline"
+                color={theme === "dark" ? "white" : "black"}
+              />
+            </View>
+          </View>
+        )}
+        <View className="w-10 items-center justify-end">
+          <View className="rounded-full p-2">
             <Ionicons
               size={25}
               name="attach"
-              color={
-                messageValue
-                  ? Colors.dark.primary
-                  : theme === "dark"
-                    ? "white"
-                    : "black"
-              }
+              color={theme === "dark" ? "white" : "black"}
             />
           </View>
         </View>
-        <View className="max-h-40 flex-1 justify-end bg-blue-400">
-          <View className="min-h-[44] justify-end bg-indigo-500 px-2">
+        <View className="max-h-40 flex-1 justify-center">
+          <View className="justify-center px-2">
             <TextInput
-              className="text-lg"
+              className="text-lg text-black dark:text-white"
+              value={messageValue}
+              onChangeText={(text) => {
+                setMessageValue(text);
+              }}
               multiline={true}
               scrollEnabled={true}
             ></TextInput>
           </View>
         </View>
-        <View className="w-10 items-center justify-end bg-red-400">
-          <View className="rounded-full bg-black p-2">
+        <View className="w-10 items-center justify-end">
+          <View className="rounded-full p-2">
             <Ionicons
               size={25}
               name="happy-outline"
-              color={
-                messageValue
-                  ? Colors.dark.primary
-                  : theme === "dark"
-                    ? "white"
-                    : "black"
-              }
+              color={theme === "dark" ? "white" : "black"}
             />
           </View>
         </View>
