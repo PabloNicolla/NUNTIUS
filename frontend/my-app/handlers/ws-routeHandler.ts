@@ -19,6 +19,9 @@ export function routeMessage(message: any) {
     case "acknowledgment":
       handleAcknowledgment(message);
       break;
+    case "connection_established":
+      console.log("WebSocket temporary success acknowledgment");
+      break;
     default:
       console.error("Unknown message type:", message.type);
   }
