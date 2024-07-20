@@ -20,7 +20,7 @@ const TopNavBarChat = ({ contactId }: Props) => {
   const db = useSQLiteContext();
 
   useEffect(() => {
-    console.log("TopNavBarChat", contactId);
+    console.log("[TOP_NAV_BAR_CHAT]: for user_id:", contactId);
     async function getChatAndContact() {
       if (contactId) {
         const contact = await getFirstContact(db, contactId);

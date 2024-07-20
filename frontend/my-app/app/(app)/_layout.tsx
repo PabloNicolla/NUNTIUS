@@ -8,7 +8,7 @@ import React from "react";
 export default function AppLayout() {
   const session = useSession();
 
-  console.log(session.isLoggedIn, "AppLayout");
+  console.log("[APP_LAYOUT]: IS USER LOGGED IN:", session.isLoggedIn);
 
   if (session.isLoggedIn) {
     return <Redirect href={"/landing"} />;

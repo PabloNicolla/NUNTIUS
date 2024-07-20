@@ -40,7 +40,7 @@ const ChatListItem = React.memo(function ChatListItem({
     setIsSelected(selectedChatItems.has(id));
   }, [selectedChatItems, id]);
 
-  console.log("-----------------------------------", id);
+  console.log("[CHAT_LIST_ITEM]: MOUNTING: %d", id);
 
   return (
     <View className="h-[80] w-full">

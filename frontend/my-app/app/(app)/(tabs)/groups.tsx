@@ -30,7 +30,7 @@ const App = () => {
   }, [db, dispatch]);
 
   useEffect(() => {
-    console.log("----- db chat initial load -----");
+    console.log("[CHAT_LIST]: db chat initial load");
     fetchAllPrivateChats();
   }, [db, dispatch, fetchAllPrivateChats]);
 
@@ -40,7 +40,7 @@ const App = () => {
     const debouncedFunction = useCallback(() => {
       if (timeoutRef.current === null) {
         timeoutRef.current = setTimeout(() => {
-          console.log("(((()))) useDebounce");
+          console.log("[CHAT_LIST]: useDebounce");
           callback();
           timeoutRef.current = null;
         }, delay);
@@ -53,10 +53,10 @@ const App = () => {
   const debouncedFetchAllChats = useDebounce(fetchAllPrivateChats, 100);
 
   useEffect(() => {
-    console.log("----- db chat add Listener -----");
+    console.log("[CHAT_LIST]: db chat add Listener");
 
     const listener = addDatabaseChangeListener((event) => {
-      console.log("----- db chat run Listener -----", event);
+      console.log("[CHAT_LIST]: db chat run Listener", event);
       if (event.tableName === "contact" || event.tableName === "private_chat") {
         debouncedFetchAllChats();
       }

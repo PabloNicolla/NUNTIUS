@@ -42,20 +42,22 @@ export default function ChatScreen() {
   const { user } = useSession();
 
   useEffect(() => {
-    console.log("ChatScreen get chat", Number(id));
+    console.log("[CHAT_SCREEN]: GET CHAT ID: %d", Number(id));
     async function getChat() {
       const chat = await getFirstPrivateChat(db, Number(id));
       if (!chat) {
-        console.log("TopNavBarChat ERROR invalid chatId");
+        console.log("[CHAT_SCREEN]: TopNavBarChat ERROR invalid chatId");
       }
-
       setChat(chat);
     }
     getChat();
   }, []);
 
   useEffect(() => {
-    console.log("ChatScreen get messages -- initial load", Number(id));
+    console.log(
+      "[CHAT_SCREEN]: INITIAL DB LOAD: get all messages for chat_id: %d",
+      Number(id),
+    );
     async function getMessages() {
       const messages = await getAllMessagesByChatId(
         db,
@@ -69,10 +71,10 @@ export default function ChatScreen() {
   }, []);
 
   useEffect(() => {
-    console.log("----- db ChatScreen add Listener -----");
+    console.log("[CHAT_SCREEN]: db add Listener");
 
     const listener = addDatabaseChangeListener((event) => {
-      console.log("----- db ChatScreen run Listener -----", event);
+      console.log("[CHAT_SCREEN]: db run Listener", event);
       if (event.tableName === "message") {
         async function getMessages() {
           const messages = await getAllMessagesByChatId(
@@ -90,8 +92,6 @@ export default function ChatScreen() {
   }, [db, id]);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
-    console.log(item.senderId, user.id);
-
     return (
       <View
         className={`mb-4 ${item.senderId === user.id ? "items-end" : "items-start"}`}
@@ -155,8 +155,8 @@ const HeaderComponent = ({
               id: 1,
               chatId: 1,
               condition: Condition.NORMAL,
-              receiverId: 998,
-              senderId: 998,
+              receiverId: 999,
+              senderId: 999,
               receiverType: ReceiverType.PRIVATE_CHAT,
               senderReferenceId: 1,
               status: MessageStatus.PENDING,
