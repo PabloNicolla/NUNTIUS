@@ -51,6 +51,14 @@ INSTALLED_APPS = [
 ]
 
 ASGI_APPLICATION = 'core.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -89,10 +97,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'my_django2',
+        'USER': 'postgresuser',
+        'PASSWORD': 'postgrespassword',
+        'HOST': 'localhost',
+        'PORT': '5600',
+    }}
 
 
 # Password validation

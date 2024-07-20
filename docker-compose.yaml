@@ -34,19 +34,19 @@ services:
     image: redis:latest
     restart: always
     ports:
-      - "6379:6379"
+      - 6379:6379
     networks:
       - app-network
 
   # web:
   #   build: .
-  #   command: python manage.py runserver 0.0.0.0:8000
+  #   command: daphne -b 0.0.0.0 -p 8000 core.asgi:application
   #   volumes:
-  #     - .:/app
+  #     - ./testing_bk/core:/app
   #   ports:
   #     - "8000:8000"
   #   depends_on:
-  #     - db
+  #     - postgres-db
   #     - redis
   #   networks:
   #     - app-network
