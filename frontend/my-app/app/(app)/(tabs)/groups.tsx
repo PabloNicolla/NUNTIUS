@@ -27,7 +27,10 @@ const App = () => {
 
   const fetchAllPrivateChats = useCallback(async () => {
     const allChats = await getAllPrivateChatsJoinContacts(db);
-    dispatch({ type: "SET_CHATS_FULL", payload: allChats });
+    if (!allChats) {
+      console.log("[GROUPS]: fetchAllPrivateChats queried undefined");
+    }
+    dispatch({ type: "SET_CHATS_FULL", payload: allChats ?? [] });
   }, [db, dispatch]);
 
   useEffect(() => {
@@ -139,21 +142,21 @@ const Header = () => {
             //   value: "asd",
             // });
 
-            await db.runAsync(
-              `
-              UPDATE private_chat
-                SET 
-                  lastMessageTimestamp = $lastMessageTimestamp,
-                  lastMessageValue = $lastMessageValue
-                WHERE
-                  id = $id;
-              `,
-              {
-                $lastMessageTimestamp: Date.now(),
-                $lastMessageValue: `test ${Count}`,
-                $id: (Count % 3) + 1,
-              },
-            );
+            // await db.runAsync(
+            //   `
+            //   UPDATE private_chat
+            //     SET
+            //       lastMessageTimestamp = $lastMessageTimestamp,
+            //       lastMessageValue = $lastMessageValue
+            //     WHERE
+            //       id = $id;
+            //   `,
+            //   {
+            //     $lastMessageTimestamp: Date.now(),
+            //     $lastMessageValue: `test ${Count}`,
+            //     $id: (Count % 3) + 1,
+            //   },
+            // );
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"

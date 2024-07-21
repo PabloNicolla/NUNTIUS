@@ -7,8 +7,8 @@ import { ThemedText } from "../themed-text";
 import { Avatar } from "react-native-paper";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { useSQLiteContext } from "expo-sqlite";
-import { Contact, PrivateChat } from "@/db/schemaTypes";
-import { getFirstContact, getFirstPrivateChat } from "@/db/statements";
+import { Contact } from "@/db/schemaTypes";
+import { getFirstContact } from "@/db/statements";
 
 type Props = {
   contactId?: number;

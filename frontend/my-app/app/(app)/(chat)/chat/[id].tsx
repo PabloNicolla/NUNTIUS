@@ -48,7 +48,7 @@ export default function ChatScreen() {
       if (!chat) {
         console.log("[CHAT_SCREEN]: TopNavBarChat ERROR invalid chatId");
       }
-      setChat(chat);
+      setChat(chat ?? null);
     }
     getChat();
   }, []);
@@ -65,7 +65,13 @@ export default function ChatScreen() {
         ReceiverType.PRIVATE_CHAT,
         true,
       );
-      setMessages(messages);
+      if (!messages) {
+        console.log("[CHAT_SCREEN]: getAllMessagesByChatId queried undefined");
+      }
+      setMessages(messages ?? []);
+    }
+    if (!chat) {
+      console.log("[CHAT_SCREEN]: TopNavBarChat ERROR invalid chatId");
     }
     getMessages();
   }, []);
@@ -77,12 +83,18 @@ export default function ChatScreen() {
       console.log("[CHAT_SCREEN]: db run Listener", event);
       if (event.tableName === "message") {
         async function getMessages() {
-          const messages = await getAllMessagesByChatId(
+          const updatedMessages = await getAllMessagesByChatId(
             db,
             Number(id),
             ReceiverType.PRIVATE_CHAT,
+            true,
           );
-          setMessages(messages);
+          if (!updatedMessages) {
+            console.log(
+              "[CHAT_SCREEN]: addDatabaseChangeListener queried undefined",
+            );
+          }
+          setMessages(updatedMessages ?? messages);
         }
         getMessages();
       }
