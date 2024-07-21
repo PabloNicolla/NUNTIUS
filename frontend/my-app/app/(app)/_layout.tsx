@@ -10,7 +10,7 @@ import { WebSocketProvider } from "@/providers/websocket-provider";
 
 export default function AppLayout() {
   const session = useSession();
-  const mydb = useRef(useSQLiteContext());
+  const db = useRef(useSQLiteContext());
 
   console.log("[APP_LAYOUT]: IS USER LOGGED IN:", session.isLoggedIn);
 
@@ -18,16 +18,8 @@ export default function AppLayout() {
     return <Redirect href={"/landing"} />;
   }
 
-  setTimeout(async () => {
-    console.log("MZZYAY");
-    console.log(mydb.current);
-
-    // const tt = await mydb.current.getAllAsync<Contact>(`SELECT * FROM contact`);
-    // console.log(tt);
-  }, 1000);
-
   return (
-    <WebSocketProvider>
+    <WebSocketProvider db={db}>
       <SelectionProvider>
         <AvatarModalProvider>
           <BottomNavbar />

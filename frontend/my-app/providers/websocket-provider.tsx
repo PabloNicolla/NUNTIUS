@@ -1,5 +1,6 @@
 import {
   createContext,
+  MutableRefObject,
   useContext,
   useEffect,
   useMemo,
@@ -7,9 +8,11 @@ import {
   useState,
 } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import { routeMessage } from "@/websocket/ws-routeHandler";
 import { useSession } from "./session-provider";
-import { useSQLiteContext } from "expo-sqlite";
+import { SQLiteDatabase } from "expo-sqlite";
+import { Contact, Message } from "@/db/schemaTypes";
+import { routeMessage } from "@/websocket/ws-routeHandler";
+import { insertMessage, updatePrivateChatById } from "@/db/statements";
 
 enum ConnectionStatus {
   CONNECTED,
@@ -36,17 +39,17 @@ export const useWebSocket = () => {
   return context;
 };
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { isLoggedIn, user } = useSession();
+export const WebSocketProvider: React.FC<{
+  children: React.ReactNode;
+  db: MutableRefObject<SQLiteDatabase>;
+}> = ({ children, db }) => {
+  const { user } = useSession();
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     ConnectionStatus.DISCONNECTED,
   );
   const socket = useRef<WebSocket | null>(null);
   const isConnecting = useRef<boolean>(false);
   const isReconnecting = useRef<boolean>(false);
-  const db = useSQLiteContext();
 
   const connect = async () => {
     if (isConnecting.current || isReconnecting.current) {
@@ -81,25 +84,27 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
       socket.current.onmessage = async (event) => {
         const message = JSON.parse(event.data);
-        // routeMessage(message, db);
+        const v: Message = message.message;
+
+        v.timestamp = Date.now();
+        v.chatId = v.senderId;
+
+        console.log("|||=-=-====-=-", v);
+
+        const ret = await insertMessage(db.current, v);
+        console.log("=-=-====-=-", ret);
+        const ret2 = await updatePrivateChatById(db.current, {
+          contactId: v.senderId,
+          id: v.chatId,
+          lastMessageId: ret.lastInsertRowId,
+          lastMessageTimestamp: v.timestamp,
+          lastMessageValue: v.value,
+        });
+
+        console.log(ret2);
+
+        // await routeMessage(message, db);
         console.log("[WEB_SOCKET]: Message received: ", message);
-        setTimeout(() => {
-          console.log("WWYAY");
-          console.log(db);
-        }, 5000);
-        if (db) {
-          try {
-            // Ensure database is open before accessing it
-            await db.withTransactionAsync(async () => {
-              const testing1 = await db.execAsync("SELECT * FROM contact");
-              console.log(testing1);
-            });
-          } catch (dbError) {
-            console.error("Database error: ", dbError);
-          }
-        } else {
-          console.error("Database is not initialized.");
-        }
       };
     } catch (error) {
       console.error("[WEB_SOCKET]: Connection error: ", error);
