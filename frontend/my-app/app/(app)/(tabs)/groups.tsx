@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/reducers/useChatReducer";
 import { getAllPrivateChatsJoinContacts } from "@/db/statements";
+import { Contact } from "@/db/schemaTypes";
 const headerHeight = 50;
 
 const App = () => {

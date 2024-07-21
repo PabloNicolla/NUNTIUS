@@ -59,8 +59,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("received it", text_data)
         data = json.loads(text_data)
-        message = text_data
-        receiver_id = data.get('receiverId')
+        message_type = data.get('type')
+
+        if message_type != "PRIVATE_CHAT":
+            return
+
+        message = data.get('message')
+        receiver_id = message.get('receiverId')
+
+        print("-------", receiver_id)
 
         if receiver_id:
             receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
@@ -88,7 +95,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "message": message
+            "message": message,
+            "type": "PRIVATE_CHAT"
         }))
 
     async def close_connection(self, event):

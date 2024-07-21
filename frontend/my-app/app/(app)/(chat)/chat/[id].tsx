@@ -164,7 +164,7 @@ const HeaderComponent = ({
               type: MessageType.TEXT,
               value: messageValue,
             };
-            sendMessage(message);
+            sendMessage({ message, type: "PRIVATE_CHAT" });
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
@@ -230,7 +230,23 @@ const HeaderComponent = ({
         <View className="w-10 items-center justify-end overflow-hidden rounded-full">
           <TouchableRipple
             className="p-2"
-            onPress={() => {}}
+            onPress={() => {
+              console.log("pressed");
+              const message: Message = {
+                id: 1,
+                chatId: 1,
+                condition: Condition.NORMAL,
+                receiverId: 999,
+                senderId: 1,
+                receiverType: ReceiverType.PRIVATE_CHAT,
+                senderReferenceId: 1,
+                status: MessageStatus.PENDING,
+                timestamp: Date.now(),
+                type: MessageType.TEXT,
+                value: messageValue,
+              };
+              sendMessage({ message, type: "PRIVATE_CHAT" });
+            }}
             rippleColor={
               theme === "dark"
                 ? "rgba(255, 255, 255, .32)"
