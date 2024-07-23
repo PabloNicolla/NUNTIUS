@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, useColorScheme, View } from "react-native";
+import { Image, Pressable, useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Avatar, TouchableRipple } from "react-native-paper";
 import { useSelection } from "@/providers/chat-provider";
@@ -7,7 +7,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
-import { PrivateChat } from "@/db/schemaTypes";
 
 export type ChatListItemProps = {
   id: number;

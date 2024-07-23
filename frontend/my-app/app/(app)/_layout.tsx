@@ -1,5 +1,4 @@
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
-import { Contact } from "@/db/schemaTypes";
 import { AvatarModalProvider } from "@/providers/avatarModal-provider";
 import { SelectionProvider } from "@/providers/chat-provider";
 import { useSession } from "@/providers/session-provider";

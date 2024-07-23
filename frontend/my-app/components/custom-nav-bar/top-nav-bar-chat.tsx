@@ -27,7 +27,7 @@ const TopNavBarChat = ({ contactId }: Props) => {
         if (!contact) {
           console.log("TopNavBarChat ERROR invalid contactId");
         }
-        setContact(contact);
+        setContact(contact ?? null);
       }
     }
     getChatAndContact();

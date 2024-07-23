@@ -10,9 +10,7 @@ import {
 import NetInfo from "@react-native-community/netinfo";
 import { useSession } from "./session-provider";
 import { SQLiteDatabase } from "expo-sqlite";
-import { Contact, Message } from "@/db/schemaTypes";
 import { routeMessage } from "@/websocket/ws-routeHandler";
-import { insertMessage, updatePrivateChatById } from "@/db/statements";
 
 enum ConnectionStatus {
   CONNECTED,

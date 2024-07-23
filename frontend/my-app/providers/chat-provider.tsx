@@ -1,13 +1,7 @@
-import {
-  deleteAllMessageByChatId,
-  deletePrivateChat,
-  getFirstPrivateChat,
-} from "@/db/statements";
 import { SQLiteDatabase } from "expo-sqlite";
 import React, {
   createContext,
   MutableRefObject,
-  useCallback,
   useContext,
   useEffect,
   useMemo,

@@ -1,7 +1,6 @@
 import TopNavBarChat from "@/components/custom-nav-bar/top-nav-bar-chat";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Colors } from "@/constants/Colors";
 import {
   Condition,
   Contact,
@@ -23,19 +22,12 @@ import {
 import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import {
-  addDatabaseChangeListener,
-  DatabaseChangeEvent,
-  useSQLiteContext,
-} from "expo-sqlite";
-import { useEffect, useRef, useState } from "react";
+import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
+import { useEffect, useState } from "react";
 import {
   FlatList,
   Platform,
-  Pressable,
-  ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   useColorScheme,
   View,
