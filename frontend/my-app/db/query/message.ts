@@ -1,6 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Message } from "react-hook-form";
-import { ReceiverType } from "../schemaTypes";
+import { Message, ReceiverType } from "../schemaTypes";
 
 export const getAllMessages = async (db: SQLiteDatabase) => {
   try {

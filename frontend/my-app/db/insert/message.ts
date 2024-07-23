@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Message } from "react-hook-form";
+import { Message } from "../schemaTypes";
 
 export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
   try {
