@@ -1,15 +1,13 @@
 import { Condition, Message } from "@/db/schemaTypes";
 import {
-  getAllPrivateChats,
-  getFirstMessage,
   getFirstMessageBySenderRef,
   getFirstPrivateChat,
   insertMessage,
+  insertPrivateChat,
   updateMessage,
   updatePrivateChatById,
 } from "@/db/statements";
-import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
-import * as SQLite from "expo-sqlite";
+import { SQLiteDatabase } from "expo-sqlite";
 import { MutableRefObject } from "react";
 
 export async function handlePrivateMessage(
@@ -28,19 +26,34 @@ export async function handlePrivateMessage(
       console.log("[handlePrivateMessage]: ERROR message outcome is undefined");
     }
 
-    console.log("=-=-=-=-", msgOutcome);
+    const chat = await getFirstPrivateChat(db.current, message.senderId);
 
-    await updatePrivateChatById(
-      db.current,
-      {
-        contactId: message.senderId,
+    if (!chat) {
+      // axios call get contact from backend
+
+      // insert contact
+
+      await insertPrivateChat(db.current, {
         id: message.senderId,
+        contactId: message.senderId,
         lastMessageId: msgOutcome!.lastInsertRowId,
         lastMessageTimestamp: message.timestamp,
         lastMessageValue: message.value,
-      },
-      true,
-    );
+        notificationCount: 1,
+      });
+    } else {
+      await updatePrivateChatById(
+        db.current,
+        {
+          contactId: message.senderId,
+          id: message.senderId,
+          lastMessageId: msgOutcome!.lastInsertRowId,
+          lastMessageTimestamp: message.timestamp,
+          lastMessageValue: message.value,
+        },
+        true,
+      );
+    }
   } else {
     await updateMessage(db.current, message);
     const chat = await getFirstPrivateChat(db.current, message.senderId);
