@@ -7,6 +7,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 3,
@@ -21,6 +23,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 4,
@@ -28,6 +31,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 5,
@@ -35,6 +39,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 6,
@@ -42,6 +47,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 7,
@@ -49,6 +55,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 8,
@@ -56,6 +63,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 9,
@@ -63,6 +71,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 10,
@@ -70,6 +79,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 11,
@@ -77,6 +87,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 12,
@@ -84,6 +95,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 13,
@@ -91,6 +103,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 14,
@@ -98,6 +111,7 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
   {
     id: 15,
@@ -105,5 +119,6 @@ export const privateChats: PrivateChat[] = [
     lastMessageId: undefined,
     lastMessageTimestamp: undefined,
     lastMessageValue: undefined,
+    notificationCount: 0,
   },
 ];

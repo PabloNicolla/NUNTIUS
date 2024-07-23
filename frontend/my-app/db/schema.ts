@@ -16,7 +16,8 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
         contactId INTEGER NOT NULL,
         lastMessageId INTEGER,
         lastMessageValue TEXT,
-        lastMessageTimestamp INTEGER
+        lastMessageTimestamp INTEGER,
+        notificationCount INTEGER
     );
     
     CREATE TABLE IF NOT EXISTS message (

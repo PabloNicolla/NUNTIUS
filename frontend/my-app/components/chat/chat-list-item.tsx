@@ -1,4 +1,4 @@
-import { Image, Pressable, useColorScheme, View } from "react-native";
+import { Image, Pressable, Text, useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Avatar, TouchableRipple } from "react-native-paper";
 import { useSelection } from "@/providers/chat-provider";
@@ -15,6 +15,7 @@ export type ChatListItemProps = {
   lastMessageId?: number;
   lastMessageValue?: string;
   lastMessageTimestamp?: number;
+  notificationCount?: number;
   username: string;
   name: string;
   imageURL?: string;
@@ -28,6 +29,7 @@ const ChatListItem = React.memo(function ChatListItem({
   lastMessageId,
   lastMessageValue,
   lastMessageTimestamp,
+  notificationCount,
   username,
   name,
   imageURL,
@@ -83,7 +85,10 @@ const ChatListItem = React.memo(function ChatListItem({
               chatName={name}
               lastMessageTime={lastMessageTimestamp}
             />
-            <MostRecentMessage recentMessage={lastMessageValue} />
+            <MostRecentMessage
+              recentMessage={lastMessageValue}
+              notificationCount={notificationCount}
+            />
           </View>
         </View>
       </TouchableRipple>
@@ -177,16 +182,33 @@ const ChatDetails = ({
   );
 };
 
-const MostRecentMessage = ({ recentMessage }: { recentMessage?: string }) => {
+const MostRecentMessage = ({
+  recentMessage,
+  notificationCount,
+}: {
+  recentMessage?: string;
+  notificationCount?: number;
+}) => {
   return (
-    <View className="h-1/2 w-full justify-center">
-      <ThemedText
-        className="overflow-ellipsis text-text-light/70 dark:text-text-dark/70"
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {recentMessage}
-      </ThemedText>
+    <View className="h-1/2 w-full flex-row justify-between">
+      <View className="flex-1 justify-center overflow-hidden">
+        <ThemedText
+          className="overflow-ellipsis text-text-light/70 dark:text-text-dark/70"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {recentMessage}
+        </ThemedText>
+      </View>
+      {!!notificationCount && (
+        <View className="h-full items-end justify-center">
+          <View className="h-5 w-5 items-center rounded-full bg-primary-light">
+            <ThemedText className="text-sm">
+              <Text>{notificationCount}</Text>
+            </ThemedText>
+          </View>
+        </View>
+      )}
     </View>
   );
 };

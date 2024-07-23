@@ -17,19 +17,22 @@ export const insertPrivateChat = async (
               contactId,
               lastMessageId,
               lastMessageValue,
-              lastMessageTimestamp
+              lastMessageTimestamp,
+              notificationCount
           ) 
           VALUES (
               $contactId,
               $lastMessageId,
               $lastMessageValue,
-              $lastMessageTimestamp
+              $lastMessageTimestamp,
+              $notificationCount
           )`,
       {
         $contactId: chat.contactId,
         $lastMessageId: chat.lastMessageId ?? null,
         $lastMessageValue: chat.lastMessageValue ?? null,
         $lastMessageTimestamp: chat.lastMessageTimestamp ?? null,
+        $notificationCount: chat.notificationCount ?? 0,
       },
     );
   } catch (error) {
@@ -192,6 +195,7 @@ export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
           pc.lastMessageId,
           pc.lastMessageValue,
           pc.lastMessageTimestamp,
+          pc.notificationCount,
           c.imageURL,
           c.name,
           c.username
@@ -222,6 +226,7 @@ export const getAllMessagesByChatId = async (
 export const updatePrivateChatById = async (
   db: SQLiteDatabase,
   chat: PrivateChat,
+  updateNotificationCount?: boolean,
 ) => {
   try {
     if (!chat.lastMessageId || !chat.lastMessageTimestamp) {
@@ -230,24 +235,67 @@ export const updatePrivateChatById = async (
       );
       return undefined;
     }
+    if (updateNotificationCount) {
+      return await db.runAsync(
+        `
+          UPDATE private_chat
+            SET 
+              lastMessageId = $lastMessageId,
+              lastMessageValue = $lastMessageValue,
+              lastMessageTimestamp = $lastMessageTimestamp,
+              notificationCount = COALESCE(notificationCount, 0) + 1
+            WHERE
+              id = $id;
+          `,
+        {
+          $lastMessageId: chat.lastMessageId,
+          $lastMessageValue: chat.lastMessageValue ?? "Something went wrong",
+          $lastMessageTimestamp: chat.lastMessageTimestamp,
+          $id: chat.id,
+        },
+      );
+    } else {
+      return await db.runAsync(
+        `
+          UPDATE private_chat
+            SET 
+              lastMessageId = $lastMessageId,
+              lastMessageValue = $lastMessageValue,
+              lastMessageTimestamp = $lastMessageTimestamp
+            WHERE
+              id = $id;
+          `,
+        {
+          $lastMessageId: chat.lastMessageId,
+          $lastMessageValue: chat.lastMessageValue ?? "Something went wrong",
+          $lastMessageTimestamp: chat.lastMessageTimestamp,
+          $id: chat.id,
+        },
+      );
+    }
+  } catch (error) {
+    console.log("[STATEMENTS]: updatePrivateChatById", error);
+  }
+};
+
+export const resetPrivateChatNotificationCount = async (
+  db: SQLiteDatabase,
+  chatId: number,
+) => {
+  try {
     return await db.runAsync(
       `
-        UPDATE private_chat
-          SET 
-            lastMessageId = $lastMessageId,
-            lastMessageValue = $lastMessageValue,
-            lastMessageTimestamp = $lastMessageTimestamp
-          WHERE
-            id = $id;
-        `,
+          UPDATE private_chat
+            SET 
+              notificationCount = 0
+            WHERE
+              id = $id;
+          `,
       {
-        $lastMessageId: chat.lastMessageId,
-        $lastMessageValue: chat.lastMessageValue ?? "Something went wrong",
-        $lastMessageTimestamp: chat.lastMessageTimestamp,
-        $id: chat.id,
+        $id: chatId,
       },
     );
   } catch (error) {
-    console.log("[STATEMENTS]: updatePrivateChatById", error);
+    console.log("[STATEMENTS]: resetPrivateChatNotificationCount", error);
   }
 };

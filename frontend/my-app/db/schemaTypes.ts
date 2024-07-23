@@ -11,6 +11,7 @@ export type PrivateChat = {
   lastMessageId?: number;
   lastMessageValue?: string;
   lastMessageTimestamp?: number;
+  notificationCount?: number;
 };
 
 export type PrivateChatJoinContact = {
@@ -19,6 +20,7 @@ export type PrivateChatJoinContact = {
   lastMessageId?: number;
   lastMessageValue?: string;
   lastMessageTimestamp?: number;
+  notificationCount?: number;
   username: string;
   name: string;
   imageURL?: string;

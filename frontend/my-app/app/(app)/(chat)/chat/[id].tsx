@@ -14,6 +14,7 @@ import {
   getAllMessagesByChatId,
   getFirstPrivateChat,
   insertMessage,
+  resetPrivateChatNotificationCount,
   updatePrivateChatById,
 } from "@/db/statements";
 import { useSession } from "@/providers/session-provider";
@@ -60,6 +61,7 @@ export default function ChatScreen() {
       setChat(chat ?? null);
     }
     getChat();
+    resetPrivateChatNotificationCount(db, Number(chatId));
   }, []);
 
   useEffect(() => {
@@ -149,11 +151,7 @@ export default function ChatScreen() {
               nestedScrollEnabled={true}
             />
           </View>
-          <HeaderComponent
-            chatId={Number(chatId)}
-            contactId={Number(contactId)}
-            handleSendMessage={() => {}}
-          />
+          <HeaderComponent chat={chat} handleSendMessage={() => {}} />
         </SafeAreaView>
       </KeyboardAvoidingView>
     </ThemedView>
@@ -162,12 +160,10 @@ export default function ChatScreen() {
 
 const HeaderComponent = ({
   handleSendMessage,
-  contactId,
-  chatId,
+  chat,
 }: {
   handleSendMessage: (query: string) => void;
-  contactId: number;
-  chatId: number;
+  chat: PrivateChat | null;
 }) => {
   const theme = useColorScheme();
   const [messageValue, setMessageValue] = useState("");
@@ -181,32 +177,36 @@ const HeaderComponent = ({
           className="bg-primary-light/50 p-3 dark:bg-primary-light"
           onPress={async () => {
             console.log("pressed");
-            const message: Message = {
-              id: 1,
-              chatId: chatId,
-              condition: Condition.NORMAL,
-              receiverId: contactId,
-              senderId: 999,
-              receiverType: ReceiverType.PRIVATE_CHAT,
-              senderReferenceId: 1,
-              status: MessageStatus.PENDING,
-              timestamp: Date.now(),
-              type: MessageType.TEXT,
-              value: messageValue,
-            };
-            sendMessage({ message, type: "PRIVATE_CHAT" });
+            if (chat) {
+              const message: Message = {
+                id: 1,
+                chatId: chat.id,
+                condition: Condition.NORMAL,
+                receiverId: chat.contactId,
+                senderId: 999,
+                receiverType: ReceiverType.PRIVATE_CHAT,
+                senderReferenceId: 1,
+                status: MessageStatus.PENDING,
+                timestamp: Date.now(),
+                type: MessageType.TEXT,
+                value: messageValue,
+              };
+              sendMessage({ message, type: "PRIVATE_CHAT" });
 
-            const ret = await insertMessage(db, message);
-            console.log("||||=-=-====-=-", ret);
-            const ret2 = await updatePrivateChatById(db, {
-              contactId: message.receiverId,
-              id: message.chatId,
-              lastMessageId: ret.lastInsertRowId,
-              lastMessageTimestamp: message.timestamp,
-              lastMessageValue: message.value,
-            });
+              const ret = await insertMessage(db, message);
+              console.log("||||=-=-====-=-", ret);
+              const ret2 = await updatePrivateChatById(db, {
+                contactId: message.receiverId,
+                id: message.chatId,
+                lastMessageId: ret.lastInsertRowId,
+                lastMessageTimestamp: message.timestamp,
+                lastMessageValue: message.value,
+              });
 
-            setMessageValue("");
+              setMessageValue("");
+            } else {
+              console.log("[CHAT_SCREEN]: ERROR: chat is null");
+            }
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
