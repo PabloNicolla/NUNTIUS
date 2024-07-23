@@ -5,17 +5,17 @@ import { insertMessage, updatePrivateChatById } from "@/db/statements";
 import { Message } from "@/db/schemaTypes";
 
 export async function routeMessage(
-  message: any,
+  wsMessage: { message: any; type: string },
   db: MutableRefObject<SQLiteDatabase>,
 ) {
-  switch (message.type) {
+  switch (wsMessage.type) {
     case "PRIVATE_CHAT":
-      await handlePrivateMessage(message, db);
+      await handlePrivateMessage(wsMessage, db);
       break;
     case "GROUP_CHAT":
-      handleGroupMessage(message);
+      handleGroupMessage(wsMessage);
       break;
     default:
-      console.error("Unknown message type:", message.type);
+      console.error("Unknown message type:", wsMessage.type);
   }
 }

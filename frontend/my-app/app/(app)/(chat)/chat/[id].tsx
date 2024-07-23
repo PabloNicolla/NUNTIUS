@@ -27,7 +27,7 @@ import {
   DatabaseChangeEvent,
   useSQLiteContext,
 } from "expo-sqlite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   Platform,
@@ -101,65 +101,22 @@ export default function ChatScreen() {
     const listener = addDatabaseChangeListener(async (event) => {
       if (event.tableName === "message") {
         const new_message = await getFirstMessage(db, event.rowId);
-        if (new_message?.chatId === Number(chatId) && new_message) {
-          setMessages((prevMessages) => [new_message, ...prevMessages]);
+        if (new_message && new_message?.chatId === Number(chatId)) {
+          if (new_message.condition === Condition.NORMAL) {
+            setMessages((prevMessages) => [new_message, ...prevMessages]);
+          } else {
+            setMessages((prevMessages) =>
+              prevMessages.map((message) =>
+                message.id === new_message.id ? new_message : message,
+              ),
+            );
+          }
         }
       }
     });
 
     return () => listener.remove();
   }, [db, chatId]);
-
-  // useEffect(() => {
-  //   console.log(
-  //     "[CHAT_SCREEN]: INITIAL DB LOAD: get all messages for chat_id: %d",
-  //     Number(chatId),
-  //   );
-  //   async function getMessages() {
-  //     const messages = await getAllMessagesByChatId(
-  //       db,
-  //       Number(chatId),
-  //       ReceiverType.PRIVATE_CHAT,
-  //       undefined,
-  //       undefined,
-  //       true,
-  //     );
-  //     if (!messages) {
-  //       console.log("[CHAT_SCREEN]: getAllMessagesByChatId queried undefined");
-  //     }
-  //     setMessages(messages ?? []);
-  //   }
-  //   getMessages();
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log("[CHAT_SCREEN]: db add Listener");
-
-  //   const listener = addDatabaseChangeListener((event) => {
-  //     console.log("[CHAT_SCREEN]: db run Listener", event);
-  //     if (event.tableName === "message") {
-  //       async function getMessages() {
-  //         const updatedMessages = await getAllMessagesByChatId(
-  //           db,
-  //           Number(chatId),
-  //           ReceiverType.PRIVATE_CHAT,
-  //           undefined,
-  //           undefined,
-  //           true,
-  //         );
-  //         if (!updatedMessages) {
-  //           console.log(
-  //             "[CHAT_SCREEN]: addDatabaseChangeListener queried undefined",
-  //           );
-  //         }
-  //         setMessages(updatedMessages ?? messages);
-  //       }
-  //       getMessages();
-  //     }
-  //   });
-
-  //   return () => listener.remove();
-  // }, [db, chatId]);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return <MessageItem item={item} user={user} />;
@@ -209,8 +166,6 @@ const MessageItem = React.memo(function MessageItem({
   item: Message;
   user: Contact;
 }) {
-  console.log("-------------------------------------", item.id);
-
   return (
     <View
       className={`mb-4 ${item.senderId === user.id ? "items-end" : "items-start"}`}
@@ -222,7 +177,11 @@ const MessageItem = React.memo(function MessageItem({
             : "items-start bg-gray-500/40"
         }`}
       >
-        <ThemedText>{item.value}</ThemedText>
+        <ThemedText>
+          {item.condition === Condition.DELETED
+            ? "[message was deleted]"
+            : item.value}
+        </ThemedText>
       </View>
     </View>
   );
@@ -235,7 +194,7 @@ const HeaderComponent = ({
   handleSendMessage: (query: string) => void;
   chat: PrivateChat | null;
 }) => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const [messageValue, setMessageValue] = useState("");
   const { sendMessage } = useWebSocket();
   const db = useSQLiteContext();
@@ -244,7 +203,7 @@ const HeaderComponent = ({
     <View className="flex-row">
       <View className="mx-2 mb-2 justify-end overflow-hidden rounded-full">
         <TouchableRipple
-          className="bg-primary-light/50 p-3 dark:bg-primary-light"
+          className="rounded-full bg-primary-light/50 p-3 dark:bg-primary-light"
           onPress={async () => {
             console.log("pressed");
             if (chat) {
@@ -344,20 +303,6 @@ const HeaderComponent = ({
             className="p-2"
             onPress={() => {
               console.log("pressed");
-              const message: Message = {
-                id: 1,
-                chatId: 1,
-                condition: Condition.NORMAL,
-                receiverId: 999,
-                senderId: 1,
-                receiverType: ReceiverType.PRIVATE_CHAT,
-                senderReferenceId: 1,
-                status: MessageStatus.PENDING,
-                timestamp: Date.now(),
-                type: MessageType.TEXT,
-                value: messageValue,
-              };
-              sendMessage({ message, type: "PRIVATE_CHAT" });
             }}
             rippleColor={
               theme === "dark"

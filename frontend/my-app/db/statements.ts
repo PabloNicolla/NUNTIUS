@@ -155,6 +155,7 @@ export const getFirstContact = async (
     console.log("[STATEMENTS]: getFirstContact", error);
   }
 };
+
 export const getFirstMessage = async (
   db: SQLiteDatabase,
   messageId: number,
@@ -170,6 +171,7 @@ export const getFirstMessage = async (
     console.log("[STATEMENTS]: getFirstMessage", error);
   }
 };
+
 export const getFirstPrivateChat = async (
   db: SQLiteDatabase,
   privateChatId: number,
@@ -217,7 +219,16 @@ export const getAllMessagesByChatIdWithPagination = async (
 ) => {
   try {
     return await db.getAllAsync<Message>(
-      `SELECT * FROM message WHERE $chatId = chatId AND $receiverType = receiverType ${sort ? "ORDER BY timestamp DESC" : ""} LIMIT $limit OFFSET $offset;`,
+      `
+      SELECT *
+      FROM message
+      WHERE 
+        $chatId = chatId
+        AND $receiverType = receiverType 
+      ${sort ? "ORDER BY timestamp DESC" : ""}
+      LIMIT $limit
+      OFFSET $offset;
+      `,
       {
         $chatId: chatId,
         $receiverType: receiverType,
@@ -304,5 +315,55 @@ export const resetPrivateChatNotificationCount = async (
     );
   } catch (error) {
     console.log("[STATEMENTS]: resetPrivateChatNotificationCount", error);
+  }
+};
+
+export const updateMessage = async (db: SQLiteDatabase, message: Message) => {
+  try {
+    return await db.runAsync(
+      `UPDATE message
+        SET
+          value = $value,
+          condition = $condition
+        WHERE
+          chatId = $chatId
+          AND senderReferenceId = $senderReferenceId;
+          `,
+      {
+        $value: message.value,
+        $condition: message.condition,
+        $chatId: message.chatId,
+        $senderReferenceId: message.senderReferenceId,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: updateMessage", error);
+  }
+};
+
+export const getFirstMessageBySenderRef = async (
+  db: SQLiteDatabase,
+  chatId: number,
+  senderReferenceId: number,
+  senderId: number,
+) => {
+  try {
+    return await db.getFirstAsync<Message>(
+      `
+      SELECT * 
+      FROM message 
+      WHERE 
+        $chatId = chatId
+        AND $senderReferenceId = senderReferenceId
+        AND $senderId = senderId;
+        `,
+      {
+        $chatId: chatId,
+        $senderReferenceId: senderReferenceId,
+        $senderId: senderId,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: getFirstMessage", error);
   }
 };

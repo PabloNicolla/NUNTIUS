@@ -83,9 +83,9 @@ export const WebSocketProvider: React.FC<{
       };
 
       socket.current.onmessage = async (event) => {
-        const message = JSON.parse(event.data);
-        await routeMessage(message, db);
-        console.log("[WEB_SOCKET]: Message received: ", message);
+        const wsMessage = JSON.parse(event.data);
+        await routeMessage(wsMessage, db);
+        console.log("[WEB_SOCKET]: Message received: ", wsMessage);
       };
     } catch (error) {
       console.error("[WEB_SOCKET]: Connection error: ", error);

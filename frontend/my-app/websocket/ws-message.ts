@@ -1,7 +1,11 @@
-import { Message } from "@/db/schemaTypes";
+import { Condition, Message } from "@/db/schemaTypes";
 import {
   getAllPrivateChats,
+  getFirstMessage,
+  getFirstMessageBySenderRef,
+  getFirstPrivateChat,
   insertMessage,
+  updateMessage,
   updatePrivateChatById,
 } from "@/db/statements";
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
@@ -9,31 +13,64 @@ import * as SQLite from "expo-sqlite";
 import { MutableRefObject } from "react";
 
 export async function handlePrivateMessage(
-  message: any,
+  wsMessage: { message: Message; type: string },
   db: MutableRefObject<SQLiteDatabase>,
 ) {
-  const v: Message = message.message;
+  const message: Message = wsMessage.message;
 
-  v.timestamp = Date.now();
-  v.chatId = v.senderId;
+  if (message.condition === Condition.NORMAL) {
+    message.timestamp = Date.now();
+    message.chatId = message.senderId;
 
-  console.log("|||=-=-====-=-", v);
+    const msgOutcome = await insertMessage(db.current, message);
 
-  const ret = await insertMessage(db.current, v);
-  console.log("=-=-====-=-", ret);
-  const ret2 = await updatePrivateChatById(
-    db.current,
-    {
-      contactId: v.senderId,
-      id: v.chatId,
-      lastMessageId: ret.lastInsertRowId,
-      lastMessageTimestamp: v.timestamp,
-      lastMessageValue: v.value,
-    },
-    true,
-  );
+    if (!msgOutcome) {
+      console.log("[handlePrivateMessage]: ERROR message outcome is undefined");
+    }
 
-  console.log(ret2);
+    console.log("=-=-=-=-", msgOutcome);
+
+    await updatePrivateChatById(
+      db.current,
+      {
+        contactId: message.senderId,
+        id: message.senderId,
+        lastMessageId: msgOutcome!.lastInsertRowId,
+        lastMessageTimestamp: message.timestamp,
+        lastMessageValue: message.value,
+      },
+      true,
+    );
+  } else {
+    await updateMessage(db.current, message);
+    const chat = await getFirstPrivateChat(db.current, message.senderId);
+    const localMessage = await getFirstMessageBySenderRef(
+      db.current,
+      message.senderId,
+      message.senderReferenceId,
+      message.senderId,
+    );
+
+    if (!localMessage) {
+      console.log(
+        "[handlePrivateMessage]: ERROR localMessage is could not be found",
+      );
+    }
+
+    if (chat?.lastMessageId === localMessage?.id) {
+      await updatePrivateChatById(
+        db.current,
+        {
+          contactId: message.senderId,
+          id: message.chatId,
+          lastMessageId: localMessage!.id,
+          lastMessageTimestamp: localMessage!.timestamp,
+          lastMessageValue: localMessage!.value,
+        },
+        false,
+      );
+    }
+  }
 }
 export function handleGroupMessage(message: any) {}
 export function handleStatusUpdate(message: any) {}
