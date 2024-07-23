@@ -20,7 +20,7 @@ const ContactListItem = React.memo(function ContactListItem({
 }: ContactListItemProps) {
   const theme = useColorScheme() ?? "light";
 
-  console.log("++++++++++++++++++++++", id);
+  console.log("[CONTACT_LIST_ITEM]: MOUNTING: %d", id);
 
   return (
     <View className="h-[80] w-full">
@@ -28,7 +28,10 @@ const ContactListItem = React.memo(function ContactListItem({
         className={`z-20 flex-1`}
         onPress={() => {
           console.log("Pressed");
-          router.push({ pathname: `/chat/[id]`, params: { id: id } });
+          router.push({
+            pathname: `/chat/[id]`,
+            params: { id: id, contactId: id, canCreateChatIfNull: "yes" },
+          });
           return true;
         }}
         rippleColor={

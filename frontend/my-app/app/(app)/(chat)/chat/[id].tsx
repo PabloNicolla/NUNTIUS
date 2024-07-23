@@ -16,6 +16,7 @@ import {
   getFirstMessage,
   getFirstPrivateChat,
   insertMessage,
+  insertPrivateChat,
   resetPrivateChatNotificationCount,
   updatePrivateChatById,
 } from "@/db/statements";
@@ -52,7 +53,7 @@ export default function ChatScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const PAGE_LIMIT = 20;
 
-  const { id: chatId, contactId } = useLocalSearchParams();
+  const { id: chatId, contactId, canCreateChatIfNull } = useLocalSearchParams();
   const theme = useColorScheme();
   const db = useSQLiteContext();
   const { user } = useSession();
@@ -60,6 +61,12 @@ export default function ChatScreen() {
   if (!contactId) {
     console.log("[CHAT_SCREEN]: ERROR: missing contactId");
   }
+
+  useEffect(() => {
+    return () => {
+      resetPrivateChatNotificationCount(db, Number(chatId));
+    };
+  }, []);
 
   useEffect(() => {
     async function loadMessages() {
@@ -82,7 +89,7 @@ export default function ChatScreen() {
     }
 
     loadMessages();
-  }, [page, chatId]);
+  }, [page, chatId, db]);
 
   useEffect(() => {
     console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", Number(chatId));
@@ -152,7 +159,14 @@ export default function ChatScreen() {
               }}
             />
           </View>
-          <HeaderComponent chat={chat} handleSendMessage={() => {}} />
+          <HeaderComponent
+            chat={chat}
+            canCreateChatIfNull={String(canCreateChatIfNull)}
+            contactId={Number(contactId)}
+            setChat={(chat: PrivateChat | null) => {
+              setChat(chat);
+            }}
+          />
         </SafeAreaView>
       </KeyboardAvoidingView>
     </ThemedView>
@@ -188,16 +202,66 @@ const MessageItem = React.memo(function MessageItem({
 });
 
 const HeaderComponent = ({
-  handleSendMessage,
   chat,
+  canCreateChatIfNull,
+  contactId,
+  setChat,
 }: {
-  handleSendMessage: (query: string) => void;
   chat: PrivateChat | null;
+  canCreateChatIfNull: string;
+  contactId: number;
+  setChat: (chat: PrivateChat | null) => void;
 }) => {
   const theme = useColorScheme() ?? "dark";
   const [messageValue, setMessageValue] = useState("");
   const { sendMessage } = useWebSocket();
   const db = useSQLiteContext();
+
+  const handleSendMessage = async () => {
+    if (canCreateChatIfNull === "yes" && !chat) {
+      await insertPrivateChat(db, { id: contactId, contactId });
+      chat = (await getFirstPrivateChat(db, contactId)) ?? null;
+      setChat(chat);
+    }
+
+    if (chat) {
+      const message: Message = {
+        id: -1,
+        chatId: chat.id,
+        condition: Condition.NORMAL,
+        receiverId: chat.contactId,
+        senderId: 999,
+        receiverType: ReceiverType.PRIVATE_CHAT,
+        senderReferenceId: -1,
+        status: MessageStatus.PENDING,
+        timestamp: Date.now(),
+        type: MessageType.TEXT,
+        value: messageValue,
+      };
+      const ret = await insertMessage(db, message);
+
+      if (!ret) {
+        throw Error("[CHAT_SCREEN]: ERROR: failed to insert new message in DB");
+      }
+
+      message.id = ret.lastInsertRowId;
+      message.senderReferenceId = ret.lastInsertRowId;
+
+      sendMessage({ message, type: "PRIVATE_CHAT" });
+
+      await updatePrivateChatById(db, {
+        contactId: message.receiverId,
+        id: message.chatId,
+        lastMessageId: ret.lastInsertRowId,
+        lastMessageTimestamp: message.timestamp,
+        lastMessageValue: message.value,
+      });
+
+      setMessageValue("");
+    } else {
+      console.log("[CHAT_SCREEN]: ERROR: chat is null");
+    }
+  };
 
   return (
     <View className="flex-row">
@@ -206,36 +270,7 @@ const HeaderComponent = ({
           className="rounded-full bg-primary-light/50 p-3 dark:bg-primary-light"
           onPress={async () => {
             console.log("pressed");
-            if (chat) {
-              const message: Message = {
-                id: 1,
-                chatId: chat.id,
-                condition: Condition.NORMAL,
-                receiverId: chat.contactId,
-                senderId: 999,
-                receiverType: ReceiverType.PRIVATE_CHAT,
-                senderReferenceId: 1,
-                status: MessageStatus.PENDING,
-                timestamp: Date.now(),
-                type: MessageType.TEXT,
-                value: messageValue,
-              };
-              sendMessage({ message, type: "PRIVATE_CHAT" });
-
-              const ret = await insertMessage(db, message);
-              console.log("||||=-=-====-=-", ret);
-              const ret2 = await updatePrivateChatById(db, {
-                contactId: message.receiverId,
-                id: message.chatId,
-                lastMessageId: ret.lastInsertRowId,
-                lastMessageTimestamp: message.timestamp,
-                lastMessageValue: message.value,
-              });
-
-              setMessageValue("");
-            } else {
-              console.log("[CHAT_SCREEN]: ERROR: chat is null");
-            }
+            handleSendMessage();
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"

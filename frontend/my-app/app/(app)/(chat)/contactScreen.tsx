@@ -29,31 +29,29 @@ const ChatOptions = (props: Props) => {
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useContactReducer();
 
-  useEffect(() => {
-    console.log("----- db contact initial load -----");
-    const fetchChats = async () => {
-      const allContacts = await getAllContacts(db);
-      dispatch({ type: "SET_CONTACTS", payload: allContacts });
-    };
-    fetchChats();
+  const fetchAllContacts = useCallback(async () => {
+    const allContacts = await getAllContacts(db);
+    if (!allContacts) {
+      console.log("[CONTACT_SCREEN]: getAllContacts queried undefined");
+    }
+    dispatch({ type: "SET_CONTACTS", payload: allContacts ?? [] });
   }, [db, dispatch]);
 
   useEffect(() => {
-    console.log("----- db contact add listener -----");
+    console.log("[CONTACT_SCREEN]: db contact initial load");
+    fetchAllContacts();
+  }, [db, dispatch, fetchAllContacts]);
 
+  useEffect(() => {
+    console.log("[CONTACT_SCREEN]: db contact add listener");
     const listener = addDatabaseChangeListener((event) => {
-      console.log("----- db contact run Listener -----", event);
+      console.log("[CONTACT_SCREEN]: db contact run Listener", event);
       if (event.tableName === "contact") {
-        const fetchChats = async () => {
-          const allContacts = await getAllContacts(db);
-          dispatch({ type: "SET_CONTACTS", payload: allContacts });
-        };
-        fetchChats();
+        fetchAllContacts();
       }
     });
-
     return () => listener.remove();
-  }, [db, dispatch]);
+  }, [db, dispatch, fetchAllContacts]);
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -84,7 +82,6 @@ const ChatOptions = (props: Props) => {
         <FlatList
           data={state.filteredContacts}
           renderItem={renderItem}
-          // ListFooterComponent={ListFooterComponent}
           ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
           indicatorStyle={theme === "dark" ? "white" : "black"}
           showsHorizontalScrollIndicator={true}

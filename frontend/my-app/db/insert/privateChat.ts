@@ -8,6 +8,7 @@ export const insertPrivateChat = async (
   try {
     return await db.runAsync(
       `INSERT INTO private_chat (
+                id,
                 contactId,
                 lastMessageId,
                 lastMessageValue,
@@ -15,6 +16,7 @@ export const insertPrivateChat = async (
                 notificationCount
             ) 
             VALUES (
+                $id,
                 $contactId,
                 $lastMessageId,
                 $lastMessageValue,
@@ -22,6 +24,7 @@ export const insertPrivateChat = async (
                 $notificationCount
             )`,
       {
+        $id: chat.id,
         $contactId: chat.contactId,
         $lastMessageId: chat.lastMessageId ?? null,
         $lastMessageValue: chat.lastMessageValue ?? null,
