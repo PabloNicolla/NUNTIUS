@@ -207,16 +207,23 @@ export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
   }
 };
 
-export const getAllMessagesByChatId = async (
+export const getAllMessagesByChatIdWithPagination = async (
   db: SQLiteDatabase,
   chatId: number,
   receiverType: ReceiverType,
+  limit: number,
+  offset: number,
   sort?: boolean,
 ) => {
   try {
     return await db.getAllAsync<Message>(
-      `SELECT * FROM message WHERE $chatId = chatId AND $receiverType = receiverType ${sort ? "ORDER BY timestamp DESC" : ""}`,
-      { $chatId: chatId, $receiverType: receiverType },
+      `SELECT * FROM message WHERE $chatId = chatId AND $receiverType = receiverType ${sort ? "ORDER BY timestamp DESC" : ""} LIMIT $limit OFFSET $offset;`,
+      {
+        $chatId: chatId,
+        $receiverType: receiverType,
+        $limit: limit,
+        $offset: offset,
+      },
     );
   } catch (error) {
     console.log("[STATEMENTS]: getAllMessagesByChatId", error);

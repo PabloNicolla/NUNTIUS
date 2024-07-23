@@ -4,6 +4,7 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/Colors";
 import {
   Condition,
+  Contact,
   Message,
   MessageStatus,
   MessageType,
@@ -11,7 +12,8 @@ import {
   ReceiverType,
 } from "@/db/schemaTypes";
 import {
-  getAllMessagesByChatId,
+  getAllMessagesByChatIdWithPagination,
+  getFirstMessage,
   getFirstPrivateChat,
   insertMessage,
   resetPrivateChatNotificationCount,
@@ -20,7 +22,11 @@ import {
 import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
+import {
+  addDatabaseChangeListener,
+  DatabaseChangeEvent,
+  useSQLiteContext,
+} from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -37,10 +43,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { TouchableRipple } from "react-native-paper";
 import { useWebSocket } from "@/providers/websocket-provider";
+import React from "react";
 
 export default function ChatScreen() {
   const [chat, setChat] = useState<PrivateChat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [page, setPage] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const PAGE_LIMIT = 20;
 
   const { id: chatId, contactId } = useLocalSearchParams();
   const theme = useColorScheme();
@@ -50,6 +60,29 @@ export default function ChatScreen() {
   if (!contactId) {
     console.log("[CHAT_SCREEN]: ERROR: missing contactId");
   }
+
+  useEffect(() => {
+    async function loadMessages() {
+      if (loadingMore) return;
+
+      setLoadingMore(true);
+      const newMessages = await getAllMessagesByChatIdWithPagination(
+        db,
+        Number(chatId),
+        ReceiverType.PRIVATE_CHAT,
+        PAGE_LIMIT,
+        page * PAGE_LIMIT,
+        true,
+      );
+      if (newMessages) {
+        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+        setPage((prevPage) => prevPage + 1);
+      }
+      setLoadingMore(false);
+    }
+
+    loadMessages();
+  }, [page, chatId]);
 
   useEffect(() => {
     console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", Number(chatId));
@@ -65,67 +98,71 @@ export default function ChatScreen() {
   }, []);
 
   useEffect(() => {
-    console.log(
-      "[CHAT_SCREEN]: INITIAL DB LOAD: get all messages for chat_id: %d",
-      Number(chatId),
-    );
-    async function getMessages() {
-      const messages = await getAllMessagesByChatId(
-        db,
-        Number(chatId),
-        ReceiverType.PRIVATE_CHAT,
-        true,
-      );
-      if (!messages) {
-        console.log("[CHAT_SCREEN]: getAllMessagesByChatId queried undefined");
-      }
-      setMessages(messages ?? []);
-    }
-    if (!chat) {
-      console.log("[CHAT_SCREEN]: TopNavBarChat ERROR invalid chatId");
-    }
-    getMessages();
-  }, []);
-
-  useEffect(() => {
-    console.log("[CHAT_SCREEN]: db add Listener");
-
-    const listener = addDatabaseChangeListener((event) => {
-      console.log("[CHAT_SCREEN]: db run Listener", event);
+    const listener = addDatabaseChangeListener(async (event) => {
       if (event.tableName === "message") {
-        async function getMessages() {
-          const updatedMessages = await getAllMessagesByChatId(
-            db,
-            Number(chatId),
-            ReceiverType.PRIVATE_CHAT,
-            true,
-          );
-          if (!updatedMessages) {
-            console.log(
-              "[CHAT_SCREEN]: addDatabaseChangeListener queried undefined",
-            );
-          }
-          setMessages(updatedMessages ?? messages);
+        const new_message = await getFirstMessage(db, event.rowId);
+        if (new_message?.chatId === Number(chatId) && new_message) {
+          setMessages((prevMessages) => [new_message, ...prevMessages]);
         }
-        getMessages();
       }
     });
 
     return () => listener.remove();
   }, [db, chatId]);
 
+  // useEffect(() => {
+  //   console.log(
+  //     "[CHAT_SCREEN]: INITIAL DB LOAD: get all messages for chat_id: %d",
+  //     Number(chatId),
+  //   );
+  //   async function getMessages() {
+  //     const messages = await getAllMessagesByChatId(
+  //       db,
+  //       Number(chatId),
+  //       ReceiverType.PRIVATE_CHAT,
+  //       undefined,
+  //       undefined,
+  //       true,
+  //     );
+  //     if (!messages) {
+  //       console.log("[CHAT_SCREEN]: getAllMessagesByChatId queried undefined");
+  //     }
+  //     setMessages(messages ?? []);
+  //   }
+  //   getMessages();
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log("[CHAT_SCREEN]: db add Listener");
+
+  //   const listener = addDatabaseChangeListener((event) => {
+  //     console.log("[CHAT_SCREEN]: db run Listener", event);
+  //     if (event.tableName === "message") {
+  //       async function getMessages() {
+  //         const updatedMessages = await getAllMessagesByChatId(
+  //           db,
+  //           Number(chatId),
+  //           ReceiverType.PRIVATE_CHAT,
+  //           undefined,
+  //           undefined,
+  //           true,
+  //         );
+  //         if (!updatedMessages) {
+  //           console.log(
+  //             "[CHAT_SCREEN]: addDatabaseChangeListener queried undefined",
+  //           );
+  //         }
+  //         setMessages(updatedMessages ?? messages);
+  //       }
+  //       getMessages();
+  //     }
+  //   });
+
+  //   return () => listener.remove();
+  // }, [db, chatId]);
+
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
-    return (
-      <View
-        className={`mb-4 ${item.senderId === user.id ? "items-end" : "items-start"}`}
-      >
-        <View
-          className={`max-w-[80%] items-start rounded-md bg-gray-500/40 p-2 ${item.senderId === user.id ? "items-end bg-blue-500/40" : "items-start bg-gray-500/40"}`}
-        >
-          <ThemedText>{item.value}</ThemedText>
-        </View>
-      </View>
-    );
+    return <MessageItem item={item} user={user} />;
   };
 
   return (
@@ -142,13 +179,20 @@ export default function ChatScreen() {
             <FlatList
               data={messages}
               renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
               indicatorStyle={theme === "dark" ? "white" : "black"}
               showsHorizontalScrollIndicator={true}
               inverted={true}
-              initialNumToRender={20} // Number of items to render initially
-              maxToRenderPerBatch={20} // Number of items to render in each batch
-              windowSize={10} // Number of items to keep in memory outside of the visible area
+              initialNumToRender={PAGE_LIMIT}
+              maxToRenderPerBatch={PAGE_LIMIT}
+              windowSize={10}
               nestedScrollEnabled={true}
+              onEndReachedThreshold={0.5}
+              onEndReached={() => {
+                if (!loadingMore) {
+                  setPage((prevPage) => prevPage + 1);
+                }
+              }}
             />
           </View>
           <HeaderComponent chat={chat} handleSendMessage={() => {}} />
@@ -157,6 +201,32 @@ export default function ChatScreen() {
     </ThemedView>
   );
 }
+
+const MessageItem = React.memo(function MessageItem({
+  item,
+  user,
+}: {
+  item: Message;
+  user: Contact;
+}) {
+  console.log("-------------------------------------", item.id);
+
+  return (
+    <View
+      className={`mb-4 ${item.senderId === user.id ? "items-end" : "items-start"}`}
+    >
+      <View
+        className={`max-w-[80%] items-start rounded-md bg-gray-500/40 p-2 ${
+          item.senderId === user.id
+            ? "items-end bg-blue-500/40"
+            : "items-start bg-gray-500/40"
+        }`}
+      >
+        <ThemedText>{item.value}</ThemedText>
+      </View>
+    </View>
+  );
+});
 
 const HeaderComponent = ({
   handleSendMessage,

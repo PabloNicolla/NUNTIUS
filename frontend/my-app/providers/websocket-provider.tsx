@@ -84,30 +84,7 @@ export const WebSocketProvider: React.FC<{
 
       socket.current.onmessage = async (event) => {
         const message = JSON.parse(event.data);
-        const v: Message = message.message;
-
-        v.timestamp = Date.now();
-        v.chatId = v.senderId;
-
-        console.log("|||=-=-====-=-", v);
-
-        const ret = await insertMessage(db.current, v);
-        console.log("=-=-====-=-", ret);
-        const ret2 = await updatePrivateChatById(
-          db.current,
-          {
-            contactId: v.senderId,
-            id: v.chatId,
-            lastMessageId: ret.lastInsertRowId,
-            lastMessageTimestamp: v.timestamp,
-            lastMessageValue: v.value,
-          },
-          true,
-        );
-
-        console.log(ret2);
-
-        // await routeMessage(message, db);
+        await routeMessage(message, db);
         console.log("[WEB_SOCKET]: Message received: ", message);
       };
     } catch (error) {
