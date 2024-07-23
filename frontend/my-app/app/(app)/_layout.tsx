@@ -20,7 +20,7 @@ export default function AppLayout() {
 
   return (
     <WebSocketProvider db={db}>
-      <SelectionProvider>
+      <SelectionProvider db={db}>
         <AvatarModalProvider>
           <BottomNavbar />
           <Stack>

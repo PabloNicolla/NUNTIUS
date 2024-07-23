@@ -1,5 +1,13 @@
+import {
+  deleteAllMessageByChatId,
+  deletePrivateChat,
+  getFirstPrivateChat,
+} from "@/db/statements";
+import { SQLiteDatabase } from "expo-sqlite";
 import React, {
   createContext,
+  MutableRefObject,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -10,6 +18,7 @@ type SelectionContextType = {
   isSelectionActive: boolean;
   selectedChatItems: Set<number>;
   selectModeHandler: (id: number) => void;
+  clearSelected: () => void;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
@@ -26,8 +35,10 @@ export const useSelection = () => {
 
 export const SelectionProvider = ({
   children,
+  db,
 }: {
   children: React.ReactNode;
+  db: MutableRefObject<SQLiteDatabase>;
 }) => {
   const [isSelectionActive, setIsSelectionActive] = useState(false);
   const [selectedChatItems, setSelectedChatItems] = useState<Set<number>>(
@@ -53,8 +64,17 @@ export const SelectionProvider = ({
     });
   };
 
+  const clearSelected = () => {
+    setSelectedChatItems(new Set());
+  };
+
   const contextMemo = useMemo(
-    () => ({ isSelectionActive, selectedChatItems, selectModeHandler }),
+    () => ({
+      isSelectionActive,
+      selectedChatItems,
+      selectModeHandler,
+      clearSelected,
+    }),
     [isSelectionActive, selectedChatItems],
   );
 

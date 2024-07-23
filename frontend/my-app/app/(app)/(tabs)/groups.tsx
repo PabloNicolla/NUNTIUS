@@ -16,7 +16,11 @@ import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/reducers/useChatReducer";
-import { getAllPrivateChatsJoinContacts } from "@/db/statements";
+import {
+  deleteAllMessageByChatId,
+  deletePrivateChat,
+  getAllPrivateChatsJoinContacts,
+} from "@/db/statements";
 import { Contact } from "@/db/schemaTypes";
 const headerHeight = 50;
 
@@ -89,27 +93,33 @@ const App = () => {
       <StatusBar style="auto" />
 
       <SafeAreaView className="flex-1">
-        <ListWithDynamicHeader
-          data={state.filteredChats}
-          renderItem={renderItem}
-          ListHeaderComponent={<HeaderComponent handleSearch={handleSearch} />}
-          DynamicHeaderComponent={Header}
-          headerHeight={headerHeight}
-          ListFooterComponent={ListFooterComponent}
-        />
+        <View className="relative flex-1">
+          <ListWithDynamicHeader
+            data={state.filteredChats}
+            renderItem={renderItem}
+            ListHeaderComponent={
+              <HeaderComponent handleSearch={handleSearch} />
+            }
+            DynamicHeaderComponent={Header}
+            headerHeight={headerHeight}
+            ListFooterComponent={ListFooterComponent}
+          />
 
-        <AvatarModal
-          isVisible={isVisible}
-          onClose={hideModal}
-          imageURL={imageURL}
-        />
+          <AvatarModal
+            isVisible={isVisible}
+            onClose={hideModal}
+            imageURL={imageURL}
+          />
 
-        <FAB
-          icon="plus"
-          className="absolute bottom-0 right-0 m-4 bg-primary-light"
-          onPress={() => router.push("/contactScreen")}
-          color="white"
-        />
+          <FAB
+            icon="plus"
+            className="absolute bottom-0 right-0 m-4 bg-primary-light"
+            onPress={() => router.push("/contactScreen")}
+            color="white"
+          />
+
+          <ActionsHeaderOnSelect />
+        </View>
       </SafeAreaView>
     </ThemedView>
   );
@@ -117,9 +127,6 @@ const App = () => {
 
 const Header = () => {
   const theme = useColorScheme();
-  const db = useSQLiteContext();
-
-  const [Count, setCount] = useState(0);
 
   return (
     <ThemedView
@@ -129,34 +136,7 @@ const Header = () => {
       <View className="overflow-hidden rounded-full">
         <TouchableRipple
           onPress={async () => {
-            console.log("config", Count);
-            setCount(Count + 1);
-            // await insertMessage(db, {
-            //   id: Count,
-            //   receiverId: 1,
-            //   senderId: 2,
-            //   sortId: Count,
-            //   status: MessageStatus.PENDING,
-            //   timestamp: Date.now(),
-            //   type: MessageType.TEXT,
-            //   value: "asd",
-            // });
-
-            // await db.runAsync(
-            //   `
-            //   UPDATE private_chat
-            //     SET
-            //       lastMessageTimestamp = $lastMessageTimestamp,
-            //       lastMessageValue = $lastMessageValue
-            //     WHERE
-            //       id = $id;
-            //   `,
-            //   {
-            //     $lastMessageTimestamp: Date.now(),
-            //     $lastMessageValue: `test ${Count}`,
-            //     $id: (Count % 3) + 1,
-            //   },
-            // );
+            console.log("config");
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
@@ -170,6 +150,67 @@ const Header = () => {
         </TouchableRipple>
       </View>
     </ThemedView>
+  );
+};
+
+const ActionsHeaderOnSelect = () => {
+  const theme = useColorScheme();
+  const { isSelectionActive, selectedChatItems, clearSelected } =
+    useSelection();
+  const db = useSQLiteContext();
+  return (
+    <View
+      className={`absolute left-0 right-0 top-0 ${isSelectionActive ? "" : "hidden"}`}
+    >
+      <ThemedView
+        className={`h-[${headerHeight}] flex-row items-center justify-between px-2`}
+      >
+        <ThemedText className="flex-grow">Conversations</ThemedText>
+        <View className="flex-row space-x-2">
+          <View className="overflow-hidden rounded-full">
+            <TouchableRipple
+              onPress={async () => {
+                console.log("trash");
+                selectedChatItems.forEach(async (chatId) => {
+                  await deletePrivateChat(db, chatId);
+                  await deleteAllMessageByChatId(db, chatId);
+                });
+                clearSelected();
+              }}
+              rippleColor={
+                theme === "dark"
+                  ? "rgba(255, 255, 255, .32)"
+                  : "rgba(0, 0, 0, .15)"
+              }
+            >
+              <Ionicons
+                name="trash-outline"
+                color={theme === "dark" ? "white" : "black"}
+                size={25}
+              />
+            </TouchableRipple>
+          </View>
+          <View className="overflow-hidden rounded-full">
+            <TouchableRipple
+              onPress={async () => {
+                console.log("config");
+              }}
+              rippleColor={
+                theme === "dark"
+                  ? "rgba(255, 255, 255, .32)"
+                  : "rgba(0, 0, 0, .15)"
+              }
+            >
+              <Ionicons
+                name="ellipsis-horizontal"
+                color={theme === "dark" ? "white" : "black"}
+                size={25}
+              />
+            </TouchableRipple>
+          </View>
+        </View>
+      </ThemedView>
+    </View>
   );
 };
 
