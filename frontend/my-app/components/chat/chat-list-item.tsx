@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
+import { PrivateChat } from "@/db/schemaTypes";
 
 export type ChatListItemProps = {
   id: number;
@@ -49,7 +50,10 @@ const ChatListItem = React.memo(function ChatListItem({
         onPress={() => {
           if (!isSelectionActive) {
             console.log("Pressed");
-            router.push({ pathname: `/chat/[id]`, params: { id: id } });
+            router.push({
+              pathname: `/chat/[id]`,
+              params: { id: id, contactId: contactId },
+            });
           } else {
             selectModeHandler(id);
           }

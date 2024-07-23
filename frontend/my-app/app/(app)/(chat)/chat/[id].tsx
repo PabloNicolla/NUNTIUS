@@ -10,7 +10,12 @@ import {
   PrivateChat,
   ReceiverType,
 } from "@/db/schemaTypes";
-import { getAllMessagesByChatId, getFirstPrivateChat } from "@/db/statements";
+import {
+  getAllMessagesByChatId,
+  getFirstPrivateChat,
+  insertMessage,
+  updatePrivateChatById,
+} from "@/db/statements";
 import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
@@ -36,17 +41,21 @@ export default function ChatScreen() {
   const [chat, setChat] = useState<PrivateChat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const { id } = useLocalSearchParams();
+  const { id: chatId, contactId } = useLocalSearchParams();
   const theme = useColorScheme();
   const db = useSQLiteContext();
   const { user } = useSession();
 
+  if (!contactId) {
+    console.log("[CHAT_SCREEN]: ERROR: missing contactId");
+  }
+
   useEffect(() => {
-    console.log("[CHAT_SCREEN]: GET CHAT ID: %d", Number(id));
+    console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", Number(chatId));
     async function getChat() {
-      const chat = await getFirstPrivateChat(db, Number(id));
+      const chat = await getFirstPrivateChat(db, Number(chatId));
       if (!chat) {
-        console.log("[CHAT_SCREEN]: TopNavBarChat ERROR invalid chatId");
+        console.log("[CHAT_SCREEN]: TopNavBarChat ERROR: invalid chatId");
       }
       setChat(chat ?? null);
     }
@@ -56,12 +65,12 @@ export default function ChatScreen() {
   useEffect(() => {
     console.log(
       "[CHAT_SCREEN]: INITIAL DB LOAD: get all messages for chat_id: %d",
-      Number(id),
+      Number(chatId),
     );
     async function getMessages() {
       const messages = await getAllMessagesByChatId(
         db,
-        Number(id),
+        Number(chatId),
         ReceiverType.PRIVATE_CHAT,
         true,
       );
@@ -85,7 +94,7 @@ export default function ChatScreen() {
         async function getMessages() {
           const updatedMessages = await getAllMessagesByChatId(
             db,
-            Number(id),
+            Number(chatId),
             ReceiverType.PRIVATE_CHAT,
             true,
           );
@@ -101,7 +110,7 @@ export default function ChatScreen() {
     });
 
     return () => listener.remove();
-  }, [db, id]);
+  }, [db, chatId]);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return (
@@ -126,7 +135,7 @@ export default function ChatScreen() {
         keyboardVerticalOffset={0}
       >
         <SafeAreaView className="flex-1">
-          <TopNavBarChat contactId={chat?.contactId} />
+          <TopNavBarChat contactId={Number(contactId)} />
           <View className="flex-1">
             <FlatList
               data={messages}
@@ -140,7 +149,11 @@ export default function ChatScreen() {
               nestedScrollEnabled={true}
             />
           </View>
-          <HeaderComponent handleSendMessage={() => {}} />
+          <HeaderComponent
+            chatId={Number(chatId)}
+            contactId={Number(contactId)}
+            handleSendMessage={() => {}}
+          />
         </SafeAreaView>
       </KeyboardAvoidingView>
     </ThemedView>
@@ -149,25 +162,30 @@ export default function ChatScreen() {
 
 const HeaderComponent = ({
   handleSendMessage,
+  contactId,
+  chatId,
 }: {
   handleSendMessage: (query: string) => void;
+  contactId: number;
+  chatId: number;
 }) => {
   const theme = useColorScheme();
   const [messageValue, setMessageValue] = useState("");
   const { sendMessage } = useWebSocket();
+  const db = useSQLiteContext();
 
   return (
     <View className="flex-row">
       <View className="mx-2 mb-2 justify-end overflow-hidden rounded-full">
         <TouchableRipple
           className="bg-primary-light/50 p-3 dark:bg-primary-light"
-          onPress={() => {
+          onPress={async () => {
             console.log("pressed");
             const message: Message = {
               id: 1,
-              chatId: 1,
+              chatId: chatId,
               condition: Condition.NORMAL,
-              receiverId: 999,
+              receiverId: contactId,
               senderId: 999,
               receiverType: ReceiverType.PRIVATE_CHAT,
               senderReferenceId: 1,
@@ -177,6 +195,18 @@ const HeaderComponent = ({
               value: messageValue,
             };
             sendMessage({ message, type: "PRIVATE_CHAT" });
+
+            const ret = await insertMessage(db, message);
+            console.log("||||=-=-====-=-", ret);
+            const ret2 = await updatePrivateChatById(db, {
+              contactId: message.receiverId,
+              id: message.chatId,
+              lastMessageId: ret.lastInsertRowId,
+              lastMessageTimestamp: message.timestamp,
+              lastMessageValue: message.value,
+            });
+
+            setMessageValue("");
           }}
           rippleColor={
             theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
