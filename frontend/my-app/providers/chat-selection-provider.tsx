@@ -2,6 +2,7 @@ import { SQLiteDatabase } from "expo-sqlite";
 import React, {
   createContext,
   MutableRefObject,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -11,7 +12,7 @@ import React, {
 type SelectionContextType = {
   isSelectionActive: boolean;
   selectedChatItems: Set<number>;
-  selectModeHandler: (id: number) => void;
+  selectModeHandler: (id: number, state: boolean) => void;
   clearSelected: () => void;
 };
 
@@ -44,21 +45,29 @@ export const ChatSelectionProvider = ({
   useEffect(() => {
     if (selectedChatItems.size === 0) {
       setIsSelectionActive(false);
+    } else if (selectedChatItems.size !== 0 && !isSelectionActive) {
+      setIsSelectionActive(true);
     }
-  }, [selectedChatItems]);
+  }, [selectedChatItems, isSelectionActive]);
 
-  const selectModeHandler = (id: number) => {
+  const selectModeHandler = useCallback((id: number, state: boolean) => {
     setSelectedChatItems((prevSelectedChatItems) => {
-      const newSelectedChatItems = new Set(prevSelectedChatItems);
-      if (!newSelectedChatItems.has(id)) {
-        newSelectedChatItems.add(id);
-        setIsSelectionActive(true);
+      if (state) {
+        prevSelectedChatItems.add(id);
       } else {
-        newSelectedChatItems.delete(id);
+        prevSelectedChatItems.delete(id);
       }
-      return newSelectedChatItems;
+
+      if (
+        (prevSelectedChatItems.size === 1 && state) ||
+        (prevSelectedChatItems.size === 0 && !state)
+      ) {
+        return new Set(prevSelectedChatItems);
+      } else {
+        return prevSelectedChatItems;
+      }
     });
-  };
+  }, []);
 
   const clearSelected = () => {
     setSelectedChatItems(new Set());
@@ -71,7 +80,7 @@ export const ChatSelectionProvider = ({
       selectModeHandler,
       clearSelected,
     }),
-    [isSelectionActive, selectedChatItems],
+    [isSelectionActive, selectedChatItems, selectModeHandler],
   );
 
   return (

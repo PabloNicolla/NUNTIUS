@@ -34,13 +34,12 @@ const ChatListItem = React.memo(function ChatListItem({
   imageURL,
 }: ChatListItemProps) {
   const theme = useColorScheme() ?? "light";
-  const { isSelectionActive, selectedChatItems, selectModeHandler } =
-    useChatSelection();
+  const { isSelectionActive, selectModeHandler } = useChatSelection();
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
-    setIsSelected(selectedChatItems.has(id));
-  }, [selectedChatItems, id]);
+    selectModeHandler(id, isSelected);
+  }, [isSelected, selectModeHandler, id]);
 
   console.log("[CHAT_LIST_ITEM]: MOUNTING: %d", id);
 
@@ -56,7 +55,7 @@ const ChatListItem = React.memo(function ChatListItem({
               params: { id: id, contactId: contactId },
             });
           } else {
-            selectModeHandler(id);
+            setIsSelected(!isSelected);
           }
           return true;
         }}
