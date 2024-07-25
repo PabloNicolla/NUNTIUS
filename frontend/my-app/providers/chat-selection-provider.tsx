@@ -19,15 +19,17 @@ const SelectionContext = createContext<SelectionContextType | undefined>(
   undefined,
 );
 
-export const useSelection = () => {
+export const useChatSelection = () => {
   const context = useContext(SelectionContext);
   if (!context) {
-    throw new Error("useSelection must be used within a SelectionProvider");
+    throw new Error(
+      "useChatSelection must be used within a ChatSelectionProvider",
+    );
   }
   return context;
 };
 
-export const SelectionProvider = ({
+export const ChatSelectionProvider = ({
   children,
   db,
 }: {

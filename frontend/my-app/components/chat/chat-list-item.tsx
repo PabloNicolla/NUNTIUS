@@ -1,7 +1,7 @@
 import { Image, Pressable, useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Avatar, TouchableRipple } from "react-native-paper";
-import { useSelection } from "@/providers/chat-provider";
+import { useChatSelection } from "@/providers/chat-selection-provider";
 import { ThemedText } from "../themed-text";
 import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
@@ -35,7 +35,7 @@ const ChatListItem = React.memo(function ChatListItem({
 }: ChatListItemProps) {
   const theme = useColorScheme() ?? "light";
   const { isSelectionActive, selectedChatItems, selectModeHandler } =
-    useSelection();
+    useChatSelection();
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 import { AvatarModalProvider } from "@/providers/avatarModal-provider";
-import { SelectionProvider } from "@/providers/chat-provider";
+import { ChatSelectionProvider } from "@/providers/chat-selection-provider";
 import { useSession } from "@/providers/session-provider";
 import { Redirect, Stack } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
@@ -19,7 +19,7 @@ export default function AppLayout() {
 
   return (
     <WebSocketProvider db={db}>
-      <SelectionProvider db={db}>
+      <ChatSelectionProvider db={db}>
         <AvatarModalProvider>
           <BottomNavbar />
           <Stack>
@@ -27,7 +27,7 @@ export default function AppLayout() {
             <Stack.Screen name="(chat)" options={{ headerShown: false }} />
           </Stack>
         </AvatarModalProvider>
-      </SelectionProvider>
+      </ChatSelectionProvider>
     </WebSocketProvider>
   );
 }

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
   ChatListItemProps,
 } from "@/components/chat/chat-list-item";
-import { useSelection } from "@/providers/chat-provider";
+import { useChatSelection } from "@/providers/chat-selection-provider";
 import { ThemedText } from "@/components/themed-text";
 import { StatusBar } from "expo-status-bar";
 import ListWithDynamicHeader from "@/components/list/list-with-dynamic-header";
@@ -156,7 +156,7 @@ const Header = () => {
 const ActionsHeaderOnSelect = () => {
   const theme = useColorScheme();
   const { isSelectionActive, selectedChatItems, clearSelected } =
-    useSelection();
+    useChatSelection();
   const db = useSQLiteContext();
   return (
     <View
@@ -220,7 +220,7 @@ const HeaderComponent = ({
   handleSearch: (query: string) => void;
 }) => {
   const theme = useColorScheme();
-  const { selectedChatItems } = useSelection();
+  const { selectedChatItems } = useChatSelection();
   const [searchQuery, setSearchQuery] = useState("");
 
   const db = useSQLiteContext();
