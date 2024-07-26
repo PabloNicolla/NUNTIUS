@@ -15,6 +15,22 @@ export const deleteAllMessageByChatId = async (
       },
     );
   } catch (error) {
-    console.log("[STATEMENTS]: deleteMessage", error);
+    console.log("[STATEMENTS]: deleteAllMessageByChatId", error);
+  }
+};
+
+export const deleteAllMessageById = async (db: SQLiteDatabase, id: number) => {
+  try {
+    return await db.runAsync(
+      `
+        DELETE FROM message 
+        WHERE $id = id;
+      `,
+      {
+        $id: id,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: deleteAllMessageById", error);
   }
 };

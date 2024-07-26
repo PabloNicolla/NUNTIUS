@@ -60,9 +60,8 @@ const ChatListItem = React.memo(function ChatListItem({
           return true;
         }}
         onLongPress={() => {
-          console.log("loong");
+          console.log("long");
           setIsSelected(!isSelected);
-          selectModeHandler(id);
         }}
         rippleColor={
           theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"

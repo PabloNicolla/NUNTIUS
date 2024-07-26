@@ -2,22 +2,33 @@ import { Image, Pressable, useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ThemedView } from "../themed-view";
 import { router } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "../themed-text";
-import { Avatar } from "react-native-paper";
+import { Avatar, TouchableRipple } from "react-native-paper";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { useSQLiteContext } from "expo-sqlite";
 import { Contact } from "@/db/schemaTypes";
-import { getFirstContact } from "@/db/statements";
+import { deleteAllMessageById, getFirstContact } from "@/db/statements";
+import { useMessageSelection } from "@/providers/message-selection-provider";
+import { useMessageSelected } from "@/providers/message-selected-provider";
 
 type Props = {
   contactId?: number;
+  clearSelectedMessages: () => void;
+  deleteSelectedMessages: () => void;
 };
 
-const TopNavBarChat = ({ contactId }: Props) => {
+const TopNavBarChat = ({
+  contactId,
+  deleteSelectedMessages,
+  clearSelectedMessages,
+}: Props) => {
   const theme = useColorScheme() ?? "light";
   const [contact, setContact] = useState<Contact | null>(null);
   const db = useSQLiteContext();
+
+  const { isSelectionActive } = useMessageSelection();
+  const { clearSelected, selectedMessages } = useMessageSelected();
 
   useEffect(() => {
     console.log("[TOP_NAV_BAR_CHAT]: for user_id:", contactId);
@@ -38,7 +49,12 @@ const TopNavBarChat = ({ contactId }: Props) => {
       <Pressable
         className="mr-4"
         onPress={() => {
-          router.back();
+          if (isSelectionActive) {
+            clearSelected();
+            clearSelectedMessages();
+          } else {
+            router.back();
+          }
         }}
       >
         <MaterialIcons
@@ -47,11 +63,63 @@ const TopNavBarChat = ({ contactId }: Props) => {
           color={theme === "light" ? "black" : "white"}
         />
       </Pressable>
-      <CustomAvatar
-        username={contact?.name ?? ""}
-        imageURl={contact?.imageURL}
-      />
-      <ThemedText className="pl-4">{contact?.name}</ThemedText>
+      {!isSelectionActive && (
+        <CustomAvatar
+          username={contact?.name ?? ""}
+          imageURl={contact?.imageURL}
+        />
+      )}
+      <ThemedText className="pl-4">
+        {isSelectionActive ? selectedMessages.size : contact?.name}
+      </ThemedText>
+      <View
+        style={{ display: isSelectionActive ? "flex" : "none" }}
+        className="flex-1 items-end justify-center"
+      >
+        <View className="flex-row space-x-2">
+          <View className="overflow-hidden rounded-full">
+            <TouchableRipple
+              onPress={async () => {
+                console.log("trash");
+                selectedMessages.forEach(async (messageId) => {
+                  await deleteAllMessageById(db, messageId);
+                });
+                deleteSelectedMessages();
+                clearSelected();
+              }}
+              rippleColor={
+                theme === "dark"
+                  ? "rgba(255, 255, 255, .32)"
+                  : "rgba(0, 0, 0, .15)"
+              }
+            >
+              <Ionicons
+                name="trash-outline"
+                color={theme === "dark" ? "white" : "black"}
+                size={25}
+              />
+            </TouchableRipple>
+          </View>
+          <View className="overflow-hidden rounded-full">
+            <TouchableRipple
+              onPress={async () => {
+                console.log("config");
+              }}
+              rippleColor={
+                theme === "dark"
+                  ? "rgba(255, 255, 255, .32)"
+                  : "rgba(0, 0, 0, .15)"
+              }
+            >
+              <Ionicons
+                name="ellipsis-horizontal"
+                color={theme === "dark" ? "white" : "black"}
+                size={25}
+              />
+            </TouchableRipple>
+          </View>
+        </View>
+      </View>
     </ThemedView>
   );
 };
