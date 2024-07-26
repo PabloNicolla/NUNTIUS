@@ -21,7 +21,7 @@ import {
   deletePrivateChat,
   getAllPrivateChatsJoinContacts,
 } from "@/db/statements";
-import { Contact } from "@/db/schemaTypes";
+import { useChatSelected } from "@/providers/chat-selection-provider copy";
 const headerHeight = 50;
 
 const App = () => {
@@ -155,8 +155,8 @@ const Header = () => {
 
 const ActionsHeaderOnSelect = () => {
   const theme = useColorScheme();
-  const { isSelectionActive, selectedChatItems, clearSelected } =
-    useChatSelection();
+  const { isSelectionActive } = useChatSelection();
+  const { clearSelected, selectedChats } = useChatSelected();
   const db = useSQLiteContext();
   return (
     <View
@@ -171,7 +171,7 @@ const ActionsHeaderOnSelect = () => {
             <TouchableRipple
               onPress={async () => {
                 console.log("trash");
-                selectedChatItems.forEach(async (chatId) => {
+                selectedChats.forEach(async (chatId) => {
                   await deletePrivateChat(db, chatId);
                   await deleteAllMessageByChatId(db, chatId);
                 });
@@ -220,7 +220,7 @@ const HeaderComponent = ({
   handleSearch: (query: string) => void;
 }) => {
   const theme = useColorScheme();
-  const { selectedChatItems } = useChatSelection();
+  const { selectedChats } = useChatSelected();
   const [searchQuery, setSearchQuery] = useState("");
 
   const db = useSQLiteContext();
@@ -230,7 +230,7 @@ const HeaderComponent = ({
       <View className="my-2 h-12 w-[95%] rounded-3xl bg-black/5 px-4 dark:bg-white/10">
         <Pressable
           onPress={async () => {
-            console.log(selectedChatItems);
+            console.log(selectedChats);
           }}
           className="flex-1 flex-row items-center"
         >

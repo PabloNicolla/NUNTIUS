@@ -6,6 +6,7 @@ import { Redirect, Stack } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useRef } from "react";
 import { WebSocketProvider } from "@/providers/websocket-provider";
+import { ChatSelectedProvider } from "@/providers/chat-selection-provider copy";
 
 export default function AppLayout() {
   const session = useSession();
@@ -19,15 +20,17 @@ export default function AppLayout() {
 
   return (
     <WebSocketProvider db={db}>
-      <ChatSelectionProvider db={db}>
-        <AvatarModalProvider>
-          <BottomNavbar />
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(chat)" options={{ headerShown: false }} />
-          </Stack>
-        </AvatarModalProvider>
-      </ChatSelectionProvider>
+      <ChatSelectedProvider>
+        <ChatSelectionProvider>
+          <AvatarModalProvider>
+            <BottomNavbar />
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(chat)" options={{ headerShown: false }} />
+            </Stack>
+          </AvatarModalProvider>
+        </ChatSelectionProvider>
+      </ChatSelectedProvider>
     </WebSocketProvider>
   );
 }

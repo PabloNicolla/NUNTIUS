@@ -200,7 +200,9 @@ const MostRecentMessage = ({
       {!!notificationCount && (
         <View className="h-full items-end justify-center">
           <View className="min-w-[20] items-center rounded-full bg-primary-light">
-            <ThemedText className="text-sm">{notificationCount}</ThemedText>
+            <ThemedText className="text-sm text-text-dark">
+              {notificationCount}
+            </ThemedText>
           </View>
         </View>
       )}

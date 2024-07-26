@@ -1,19 +1,16 @@
-import { SQLiteDatabase } from "expo-sqlite";
 import React, {
   createContext,
-  MutableRefObject,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
+import { useChatSelected } from "./chat-selection-provider copy";
 
 type SelectionContextType = {
   isSelectionActive: boolean;
-  selectedChatItems: Set<number>;
   selectModeHandler: (id: number, state: boolean) => void;
-  clearSelected: () => void;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
@@ -32,55 +29,30 @@ export const useChatSelection = () => {
 
 export const ChatSelectionProvider = ({
   children,
-  db,
 }: {
   children: React.ReactNode;
-  db: MutableRefObject<SQLiteDatabase>;
 }) => {
   const [isSelectionActive, setIsSelectionActive] = useState(false);
-  const [selectedChatItems, setSelectedChatItems] = useState<Set<number>>(
-    new Set(),
-  );
+  const { action, selectedChats } = useChatSelected();
 
   useEffect(() => {
-    if (selectedChatItems.size === 0) {
+    if (selectedChats.size === 0) {
       setIsSelectionActive(false);
-    } else if (selectedChatItems.size !== 0 && !isSelectionActive) {
+    } else if (selectedChats.size !== 0 && !isSelectionActive) {
       setIsSelectionActive(true);
     }
-  }, [selectedChatItems, isSelectionActive]);
+  }, [selectedChats, isSelectionActive]);
 
   const selectModeHandler = useCallback((id: number, state: boolean) => {
-    setSelectedChatItems((prevSelectedChatItems) => {
-      if (state) {
-        prevSelectedChatItems.add(id);
-      } else {
-        prevSelectedChatItems.delete(id);
-      }
-
-      if (
-        (prevSelectedChatItems.size === 1 && state) ||
-        (prevSelectedChatItems.size === 0 && !state)
-      ) {
-        return new Set(prevSelectedChatItems);
-      } else {
-        return prevSelectedChatItems;
-      }
-    });
+    return action(id, state);
   }, []);
-
-  const clearSelected = () => {
-    setSelectedChatItems(new Set());
-  };
 
   const contextMemo = useMemo(
     () => ({
       isSelectionActive,
-      selectedChatItems,
       selectModeHandler,
-      clearSelected,
     }),
-    [isSelectionActive, selectedChatItems, selectModeHandler],
+    [isSelectionActive, selectModeHandler],
   );
 
   return (

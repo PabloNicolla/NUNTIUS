@@ -10,7 +10,6 @@ import { useMessageSelected } from "./message-selected-provider";
 
 type SelectionContextType = {
   isSelectionActive: boolean;
-  // selectedMessages: Set<number>;
   selectModeHandler: (id: number, state: boolean) => boolean;
 };
 
@@ -33,9 +32,6 @@ export const MessageSelectionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  // const [selectedMessages, setSelectedMessages] = useState<Set<number>>(
-  //   new Set(),
-  // );
   const [isSelectionActive, setIsSelectionActive] = useState(false);
   const { action, selectedMessages } = useMessageSelected();
 
@@ -46,31 +42,6 @@ export const MessageSelectionProvider = ({
       setIsSelectionActive(true);
     }
   }, [selectedMessages, isSelectionActive]);
-
-  // const selectModeHandler = useCallback((id: number, state: boolean) => {
-  //   console.log(selectedMessages);
-
-  //   setSelectedMessages((prevSelectedMessages) => {
-  //     if (state) {
-  //       prevSelectedMessages.add(id);
-  //     } else {
-  //       prevSelectedMessages.delete(id);
-  //     }
-
-  //     // if (
-  //     //   (prevSelectedMessages.size === 1 && state) ||
-  //     //   (prevSelectedMessages.size === 0 && !state)
-  //     // ) {
-  //     //   return new Set(prevSelectedMessages);
-  //     // } else {
-  //     //   return prevSelectedMessages;
-  //     // }
-  //     return new Set(prevSelectedMessages);
-  //   });
-  //   console.log("my sate is", state);
-
-  //   return state;
-  // }, []);
 
   const selectModeHandler = useCallback((id: number, state: boolean) => {
     return action(id, state);
