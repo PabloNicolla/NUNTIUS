@@ -1,0 +1,41 @@
+POST http://127.0.0.1:8000/register/
+Content-Type: application/json
+
+{"username": "user2", "password": "Pass1234!", "email": "user1@test.test"}
+
+###
+
+POST http://127.0.0.1:8000/login/
+Content-Type: application/json
+
+{"username": "user2", "password": "Pass1234!"}
+
+### 
+
+POST http://127.0.0.1:8000/logout/
+Content-Type: application/json
+Authorization: Token 028acc1b37bcac6158225fbfb446cebf8edafe01
+
+{}
+### 
+
+GET http://127.0.0.1:8000/public/
+Content-Type: application/json
+
+{}
+### 
+
+GET http://127.0.0.1:8000/private/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIyMDQxMzM1LCJpYXQiOjE3MjIwMzkxMzEsImp0aSI6IjZjOWMwYzMwYWQ0YjRiNjdhYzMxOTk3ZTE5NDQ1MzAwIiwidXNlcl9pZCI6Mn0.axuGbVTm2sWg2MopncpbuNO7GoEdto_5IUQ7ol8mez8
+
+
+{}
+### 
+
+POST http://127.0.0.1:8000/token/refresh/
+Content-Type: application/json
+
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyMjEyNTUzMSwiaWF0IjoxNzIyMDM5MTMxLCJqdGkiOiJkNWI5ZDUxMDhhNzQ0Mzg2ODRiMzViNWRjNTcxNTBmNiIsInVzZXJfaWQiOjJ9.E_dDFRrFKu_IvFsoM6HoWd1_GXmT1vx8tpSp0uEc7uE"
+}
