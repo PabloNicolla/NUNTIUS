@@ -8,9 +8,10 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { SessionProvider } from "@/providers/session-provider";
 import { migrateDbIfNeeded } from "@/db/migration";
+import SplashScreenL from "@/components/splash-screen";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -19,7 +20,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
+      // SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
 
@@ -28,22 +29,34 @@ export default function RootLayout() {
   }
 
   return (
-    <SQLiteProvider
-      databaseName="local56.db"
-      onInit={migrateDbIfNeeded}
-      options={{ enableChangeListener: true }}
-    >
-      <SessionProvider>
-        <PaperProvider>
-          <KeyboardProvider statusBarTranslucent={true}>
-            <Stack>
-              <Stack.Screen name="(app)" options={{ headerShown: false }} />
-              <Stack.Screen name="(landing)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            </Stack>
-          </KeyboardProvider>
-        </PaperProvider>
-      </SessionProvider>
-    </SQLiteProvider>
+    <>
+      {fontsLoaded ? (
+        <SQLiteProvider
+          databaseName="local56.db"
+          onInit={migrateDbIfNeeded}
+          options={{ enableChangeListener: true }}
+        >
+          <SessionProvider>
+            <PaperProvider>
+              <KeyboardProvider statusBarTranslucent={true}>
+                <Stack>
+                  <Stack.Screen name="(app)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(landing)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </KeyboardProvider>
+            </PaperProvider>
+          </SessionProvider>
+        </SQLiteProvider>
+      ) : (
+        <SplashScreenL />
+      )}
+    </>
   );
 }
