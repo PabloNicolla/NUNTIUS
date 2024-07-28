@@ -18,11 +18,15 @@
     "@expo/vector-icons": "^14.0.2",
     "@hookform/resolvers": "^3.9.0",
     "@react-native-community/netinfo": "11.3.1",
+    "@react-native-google-signin/google-signin": "^12.2.1",
     "@react-navigation/native": "^6.0.2",
+    "@shopify/flash-list": "1.6.4",
     "axios": "^1.7.2",
     "date-fns": "^3.6.0",
     "expo": "^51.0.20",
+    "expo-auth-session": "~5.5.2",
     "expo-constants": "~16.0.2",
+    "expo-crypto": "~13.0.2",
     "expo-font": "^12.0.8",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
@@ -48,7 +52,8 @@
     "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.10",
     "zod": "^3.23.8",
-    "@shopify/flash-list": "1.6.4"
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "expo-secure-store": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
