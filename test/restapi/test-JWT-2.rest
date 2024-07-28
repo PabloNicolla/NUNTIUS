@@ -1,0 +1,42 @@
+POST http://192.168.214.206:8000/login/
+Content-Type: application/json
+
+{"username": "user3", "password1": "Pass1234!", "password2": "Pass1234!", "email": "user3@test.test"}
+
+###
+POST http://192.168.214.206:8000/register/
+Content-Type: application/json
+
+{"username": "user33", "password": "Pass1234!", "email": "user33@test.test"}
+
+###
+GET http://192.168.214.206:8000/private
+Content-Type: application/json
+
+{"username": "user3", "password1": "Pass1234!", "password2": "Pass1234!", "email": "user3@test.test"}
+
+###
+GET http://192.168.214.206:8000/public
+Content-Type: application/json
+
+{"username": "user3", "password1": "Pass1234!", "password2": "Pass1234!", "email": "user3@test.test"}
+
+###
+POST http://192.168.214.206:8000/dj-rest-auth/login/
+Content-Type: application/json
+
+{
+  "username": "NewestUser55113",
+  "password": "test123!@#"
+}
+
+###
+POST http://192.168.214.206:8000/dj-rest-auth/registration/
+Content-Type: application/json
+
+{
+  "username": "NewestUser551113",
+  "email": "NewestUser@test.com",
+  "password1": "test123!@#",
+  "password2": "test123!@#"
+}
