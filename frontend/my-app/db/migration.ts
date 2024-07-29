@@ -19,14 +19,18 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
     return;
   }
   if (currentDbVersion === 0) {
-    console.log("----------------------------------------------------0v");
+    console.log(
+      "[DATABASE_MIGRATION]: ----------------------------------------------------0v",
+    );
 
     await loadDatabaseSchema(db);
 
     currentDbVersion = 1;
   }
   if (currentDbVersion === 1) {
-    console.log("----------------------------------------------------1v");
+    console.log(
+      "[DATABASE_MIGRATION]: ----------------------------------------------------1v",
+    );
 
     users.forEach(async (user) => {
       await insertContact(db, user);
@@ -43,12 +47,16 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
     currentDbVersion = 2;
   }
   if (currentDbVersion === 2) {
-    console.log("----------------------------------------------------2v");
+    console.log(
+      "[DATABASE_MIGRATION]: ----------------------------------------------------2v",
+    );
     await addMessageTableIndexes(db);
     currentDbVersion = 3;
   }
   if (currentDbVersion === 3) {
-    console.log("----------------------------------------------------3v");
+    console.log(
+      "[DATABASE_MIGRATION]: ----------------------------------------------------3v",
+    );
     //TODO
   }
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);

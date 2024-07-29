@@ -1,5 +1,4 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
 import { Tabs } from "expo-router";
@@ -7,27 +6,7 @@ import React from "react";
 import { useColorScheme, View } from "react-native";
 import { BottomNavigation, TouchableRipple } from "react-native-paper";
 
-const TabIcon = ({
-  color,
-  focused,
-  icon,
-  iconFocused,
-}: {
-  color: string;
-  focused: boolean;
-  icon: keyof typeof Ionicons.glyphMap;
-  iconFocused: keyof typeof Ionicons.glyphMap;
-}) => {
-  return (
-    <View className="">
-      <Ionicons name={focused ? icon : iconFocused} size={28} color={color} />
-    </View>
-  );
-};
-
 export default function TabsLayout() {
-  const session = useSession();
-
   const theme = useColorScheme() ?? "light";
 
   const navBgColor = useThemeColor({}, "background");
@@ -167,3 +146,21 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const TabIcon = ({
+  color,
+  focused,
+  icon,
+  iconFocused,
+}: {
+  color: string;
+  focused: boolean;
+  icon: keyof typeof Ionicons.glyphMap;
+  iconFocused: keyof typeof Ionicons.glyphMap;
+}) => {
+  return (
+    <View className="">
+      <Ionicons name={focused ? icon : iconFocused} size={28} color={color} />
+    </View>
+  );
+};

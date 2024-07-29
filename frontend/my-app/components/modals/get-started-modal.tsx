@@ -15,7 +15,6 @@ import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as z from "zod";
 import axios from "axios";
-import qs from "query-string";
 import { ThemedText } from "@/components/themed-text";
 import PrimaryButton from "@/components/buttons/primary-button";
 import { ThemedView } from "@/components/themed-view";
@@ -57,7 +56,7 @@ export default function GetStartedModal({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("[GetStartedModal]: SUBMITTING GET STARTED FORM", values);
+      console.log("[GET_STARTED_MODAL]: SUBMITTING GET STARTED FORM", values);
       form.reset();
 
       const requestData: CheckEmailRequestData = {
@@ -73,7 +72,7 @@ export default function GetStartedModal({
         pathname = "/sign-in";
       } else if (response.code !== "AVAILABLE") {
         console.log(
-          "[GetStartedModal]: ERROR: response.code not matching any correct value",
+          "[GET_STARTED_MODAL]: ERROR: response.code not matching any correct value",
         );
       }
 
@@ -83,7 +82,7 @@ export default function GetStartedModal({
         params: { email: values.email },
       });
     } catch (error) {
-      console.log("[GetStartedModal]:", error);
+      console.log("[GET_STARTED_MODAL]:", error);
     }
   };
 

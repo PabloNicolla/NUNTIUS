@@ -34,7 +34,7 @@ const formSchema = z.object({
     .min(8, "Password too short"),
 });
 
-export default function SignIpScreen() {
+export default function SignInScreen() {
   const theme = useColorScheme() ?? "light";
   const { email } = useLocalSearchParams<{ email: string }>();
   const { login } = useSession();
@@ -52,7 +52,7 @@ export default function SignIpScreen() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("[SignIpScreen]: SUBMITTING SIGN IN FORM", values);
+      console.log("[SIGN_IN_SCREEN]: SUBMITTING SIGN IN FORM", values);
       setLoginErrorMessage("");
 
       const requestData: LoginRequestData = {
@@ -73,7 +73,7 @@ export default function SignIpScreen() {
       setLoginErrorMessage(
         "Password, email or combination are invalid. Please try again.",
       );
-      console.log("[SignIpScreen]:", error);
+      console.log("[SIGN_IN_SCREEN]:", error);
     }
   };
 

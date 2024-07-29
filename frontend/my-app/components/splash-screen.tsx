@@ -1,21 +1,21 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withRepeat,
   withTiming,
   withDelay,
 } from "react-native-reanimated";
 import { ThemedView } from "./themed-view";
+import { Colors } from "@/constants/Colors";
 
 const duration = 2000;
 const easing = Easing.bezier(0.25, -0.5, 0.25, 1);
 
 export default function SplashScreenL() {
+  const theme = useColorScheme() ?? "dark";
   const rotation = useSharedValue<number>(0);
   const borderWidth = useSharedValue<number>(10);
 
@@ -24,7 +24,7 @@ export default function SplashScreenL() {
     borderWidth.value = withRepeat(
       withTiming(25, { duration: duration / 2, easing }),
       -1,
-      true, // This reverses the animation
+      true,
     );
   }, []);
 
@@ -32,10 +32,6 @@ export default function SplashScreenL() {
     transform: [{ rotate: `${rotation.value * 360}deg` }],
     borderWidth: borderWidth.value,
   }));
-
-  // ---------------------
-
-  const scale = useSharedValue<number>(1);
 
   const scale1 = useSharedValue<number>(1);
   const scale2 = useSharedValue<number>(1);
@@ -69,12 +65,30 @@ export default function SplashScreenL() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.loadingContainer} />
+      <View style={{}} />
       <Animated.View style={[styles.loading, animatedStyle]} />
       <View className="flex-row">
-        <Animated.View style={[styles.ball, scaleStyles1]} />
-        <Animated.View style={[styles.ball, scaleStyles2]} />
-        <Animated.View style={[styles.ball, scaleStyles3]} />
+        <Animated.View
+          style={[
+            styles.ball,
+            { backgroundColor: Colors[theme].text },
+            scaleStyles1,
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.ball,
+            { backgroundColor: Colors[theme].text },
+            scaleStyles2,
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.ball,
+            { backgroundColor: Colors[theme].text },
+            scaleStyles3,
+          ]}
+        />
       </View>
     </ThemedView>
   );
@@ -87,12 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: "100%",
   },
-  loadingContainer: {
-    height: 120,
-    width: 120,
-    borderRadius: 60,
-    position: "absolute",
-  },
+
   loading: {
     height: 120,
     width: 120,
@@ -107,7 +116,6 @@ const styles = StyleSheet.create({
     height: 10,
     width: 10,
     margin: 5,
-    backgroundColor: "#000000",
     borderRadius: 50,
   },
 });
