@@ -11,6 +11,7 @@ import * as WebBrowser from "expo-web-browser";
 
 import { makeRedirectUri } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
+import LogoutButton from "@/components/buttons/logout-button";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -86,6 +87,7 @@ const SignUpScreen = ({}) => {
       <GoogleSignInMy />
       <Button title="Reg" onPress={handleReg} />
       <Button title="Fetch" onPress={fetchData} />
+      <LogoutButton />
     </View>
   );
 };

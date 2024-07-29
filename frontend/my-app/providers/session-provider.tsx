@@ -20,7 +20,7 @@ type SessionContextType = {
   user: SessionUser | null;
   register: (data: RegisterResponseData) => void;
   login: (data: LoginResponseData) => void;
-  logout: () => Promise<boolean>;
+  logout: () => void;
   signInWithGoogle: () => Promise<boolean>;
   resetPassword: () => Promise<boolean>;
   changePassword: () => Promise<boolean>;
@@ -79,7 +79,10 @@ export function SessionProvider({
   };
 
   const logout = async () => {
-    return false;
+    setUser(null);
+    setAccessToken("");
+    setRefreshToken("");
+    await AsyncStorage.removeItem("STORED_USER");
   };
   const signInWithGoogle = async () => {
     return false;
@@ -98,11 +101,18 @@ export function SessionProvider({
         );
       }
       const newUser: SessionUser = {
-        ...user,
+        email: data.email,
+        id: data.pk,
+        username: data.username,
         first_name: data.first_name,
         last_name: data.last_name,
       };
-      setUser(() => newUser);
+      setUser((user) => {
+        return {
+          ...newUser,
+          imageURL: user?.imageURL,
+        };
+      });
       await storeUser(newUser);
     } catch (error) {
       console.log("[ACCESS_TOKEN]:", error);

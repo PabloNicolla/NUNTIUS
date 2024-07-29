@@ -26,6 +26,15 @@ import {
   CheckEmailRequestData,
   CheckEmailResponseData,
 } from "@/API/check-email";
+import { makeRedirectUri } from "expo-auth-session";
+import * as Google from "expo-auth-session/providers/google";
+import {
+  GOOGLE_AUTH,
+  GoogleAuthRequestData,
+  GoogleAuthResponseData,
+} from "@/API/google-auth";
+import { GET_USER_URL, GetUserResponseData } from "@/API/get-user";
+import { useSession } from "@/providers/session-provider";
 
 type GetStartedModalProps = {
   isVisible: boolean;
@@ -124,7 +133,7 @@ export default function GetStartedModal({
                 className=""
                 keyboardShouldPersistTaps="handled"
               >
-                <View className="mt-[30%] w-[80%]">
+                <View className="mb-20 mt-[30%] w-[80%]">
                   <ThemedText className="mb-5 text-3xl font-bold">
                     Lets Get Started!
                   </ThemedText>
@@ -155,12 +164,19 @@ export default function GetStartedModal({
                   />
 
                   <PrimaryButton
-                    className="mb-20"
+                    className=""
                     handlePress={form.handleSubmit((data: any) =>
                       onSubmit(data),
                     )}
                     title="GET STARTED"
+                    isLoading={isLoading}
                   />
+
+                  <View className="my-5 items-center justify-center">
+                    <ThemedText className="">OR</ThemedText>
+                  </View>
+
+                  <GoogleSignInOption />
                 </View>
               </ScrollView>
             </View>
@@ -191,5 +207,71 @@ const CloseModalX = ({
         <MaterialIcons name="close" size={25} color={color} />
       </Pressable>
     </View>
+  );
+};
+
+const GoogleSignInOption = ({}) => {
+  const { login } = useSession();
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    redirectUri: makeRedirectUri({ scheme: "com.anonymous.myapp" }),
+  });
+
+  useEffect(() => {
+    console.log("[GET_STARTED_MODAL]: receiving Google response");
+
+    const handleLogin = async () => {
+      try {
+        if (!response || response.type !== "success") {
+          return;
+        }
+        const requestData: GoogleAuthRequestData = {
+          access_token: response.authentication?.accessToken ?? "",
+        };
+
+        const responseData: GoogleAuthResponseData = (
+          await axios.post(GOOGLE_AUTH, requestData)
+        ).data;
+        console.log("[GET_STARTED_MODAL]: Logged in with Google");
+
+        const user = (
+          await axios.get(GET_USER_URL, {
+            headers: { Authorization: `Bearer ${responseData.access}` },
+          })
+        ).data;
+
+        login({
+          access: responseData.access,
+          refresh: responseData.refresh,
+          user: {
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            pk: user.pk,
+            username: user.username,
+          },
+        });
+
+        if (router.canGoBack()) {
+          router.dismissAll();
+        }
+        router.replace("/");
+      } catch (error) {
+        console.log(
+          "[GET_STARTED_MODAL]: ERROR, make sure CLIENT_ID AND SECRET_ID are configure in django admin panel",
+          error,
+        );
+      }
+    };
+
+    handleLogin();
+  }, [response]);
+
+  return (
+    <PrimaryButton
+      isLoading={!request}
+      title="Sign In with Google"
+      handlePress={() => promptAsync()}
+    />
   );
 };

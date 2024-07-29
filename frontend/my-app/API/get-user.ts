@@ -1,10 +1,6 @@
 import qs from "query-string";
 
-export type ChangeNameRequestData = {
-  first_name: string;
-  last_name?: string;
-};
-export type ChangeNameResponseData = {
+export type GetUserResponseData = {
   email: string;
   first_name: string;
   last_name: string;
@@ -12,6 +8,6 @@ export type ChangeNameResponseData = {
   username: string;
 };
 
-export const CHANGE_NAME_URL = qs.stringifyUrl({
+export const GET_USER_URL = qs.stringifyUrl({
   url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/dj-rest-auth/user/`,
 });
