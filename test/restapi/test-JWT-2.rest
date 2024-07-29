@@ -1,42 +1,78 @@
-POST http://192.168.214.206:8000/login/
+POST http://192.168.56.1:8000/login/
 Content-Type: application/json
 
 {"username": "user3", "password1": "Pass1234!", "password2": "Pass1234!", "email": "user3@test.test"}
 
 ###
-POST http://192.168.214.206:8000/register/
+POST http://192.168.56.1:8000/register/
 Content-Type: application/json
 
 {"username": "user33", "password": "Pass1234!", "email": "user33@test.test"}
 
 ###
-GET http://192.168.214.206:8000/private
+GET http://192.168.56.1:8000/private
 Content-Type: application/json
 
 {"username": "user3", "password1": "Pass1234!", "password2": "Pass1234!", "email": "user3@test.test"}
 
 ###
-GET http://192.168.214.206:8000/public
+GET http://192.168.56.1:8000/public
 Content-Type: application/json
 
 {"username": "user3", "password1": "Pass1234!", "password2": "Pass1234!", "email": "user3@test.test"}
 
 ###
-POST http://192.168.214.206:8000/dj-rest-auth/login/
+POST http://192.168.56.1:8000/dj-rest-auth/login/
 Content-Type: application/json
 
 {
-  "username": "NewestUser55113",
+  "username": "NewestUser1454",
   "password": "test123!@#"
 }
 
 ###
-POST http://192.168.214.206:8000/dj-rest-auth/registration/
+POST http://192.168.56.1:8000/dj-rest-auth/registration/
 Content-Type: application/json
 
 {
-  "username": "NewestUser551113",
+  "username": "NewestUser145154",
   "email": "NewestUser@test.com",
   "password1": "test123!@#",
   "password2": "test123!@#"
+}
+
+
+###
+POST http://192.168.56.1:8000/dj-rest-auth/logout/
+Content-Type: application/json
+
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyMjI4NDMwMiwiaWF0IjoxNzIyMTk3OTAyLCJqdGkiOiJhNDFiMDJkMDM3YzY0YzQ5OTk0YjYwYWZhODVhOWI1ZCIsInVzZXJfaWQiOjJ9.IsXNEBmPmUnilS48T0ckdpGjX26PuVUU_kkNdQ592C0"
+}
+
+###
+POST http://192.168.56.1:8000/dj-rest-auth/password/reset/
+Content-Type: application/json
+
+{
+  "email": "NewestUser@test.com"
+}
+###
+GET http://192.168.56.1:8000/dj-rest-auth/user/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIyMjAzNjk3LCJpYXQiOjE3MjIyMDMzOTcsImp0aSI6IjQ0YmJhMmRmYWYyNDQ3NWQ5NTVjMTNiMWY1Mzk3NGIyIiwidXNlcl9pZCI6ImI5YWIyMjc2LTcxZTgtNGJiNC1iOGFlLTc1ZWYzMmZiM2EwOCJ9._WpP62UsjkpmQVl3Nmw0A-vtE4oDYOX6g59TV9WRqbc
+
+{}
+###
+PATCH http://192.168.56.1:8000/dj-rest-auth/user/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIyMjAzMTMwLCJpYXQiOjE3MjIyMDI4MzAsImp0aSI6IjFkZDc4ZDdiNTZiYTQ5N2ZhZTllMGI1MzRkMjQ2NGMxIiwidXNlcl9pZCI6ImI5YWIyMjc2LTcxZTgtNGJiNC1iOGFlLTc1ZWYzMmZiM2EwOCJ9.ndboMhMEC5mvOlHKvS74e8HnTV_JKwIu5OQFu4fZpTs
+
+{"first_name": "asd","last_name": "dsa"}
+###
+POST http://192.168.56.1:8000/check-email/
+Content-Type: application/json
+
+{
+    "email": "NewestUser@test.com"
 }

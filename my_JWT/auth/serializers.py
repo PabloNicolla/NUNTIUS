@@ -87,3 +87,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 #         data.update(self.get_token(self.user))
 #         return data
+
+# myapp/serializers.py
+
+
+class CustomRegisterSerializer(RegisterSerializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, email):
+        if CustomUser.objects.filter(email=email).exists():
+            raise serializers.ValidationError(
+                "This email address is already in use.")
+        return email
+
+    def save(self, request):
+        user = super().save(request)
+        user.email = self.validated_data.get('email')
+        user.save()
+        return user

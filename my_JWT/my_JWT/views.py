@@ -42,16 +42,16 @@ class CustomRegisterView(RegisterView):
             response_data = response.data
 
             # Set cookies
-            response.set_cookie(
-                settings.REST_AUTH['JWT_AUTH_COOKIE'],
-                response_data['access'],
-                httponly=settings.REST_AUTH['JWT_AUTH_HTTPONLY'],
-                samesite=settings.REST_AUTH['JWT_AUTH_SAMESITE']
-            )
-            response.set_cookie(
-                settings.REST_AUTH['JWT_AUTH_REFRESH_COOKIE'],
-                response_data['refresh'],
-                httponly=settings.REST_AUTH['JWT_AUTH_HTTPONLY'],
-                samesite=settings.REST_AUTH['JWT_AUTH_SAMESITE']
-            )
+            # response.set_cookie(
+            #     settings.REST_AUTH['JWT_AUTH_COOKIE'],
+            #     response_data['access'],
+            #     httponly=settings.REST_AUTH['JWT_AUTH_HTTPONLY'],
+            #     samesite=settings.REST_AUTH['JWT_AUTH_SAMESITE']
+            # )
+            # response.set_cookie(
+            #     settings.REST_AUTH['JWT_AUTH_REFRESH_COOKIE'],
+            #     response_data['refresh'],
+            #     httponly=settings.REST_AUTH['JWT_AUTH_HTTPONLY'],
+            #     samesite=settings.REST_AUTH['JWT_AUTH_SAMESITE']
+            # )
         return response
