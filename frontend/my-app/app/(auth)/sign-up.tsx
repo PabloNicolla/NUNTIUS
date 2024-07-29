@@ -14,12 +14,11 @@ import { Controller, useForm } from "react-hook-form";
 import { router, useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-
+import axios from "axios";
+import qs from "query-string";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useSession } from "@/providers/session-provider";
-
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
@@ -151,6 +150,7 @@ export default function SignUpScreen() {
                       ref={emailInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
+                      titleTransformX={8}
                       title="Email"
                       value={value}
                       error={error}
@@ -172,6 +172,7 @@ export default function SignUpScreen() {
                       ref={usernameInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
+                      titleTransformX={16}
                       title="Username"
                       value={value}
                       error={error}

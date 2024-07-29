@@ -8,24 +8,23 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Controller, useForm } from "react-hook-form";
 import { router, useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import axios from "axios";
 import { useSession } from "@/providers/session-provider";
-
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 import { Colors } from "@/constants/Colors";
+import { LOGIN_URL, LoginResponseData } from "@/API/login";
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid Email format"),
@@ -35,12 +34,11 @@ const formSchema = z.object({
     .min(8, "Password too short"),
 });
 
-export default function SignUpScreen() {
+export default function SignIpScreen() {
   const theme = useColorScheme() ?? "light";
-
   const { email } = useLocalSearchParams<{ email: string }>();
-
   const { login } = useSession();
+  const [loginErrorMessage, setLoginErrorMessage] = useState("");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -54,13 +52,22 @@ export default function SignUpScreen() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("SUBMITTING SIGN IN FORM", values);
+      console.log("[SignIpScreen]: SUBMITTING SIGN IN FORM", values);
+      setLoginErrorMessage("");
+
+      const response: LoginResponseData = (await axios.post(LOGIN_URL, values))
+        .data;
+
+      login(response);
+
       form.reset();
-      login(values.email, values.password, "EMAIL");
       router.dismissAll();
       router.replace("/");
     } catch (error) {
-      console.log(error);
+      setLoginErrorMessage(
+        "Password, email or combination are invalid. Please try again.",
+      );
+      console.log("[SignIpScreen]:", error);
     }
   };
 
@@ -119,6 +126,13 @@ export default function SignUpScreen() {
               keyboardShouldPersistTaps="handled"
             >
               <View className="mt-[10%] w-[80%]">
+                {!!loginErrorMessage && (
+                  <View className="py-4">
+                    <ThemedText className="text-center text-red-500">
+                      {loginErrorMessage}
+                    </ThemedText>
+                  </View>
+                )}
                 <Controller
                   control={form.control}
                   name="email"
@@ -131,6 +145,7 @@ export default function SignUpScreen() {
                       ref={EmailInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
+                      titleTransformX={8}
                       title="Email"
                       value={value}
                       error={error}
@@ -172,7 +187,7 @@ export default function SignUpScreen() {
                 />
 
                 <View className="mb-20 mt-10 items-center">
-                  <ThemedText className="mb-10 text-lg font-bold text-text-light/70 dark:text-text-dark/70">
+                  <ThemedText className="mb-10 text-lg font-bold text-primary-light">
                     Forgot Password?
                   </ThemedText>
                   <Pressable
@@ -181,7 +196,10 @@ export default function SignUpScreen() {
                     }}
                   >
                     <ThemedText className="text-lg font-bold text-text-light/70 dark:text-text-dark/70">
-                      New to [THIS APP]? Sign up now.
+                      New to Nuntius?{" "}
+                      <ThemedText className="text-lg font-bold text-primary-light">
+                        Sign up now.
+                      </ThemedText>
                     </ThemedText>
                   </Pressable>
                 </View>

@@ -123,7 +123,6 @@ const PrimaryPage = ({
               <PrimaryButton
                 handlePress={() => onClick()}
                 title="GET STARTED"
-                removeShadow={true}
               />
             </View>
           </View>

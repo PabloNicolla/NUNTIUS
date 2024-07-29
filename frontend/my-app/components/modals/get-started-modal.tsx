@@ -16,14 +16,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as z from "zod";
 import axios from "axios";
 import qs from "query-string";
-
 import { ThemedText } from "@/components/themed-text";
 import PrimaryButton from "@/components/buttons/primary-button";
 import { ThemedView } from "@/components/themed-view";
 import FormTextField from "@/components/form/form-text-field";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckEmailData } from "@/API/check-email";
+import { CheckEmailResponseData } from "@/API/check-email";
 
 type GetStartedModalProps = {
   isVisible: boolean;
@@ -59,12 +58,10 @@ export default function GetStartedModal({
 
       const url = qs.stringifyUrl({
         url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/check-email/`,
-        query: {
-          email: values.email,
-        },
       });
 
-      const response: CheckEmailData = (await axios.post(url, values)).data;
+      const response: CheckEmailResponseData = (await axios.post(url, values))
+        .data;
 
       let pathname = "/sign-up";
       if (response.code === "IN_USE") {

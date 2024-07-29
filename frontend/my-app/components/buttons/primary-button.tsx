@@ -12,7 +12,6 @@ export type PrimaryButtonProps = {
   rippleColor?: TouchableRippleProps["rippleColor"];
   className?: ViewProps["className"];
   titleClassName?: ThemedTextProps["className"];
-  removeShadow?: boolean;
   minHeight?: number;
 };
 

@@ -1,13 +1,10 @@
 import { Contact } from "@/db/schemaTypes";
 import React, { createContext, useState, useContext, useMemo } from "react";
+import * as SecureStore from "expo-secure-store";
+import { LoginResponseData } from "@/API/login";
 
 export type SessionUser = Contact & {
   email: string;
-};
-
-export type SessionAnswer = {
-  success: boolean;
-  message: string;
 };
 
 type SessionContextType = {
@@ -16,24 +13,20 @@ type SessionContextType = {
     username: string,
     password: string,
     email: string,
-  ) => SessionAnswer;
-  login: (
-    identification: string,
-    password: string,
-    idType: "EMAIL" | "USERNAME",
-  ) => SessionAnswer;
-  logout: () => SessionAnswer;
-  signInWithGoogle: () => SessionAnswer;
-  resetPassword: () => SessionAnswer;
-  changePassword: () => SessionAnswer;
+  ) => Promise<boolean>;
+  login: (data: LoginResponseData) => void;
+  logout: () => Promise<boolean>;
+  signInWithGoogle: () => Promise<boolean>;
+  resetPassword: () => Promise<boolean>;
+  changePassword: () => Promise<boolean>;
 
-  verifyIfAccessTokenIsValid: () => SessionAnswer;
-  refreshAccessToken: () => SessionAnswer;
+  verifyIfAccessTokenIsValid: () => Promise<boolean>;
+  refreshAccessToken: () => Promise<boolean>;
 
-  setAccessToken: (token: string) => SessionAnswer;
-  getAccessToken: () => SessionAnswer;
-  setRefreshToken: (token: string) => SessionAnswer;
-  getRefreshToken: () => SessionAnswer;
+  setAccessToken: (token: string) => Promise<boolean>;
+  getAccessToken: () => Promise<boolean>;
+  setRefreshToken: (token: string) => Promise<boolean>;
+  getRefreshToken: () => Promise<boolean>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -51,51 +44,62 @@ export function SessionProvider({
 }: Readonly<{ children: React.ReactNode }>) {
   const [user, setUser] = useState<SessionUser | null>(null);
 
-  const register = (
+  const register = async (
     username: string,
     password: string,
     email: string,
-  ): SessionAnswer => {
-    return { success: true, message: "" };
-  };
-  const login = (
-    identification: string,
-    password: string,
-    idType: "EMAIL" | "USERNAME",
-  ): SessionAnswer => {
-    return { success: true, message: "" };
-  };
-  const logout = (): SessionAnswer => {
-    return { success: true, message: "" };
-  };
-  const signInWithGoogle = (): SessionAnswer => {
-    return { success: true, message: "" };
-  };
-  const resetPassword = (): SessionAnswer => {
-    return { success: true, message: "" };
-  };
-  const changePassword = (): SessionAnswer => {
-    return { success: true, message: "" };
+  ) => {
+    return false;
   };
 
-  const verifyIfAccessTokenIsValid = (): SessionAnswer => {
-    return { success: true, message: "" };
-  };
-  const refreshAccessToken = (): SessionAnswer => {
-    return { success: true, message: "" };
+  const login = async (data: LoginResponseData) => {
+    console.log(data);
+
+    setUser(() => {
+      return {
+        id: data.user.pk,
+        email: data.user.email,
+        first_name: data.user.first_name,
+        last_name: data.user.last_name,
+        username: data.user.username,
+      };
+    });
+
+    SecureStore.setItem("ACCESS_TOKEN", data.access);
+    SecureStore.setItem("REFRESH_TOKEN", data.refresh);
   };
 
-  const setAccessToken = (token: string): SessionAnswer => {
-    return { success: true, message: "" };
+  const logout = async () => {
+    return false;
   };
-  const getAccessToken = (): SessionAnswer => {
-    return { success: true, message: "" };
+  const signInWithGoogle = async () => {
+    return false;
   };
-  const setRefreshToken = (token: string): SessionAnswer => {
-    return { success: true, message: "" };
+  const resetPassword = async () => {
+    return false;
   };
-  const getRefreshToken = (): SessionAnswer => {
-    return { success: true, message: "" };
+  const changePassword = async () => {
+    return false;
+  };
+
+  const verifyIfAccessTokenIsValid = async () => {
+    return false;
+  };
+  const refreshAccessToken = async () => {
+    return false;
+  };
+
+  const setAccessToken = async (token: string) => {
+    return false;
+  };
+  const getAccessToken = async () => {
+    return false;
+  };
+  const setRefreshToken = async (token: string) => {
+    return false;
+  };
+  const getRefreshToken = async () => {
+    return false;
   };
 
   const contextMemo = useMemo(
