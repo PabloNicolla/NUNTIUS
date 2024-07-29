@@ -10,6 +10,7 @@ import * as SecureStore from "expo-secure-store";
 import { LoginResponseData } from "@/API/login";
 import { RegisterResponseData } from "@/API/register";
 import { ChangeNameResponseData } from "@/API/change-name";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type SessionUser = Contact & {
   email: string;
@@ -30,6 +31,8 @@ type SessionContextType = {
   getAccessToken: () => Promise<string>;
   setRefreshToken: (token: string) => void;
   getRefreshToken: () => Promise<string>;
+  storeUser: (user: SessionUser) => void;
+  loadStoredUser: () => Promise<SessionUser | null | undefined>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -48,32 +51,31 @@ export function SessionProvider({
   const [user, setUser] = useState<SessionUser | null>(null);
 
   const register = async (data: RegisterResponseData) => {
-    setUser(() => {
-      return {
-        id: data.user.pk,
-        email: data.user.email,
-        first_name: data.user.first_name,
-        last_name: data.user.last_name,
-        username: data.user.username,
-      };
-    });
+    const newUser: SessionUser = {
+      id: data.user.pk,
+      email: data.user.email,
+      first_name: data.user.first_name,
+      last_name: data.user.last_name,
+      username: data.user.username,
+    };
+    setUser(newUser);
     setAccessToken(data.access);
     setRefreshToken(data.refresh);
+    await storeUser(newUser);
   };
 
   const login = async (data: LoginResponseData) => {
-    setUser(() => {
-      return {
-        id: data.user.pk,
-        email: data.user.email,
-        first_name: data.user.first_name,
-        last_name: data.user.last_name,
-        username: data.user.username,
-      };
-    });
-
+    const newUser: SessionUser = {
+      id: data.user.pk,
+      email: data.user.email,
+      first_name: data.user.first_name,
+      last_name: data.user.last_name,
+      username: data.user.username,
+    };
+    setUser(newUser);
     setAccessToken(data.access);
     setRefreshToken(data.refresh);
+    await storeUser(newUser);
   };
 
   const logout = async () => {
@@ -89,16 +91,22 @@ export function SessionProvider({
     return false;
   };
   const changeName = async (data: ChangeNameResponseData) => {
-    setUser((user) => {
+    try {
       if (!user) {
-        return null;
+        throw new Error(
+          "Trying to changeName without any user being logged in",
+        );
       }
-      user.first_name = data.first_name;
-      user.last_name = data.last_name;
-      console.log(user);
-
-      return { ...user };
-    });
+      const newUser: SessionUser = {
+        ...user,
+        first_name: data.first_name,
+        last_name: data.last_name,
+      };
+      setUser(() => newUser);
+      await storeUser(newUser);
+    } catch (error) {
+      console.log("[ACCESS_TOKEN]:", error);
+    }
   };
 
   const verifyIfAccessTokenIsValid = async () => {
@@ -128,6 +136,30 @@ export function SessionProvider({
     }
     return token ?? "";
   };
+  const storeUser = async (user: SessionUser) => {
+    try {
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.setItem("STORED_USER", jsonValue);
+    } catch (error) {
+      console.log("[SESSION_PROVIDER]: failed in storing STORED_USER", error);
+    }
+  };
+  const loadStoredUser = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("STORED_USER");
+      if (jsonValue != null) {
+        const user: SessionUser = JSON.parse(jsonValue);
+        setUser(() => user);
+        return user.id ? user : null;
+      }
+      return null;
+    } catch (error) {
+      console.log(
+        "[SESSION_PROVIDER]: failed in retrieving STORED_USER",
+        error,
+      );
+    }
+  };
 
   const contextMemo = useMemo(
     () => ({
@@ -145,6 +177,8 @@ export function SessionProvider({
       getAccessToken,
       setRefreshToken,
       getRefreshToken,
+      storeUser,
+      loadStoredUser,
     }),
     [user],
   );
