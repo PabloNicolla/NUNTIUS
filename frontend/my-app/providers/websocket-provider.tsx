@@ -52,7 +52,7 @@ export const WebSocketProvider: React.FC<{
   useEffect(() => {
     if (user) {
       console.log("[WEB_SOCKET]: Initial connection");
-      // connect();
+      connect();
       return () => {
         socket.current?.close();
       };
