@@ -1,13 +1,14 @@
 export type Contact = {
-  id: number;
+  id: string;
   username: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   imageURL?: string;
 };
 
 export type PrivateChat = {
-  id: number;
-  contactId: number;
+  id: string;
+  contactId: string;
   lastMessageId?: number;
   lastMessageValue?: string;
   lastMessageTimestamp?: number;
@@ -15,14 +16,15 @@ export type PrivateChat = {
 };
 
 export type PrivateChatJoinContact = {
-  id: number;
-  contactId: number;
+  id: string;
+  contactId: string;
   lastMessageId?: number;
   lastMessageValue?: string;
   lastMessageTimestamp?: number;
   notificationCount?: number;
   username: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   imageURL?: string;
 };
 
@@ -51,8 +53,8 @@ export enum Condition {
 
 export type Message = {
   id: number;
-  senderId: number;
-  receiverId: number;
+  senderId: string;
+  receiverId: string;
 
   value: string;
   timestamp: number;
@@ -60,7 +62,7 @@ export type Message = {
   status: MessageStatus;
 
   receiverType: ReceiverType;
-  chatId: number;
+  chatId: string;
   senderReferenceId: number;
   condition: Condition;
 };

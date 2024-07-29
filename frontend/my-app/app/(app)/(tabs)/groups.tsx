@@ -17,7 +17,7 @@ import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
 import useChatReducer from "@/reducers/useChatReducer";
 import {
-  deleteAllMessageByChatId,
+  deleteAllMessagesByChatId,
   deletePrivateChat,
   getAllPrivateChatsJoinContacts,
 } from "@/db/statements";
@@ -173,7 +173,7 @@ const ActionsHeaderOnSelect = () => {
                 console.log("trash");
                 selectedChats.forEach(async (chatId) => {
                   await deletePrivateChat(db, chatId);
-                  await deleteAllMessageByChatId(db, chatId);
+                  await deleteAllMessagesByChatId(db, chatId);
                 });
                 clearSelected();
               }}
@@ -222,8 +222,6 @@ const HeaderComponent = ({
   const theme = useColorScheme();
   const { selectedChats } = useChatSelected();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const db = useSQLiteContext();
 
   return (
     <View className="w-full items-center justify-center">

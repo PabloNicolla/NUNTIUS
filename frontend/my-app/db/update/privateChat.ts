@@ -58,7 +58,7 @@ export const updatePrivateChatById = async (
 
 export const resetPrivateChatNotificationCount = async (
   db: SQLiteDatabase,
-  chatId: number,
+  chatId: string,
 ) => {
   try {
     return await db.runAsync(

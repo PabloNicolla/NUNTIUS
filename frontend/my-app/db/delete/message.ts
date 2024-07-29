@@ -1,8 +1,9 @@
 import { SQLiteDatabase } from "expo-sqlite";
+import { Message, PrivateChat } from "../schemaTypes";
 
-export const deleteAllMessageByChatId = async (
+export const deleteAllMessagesByChatId = async (
   db: SQLiteDatabase,
-  chatId: number,
+  chatId: PrivateChat["id"],
 ) => {
   try {
     return await db.runAsync(
@@ -19,7 +20,10 @@ export const deleteAllMessageByChatId = async (
   }
 };
 
-export const deleteAllMessageById = async (db: SQLiteDatabase, id: number) => {
+export const deleteMessageById = async (
+  db: SQLiteDatabase,
+  id: Message["id"],
+) => {
   try {
     return await db.runAsync(
       `
@@ -31,6 +35,6 @@ export const deleteAllMessageById = async (db: SQLiteDatabase, id: number) => {
       },
     );
   } catch (error) {
-    console.log("[STATEMENTS]: deleteAllMessageById", error);
+    console.log("[STATEMENTS]: deleteMessageById", error);
   }
 };

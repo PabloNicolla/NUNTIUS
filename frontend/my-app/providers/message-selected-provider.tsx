@@ -1,3 +1,4 @@
+import { Message } from "@/db/schemaTypes";
 import {
   createContext,
   useCallback,
@@ -7,8 +8,8 @@ import {
 } from "react";
 
 type SelectedContextType = {
-  selectedMessages: Set<number>;
-  action: (id: number, state: boolean) => boolean;
+  selectedMessages: Set<Message["id"]>;
+  action: (id: Message["id"], state: boolean) => boolean;
   clearSelected: () => void;
 };
 
@@ -31,11 +32,11 @@ export const MessageSelectedProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(
+  const [selectedMessages, setSelectedMessages] = useState<Set<Message["id"]>>(
     new Set(),
   );
 
-  const action = useCallback((id: number, state: boolean) => {
+  const action = useCallback((id: Message["id"], state: boolean) => {
     setSelectedMessages((prevSelectedMessages) => {
       if (state) {
         prevSelectedMessages.add(id);

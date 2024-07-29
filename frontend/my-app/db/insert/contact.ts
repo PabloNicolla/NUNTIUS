@@ -7,19 +7,22 @@ export const insertContact = async (db: SQLiteDatabase, contact: Contact) => {
       `INSERT INTO contact (
                 id,
                 username,
-                name,
+                first_name,
+                last_name,
                 imageURL
             ) 
             VALUES (
                 $id,
                 $username,
-                $name,
+                $first_name,
+                $last_name,
                 $imageURL
             )`,
       {
         $id: contact.id,
         $username: contact.username,
-        $name: contact.name,
+        $first_name: contact.first_name,
+        $last_name: contact.last_name,
         $imageURL: contact.imageURL ?? null,
       },
     );

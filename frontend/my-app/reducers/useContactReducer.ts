@@ -29,7 +29,9 @@ const contactReducer = (
         ...state,
         contacts: action.payload,
         filteredContacts: action.payload.filter((contact) =>
-          contact.name.toLowerCase().includes(state.searchQuery.toLowerCase()),
+          contact.first_name
+            .toLowerCase()
+            .includes(state.searchQuery.toLowerCase()),
         ),
       };
     case "SET_SEARCH_QUERY":
@@ -37,7 +39,9 @@ const contactReducer = (
         ...state,
         searchQuery: action.payload,
         filteredContacts: state.contacts.filter((contact) =>
-          contact.name.toLowerCase().includes(action.payload.toLowerCase()),
+          contact.first_name
+            .toLowerCase()
+            .includes(action.payload.toLowerCase()),
         ),
       };
     default:

@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Contact } from "../schemaTypes";
+import { Contact, PrivateChat } from "../schemaTypes";
 
 export const getAllContacts = async (db: SQLiteDatabase) => {
   try {
@@ -11,7 +11,7 @@ export const getAllContacts = async (db: SQLiteDatabase) => {
 
 export const getFirstContact = async (
   db: SQLiteDatabase,
-  contactId: number,
+  contactId: PrivateChat["id"],
 ) => {
   try {
     return await db.getFirstAsync<Contact>(

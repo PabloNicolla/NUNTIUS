@@ -29,6 +29,7 @@ import { Colors } from "@/constants/Colors";
 
 const formSchema = z.object({
   email: z.string().email("Invalid Email format").min(1, "Email is required"),
+  username: z.string().min(1, "Username is required"),
   password: z
     .string()
     .min(1, "Password is required")
@@ -40,23 +41,24 @@ export default function SignUpScreen() {
 
   const { email } = useLocalSearchParams<{ email: string }>();
 
-  const { login } = useSession();
+  const { register } = useSession();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: email ?? "",
+      username: "",
       password: "",
     },
   });
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log("SUBMITTING SIGN UP FORM", values);
       form.reset();
-      login();
+      register(values.username, values.password, values.email);
       router.dismissAll();
       router.replace("/");
     } catch (error) {
@@ -64,18 +66,18 @@ export default function SignUpScreen() {
     }
   };
 
-  const PasswordInputRef = useRef<TextInput | null>(null);
-  const EmailInputRef = useRef<TextInput | null>(null);
+  const usernameInputRef = useRef<TextInput | null>(null);
+  const emailInputRef = useRef<TextInput | null>(null);
 
   useEffect(() => {
-    if (email && PasswordInputRef.current) {
+    if (email && usernameInputRef.current) {
       const timer = setTimeout(() => {
-        PasswordInputRef.current?.focus();
+        usernameInputRef.current?.focus();
       }, 400);
       return () => clearTimeout(timer);
     } else {
       const timer = setTimeout(() => {
-        EmailInputRef.current?.focus();
+        emailInputRef.current?.focus();
       }, 400);
       return () => clearTimeout(timer);
     }
@@ -146,7 +148,7 @@ export default function SignUpScreen() {
                     fieldState: { error },
                   }) => (
                     <FormTextField
-                      ref={EmailInputRef}
+                      ref={emailInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
                       title="Email"
@@ -160,6 +162,26 @@ export default function SignUpScreen() {
 
                 <Controller
                   control={form.control}
+                  name="username"
+                  disabled={isLoading}
+                  render={({
+                    field: { value, onChange, onBlur },
+                    fieldState: { error },
+                  }) => (
+                    <FormTextField
+                      ref={usernameInputRef}
+                      className="mb-5"
+                      handleTextChange={onChange}
+                      title="Username"
+                      value={value}
+                      error={error}
+                      isLoading={isLoading}
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={form.control}
                   name="password"
                   disabled={isLoading}
                   render={({
@@ -167,7 +189,6 @@ export default function SignUpScreen() {
                     fieldState: { error },
                   }) => (
                     <FormTextField
-                      ref={PasswordInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
                       title="Password"

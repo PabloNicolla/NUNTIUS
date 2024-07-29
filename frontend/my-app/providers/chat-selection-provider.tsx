@@ -7,10 +7,11 @@ import React, {
   useState,
 } from "react";
 import { useChatSelected } from "./chat-selection-provider copy";
+import { PrivateChat } from "@/db/schemaTypes";
 
 type SelectionContextType = {
   isSelectionActive: boolean;
-  selectModeHandler: (id: number, state: boolean) => void;
+  selectModeHandler: (id: PrivateChat["id"], state: boolean) => void;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
@@ -43,9 +44,12 @@ export const ChatSelectionProvider = ({
     }
   }, [selectedChats, isSelectionActive]);
 
-  const selectModeHandler = useCallback((id: number, state: boolean) => {
-    return action(id, state);
-  }, []);
+  const selectModeHandler = useCallback(
+    (id: PrivateChat["id"], state: boolean) => {
+      return action(id, state);
+    },
+    [],
+  );
 
   const contextMemo = useMemo(
     () => ({

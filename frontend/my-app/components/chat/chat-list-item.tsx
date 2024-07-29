@@ -7,20 +7,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
+import { PrivateChatJoinContact } from "@/db/schemaTypes";
 
-export type ChatListItemProps = {
-  id: number;
-  contactId: number;
-  lastMessageId?: number;
-  lastMessageValue?: string;
-  lastMessageTimestamp?: number;
-  notificationCount?: number;
-  username: string;
-  name: string;
-  imageURL?: string;
-
-  // isVisible?: boolean;
-};
+export type ChatListItemProps = PrivateChatJoinContact;
 
 const ChatListItem = React.memo(function ChatListItem({
   id,
@@ -30,7 +19,8 @@ const ChatListItem = React.memo(function ChatListItem({
   lastMessageTimestamp,
   notificationCount,
   username,
-  name,
+  first_name,
+  last_name,
   imageURL,
 }: ChatListItemProps) {
   const theme = useColorScheme() ?? "light";
@@ -79,7 +69,7 @@ const ChatListItem = React.memo(function ChatListItem({
 
           <View className="h-[50] flex-1 flex-col">
             <ChatDetails
-              chatName={name}
+              chatName={first_name}
               lastMessageTime={lastMessageTimestamp}
             />
             <MostRecentMessage

@@ -65,25 +65,14 @@ const AddContact = (props: Props) => {
               title="Save"
               handlePress={async () => {
                 console.log("pressed");
-
-                const phone = parseInt(phoneNumber, 10);
-
-                if (isNaN(phone)) {
-                  console.warn(
-                    "The phoneNumber string cannot be converted to a number.",
-                  );
-                } else {
-                  console.log(phone);
-
-                  await insertContact(db, {
-                    id: phone,
-                    name: name,
-                    username: name,
-                    imageURL: "",
-                  });
-
-                  router.back();
-                }
+                // await insertContact(db, {
+                //   id: phoneNumber,
+                //   first_name: name,
+                //   last_name: name,
+                //   username: name,
+                //   imageURL: "",
+                // });
+                router.back();
               }}
             />
           </View>

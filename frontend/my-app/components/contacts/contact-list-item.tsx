@@ -4,18 +4,15 @@ import { Avatar, TouchableRipple } from "react-native-paper";
 import { ThemedText } from "../themed-text";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { router } from "expo-router";
+import { Contact } from "@/db/schemaTypes";
 
-export type ContactListItemProps = {
-  id: number;
-  username: string;
-  name: string;
-  imageURL?: string;
-};
+export type ContactListItemProps = Contact;
 
 const ContactListItem = React.memo(function ContactListItem({
   id,
   username,
-  name,
+  first_name,
+  last_name,
   imageURL,
 }: ContactListItemProps) {
   const theme = useColorScheme() ?? "light";
@@ -44,7 +41,7 @@ const ContactListItem = React.memo(function ContactListItem({
           </View>
 
           <View className="h-[50] flex-1 flex-col">
-            <ChatDetails chatName={name} />
+            <ChatDetails chatName={first_name} />
           </View>
         </View>
       </TouchableRipple>

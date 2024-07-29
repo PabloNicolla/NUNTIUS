@@ -7,10 +7,11 @@ import {
   useState,
 } from "react";
 import { useMessageSelected } from "./message-selected-provider";
+import { Message } from "@/db/schemaTypes";
 
 type SelectionContextType = {
   isSelectionActive: boolean;
-  selectModeHandler: (id: number, state: boolean) => boolean;
+  selectModeHandler: (id: Message["id"], state: boolean) => boolean;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
@@ -43,7 +44,7 @@ export const MessageSelectionProvider = ({
     }
   }, [selectedMessages, isSelectionActive]);
 
-  const selectModeHandler = useCallback((id: number, state: boolean) => {
+  const selectModeHandler = useCallback((id: Message["id"], state: boolean) => {
     return action(id, state);
   }, []);
 

@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Message, ReceiverType } from "../schemaTypes";
+import { Contact, Message, PrivateChat, ReceiverType } from "../schemaTypes";
 
 export const getAllMessages = async (db: SQLiteDatabase) => {
   try {
@@ -11,7 +11,7 @@ export const getAllMessages = async (db: SQLiteDatabase) => {
 
 export const getFirstMessage = async (
   db: SQLiteDatabase,
-  messageId: number,
+  messageId: Message["id"],
 ) => {
   try {
     return await db.getFirstAsync<Message>(
@@ -27,7 +27,7 @@ export const getFirstMessage = async (
 
 export const getAllMessagesByChatIdWithPagination = async (
   db: SQLiteDatabase,
-  chatId: number,
+  chatId: PrivateChat["id"],
   receiverType: ReceiverType,
   limit: number,
   offset: number,
@@ -59,9 +59,9 @@ export const getAllMessagesByChatIdWithPagination = async (
 
 export const getFirstMessageBySenderRef = async (
   db: SQLiteDatabase,
-  chatId: number,
-  senderReferenceId: number,
-  senderId: number,
+  chatId: PrivateChat["id"],
+  senderReferenceId: Message["senderReferenceId"],
+  senderId: Contact["id"],
 ) => {
   try {
     return await db.getFirstAsync<Message>(

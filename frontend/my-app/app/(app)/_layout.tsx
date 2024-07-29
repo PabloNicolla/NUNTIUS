@@ -9,12 +9,12 @@ import { WebSocketProvider } from "@/providers/websocket-provider";
 import { ChatSelectedProvider } from "@/providers/chat-selection-provider copy";
 
 export default function AppLayout() {
-  const session = useSession();
+  const { user } = useSession();
   const db = useRef(useSQLiteContext());
 
-  console.log("[APP_LAYOUT]: IS USER LOGGED IN:", session.isLoggedIn);
+  console.log("[APP_LAYOUT]: IS USER LOGGED IN:", !!user);
 
-  if (session.isLoggedIn) {
+  if (!user) {
     return <Redirect href={"/landing"} />;
   }
 

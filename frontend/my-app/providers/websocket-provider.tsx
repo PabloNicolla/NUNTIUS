@@ -49,7 +49,22 @@ export const WebSocketProvider: React.FC<{
   const isConnecting = useRef<boolean>(false);
   const isReconnecting = useRef<boolean>(false);
 
+  useEffect(() => {
+    if (user) {
+      console.log("[WEB_SOCKET]: Initial connection");
+      // connect();
+      return () => {
+        socket.current?.close();
+      };
+    }
+  }, []);
+
   const connect = async () => {
+    if (!user) {
+      console.log("[WEB_SOCKET]: User not logged in");
+      return;
+    }
+
     if (isConnecting.current || isReconnecting.current) {
       console.log("[WEB_SOCKET]: Already connecting or reconnecting");
       return;
@@ -123,16 +138,6 @@ export const WebSocketProvider: React.FC<{
 
     setTimeout(checkNetworkAndReconnect, retryInterval);
   };
-
-  useEffect(() => {
-    // if (!isLoggedIn) {
-    console.log("[WEB_SOCKET]: Initial connection");
-    // connect();
-    return () => {
-      socket.current?.close();
-    };
-    // }
-  }, []);
 
   const contextValue = useMemo(
     () => ({ socket: socket.current, sendMessage, connectionStatus }),

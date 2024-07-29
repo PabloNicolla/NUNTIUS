@@ -5,15 +5,16 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
     PRAGMA journal_mode = WAL;
 
     CREATE TABLE IF NOT EXISTS contact (
-        id INTEGER PRIMARY KEY,
+        id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
-        name TEXT NOT NULL,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
         imageURL TEXT
     );
 
     CREATE TABLE IF NOT EXISTS private_chat (
-        id INTEGER PRIMARY KEY,
-        contactId INTEGER NOT NULL,
+        id TEXT PRIMARY KEY,
+        contactId TEXT NOT NULL,
         lastMessageId INTEGER,
         lastMessageValue TEXT,
         lastMessageTimestamp INTEGER,
@@ -22,8 +23,8 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
     
     CREATE TABLE IF NOT EXISTS message (
         id INTEGER PRIMARY KEY,
-        senderId INTEGER NOT NULL,
-        receiverId INTEGER NOT NULL,
+        senderId TEXT NOT NULL,
+        receiverId TEXT NOT NULL,
 
         value TEXT NOT NULL,
         timestamp INTEGER NOT NULL,
@@ -31,7 +32,7 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
         status INTEGER NOT NULL,
 
         receiverType INTEGER NOT NULL,
-        chatId INTEGER NOT NULL,
+        chatId TEXT NOT NULL,
         senderReferenceId NOT NULL,
         condition INTEGER NOT NULL
     );

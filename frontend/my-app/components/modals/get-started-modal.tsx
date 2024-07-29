@@ -14,6 +14,8 @@ import { useEffect, useRef } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as z from "zod";
+import axios from "axios";
+import qs from "query-string";
 
 import { ThemedText } from "@/components/themed-text";
 import PrimaryButton from "@/components/buttons/primary-button";
@@ -21,7 +23,12 @@ import { ThemedView } from "@/components/themed-view";
 import FormTextField from "@/components/form/form-text-field";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckEmailData } from "@/API/check-email";
 
+type GetStartedModalProps = {
+  isVisible: boolean;
+  onClose: () => void;
+};
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid Email format"),
 });
@@ -29,10 +36,7 @@ const formSchema = z.object({
 export default function GetStartedModal({
   isVisible,
   onClose,
-}: Readonly<{
-  isVisible: boolean;
-  onClose: () => void;
-}>) {
+}: GetStartedModalProps) {
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
   const theme = useColorScheme() ?? "light";
@@ -50,20 +54,34 @@ export default function GetStartedModal({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("SUBMITTING GET STARTED FORM", values);
+      console.log("[GetStartedModal]: SUBMITTING GET STARTED FORM", values);
       form.reset();
 
+      const url = qs.stringifyUrl({
+        url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/check-email/`,
+        query: {
+          email: values.email,
+        },
+      });
+
+      const response: CheckEmailData = (await axios.post(url, values)).data;
+
       let pathname = "/sign-up";
-      if (values.email) {
+      if (response.code === "IN_USE") {
         pathname = "/sign-in";
+      } else if (response.code !== "AVAILABLE") {
+        console.log(
+          "[GetStartedModal]: ERROR: response.code not matching any correct value",
+        );
       }
+
       onClose();
       router.push({
         pathname: pathname,
         params: { email: values.email },
       });
     } catch (error) {
-      console.log(error);
+      console.log("[GetStartedModal]:", error);
     }
   };
 

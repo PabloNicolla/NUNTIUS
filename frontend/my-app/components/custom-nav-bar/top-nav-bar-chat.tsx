@@ -8,12 +8,12 @@ import { Avatar, TouchableRipple } from "react-native-paper";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { useSQLiteContext } from "expo-sqlite";
 import { Contact } from "@/db/schemaTypes";
-import { deleteAllMessageById, getFirstContact } from "@/db/statements";
+import { deleteMessageById, getFirstContact } from "@/db/statements";
 import { useMessageSelection } from "@/providers/message-selection-provider";
 import { useMessageSelected } from "@/providers/message-selected-provider";
 
 type Props = {
-  contactId?: number;
+  contactId?: Contact["id"];
   clearSelectedMessages: () => void;
   deleteSelectedMessages: () => void;
 };
@@ -65,12 +65,12 @@ const TopNavBarChat = ({
       </Pressable>
       {!isSelectionActive && (
         <CustomAvatar
-          username={contact?.name ?? ""}
+          username={contact?.first_name ?? ""}
           imageURl={contact?.imageURL}
         />
       )}
       <ThemedText className="pl-4">
-        {isSelectionActive ? selectedMessages.size : contact?.name}
+        {isSelectionActive ? selectedMessages.size : contact?.first_name}
       </ThemedText>
       <View
         style={{ display: isSelectionActive ? "flex" : "none" }}
@@ -82,7 +82,7 @@ const TopNavBarChat = ({
               onPress={async () => {
                 console.log("trash");
                 selectedMessages.forEach(async (messageId) => {
-                  await deleteAllMessageById(db, messageId);
+                  await deleteMessageById(db, messageId);
                 });
                 deleteSelectedMessages();
                 clearSelected();

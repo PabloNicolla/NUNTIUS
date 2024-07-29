@@ -1,3 +1,4 @@
+import { PrivateChat } from "@/db/schemaTypes";
 import React, {
   createContext,
   useCallback,
@@ -7,8 +8,8 @@ import React, {
 } from "react";
 
 type SelectedContextType = {
-  selectedChats: Set<number>;
-  action: (id: number, state: boolean) => void;
+  selectedChats: Set<PrivateChat["id"]>;
+  action: (id: PrivateChat["id"], state: boolean) => void;
   clearSelected: () => void;
 };
 
@@ -31,9 +32,11 @@ export const ChatSelectedProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [selectedChats, setSelectedChats] = useState<Set<number>>(new Set());
+  const [selectedChats, setSelectedChats] = useState<Set<PrivateChat["id"]>>(
+    new Set(),
+  );
 
-  const action = useCallback((id: number, state: boolean) => {
+  const action = useCallback((id: PrivateChat["id"], state: boolean) => {
     setSelectedChats((prevSelectedChats) => {
       if (state) {
         prevSelectedChats.add(id);

@@ -56,7 +56,7 @@ export default function SignUpScreen() {
     try {
       console.log("SUBMITTING SIGN IN FORM", values);
       form.reset();
-      login();
+      login(values.email, values.password, "EMAIL");
       router.dismissAll();
       router.replace("/");
     } catch (error) {

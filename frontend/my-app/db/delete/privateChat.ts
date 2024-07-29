@@ -1,6 +1,10 @@
 import { SQLiteDatabase } from "expo-sqlite";
+import { PrivateChat } from "../schemaTypes";
 
-export const deletePrivateChat = async (db: SQLiteDatabase, chatId: number) => {
+export const deletePrivateChat = async (
+  db: SQLiteDatabase,
+  chatId: PrivateChat["id"],
+) => {
   try {
     return await db.runAsync(
       `

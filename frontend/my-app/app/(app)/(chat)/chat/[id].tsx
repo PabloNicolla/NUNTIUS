@@ -19,7 +19,7 @@ import {
   resetPrivateChatNotificationCount,
   updatePrivateChatById,
 } from "@/db/statements";
-import { useSession } from "@/providers/session-provider";
+import { SessionUser, useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
@@ -57,6 +57,10 @@ export default function ChatScreen() {
   const db = useSQLiteContext();
   const { user } = useSession();
 
+  if (!user) {
+    throw Error("[CHAT_SCREEN]: ERROR: user most be logged in");
+  }
+
   if (!contactId) {
     console.log("[CHAT_SCREEN]: ERROR: missing contactId");
   }
@@ -82,7 +86,7 @@ export default function ChatScreen() {
 
   useEffect(() => {
     return () => {
-      resetPrivateChatNotificationCount(db, Number(chatId));
+      resetPrivateChatNotificationCount(db, String(chatId));
     };
   }, []);
 
@@ -94,7 +98,7 @@ export default function ChatScreen() {
       setLoadingMore(true);
       const newMessages = await getAllMessagesByChatIdWithPagination(
         db,
-        Number(chatId),
+        String(chatId),
         ReceiverType.PRIVATE_CHAT,
         PAGE_LIMIT,
         page * PAGE_LIMIT,
@@ -110,16 +114,16 @@ export default function ChatScreen() {
   }, [chatId, db, requestMoreMsg]);
 
   useEffect(() => {
-    console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", Number(chatId));
+    console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", String(chatId));
     async function getChat() {
-      const chat = await getFirstPrivateChat(db, Number(chatId));
+      const chat = await getFirstPrivateChat(db, String(chatId));
       if (!chat) {
         console.log("[CHAT_SCREEN]: TopNavBarChat ERROR: invalid chatId");
       }
       setChat(chat ?? null);
     }
     getChat();
-    resetPrivateChatNotificationCount(db, Number(chatId));
+    resetPrivateChatNotificationCount(db, String(chatId));
   }, []);
 
   useEffect(() => {
@@ -128,7 +132,7 @@ export default function ChatScreen() {
         return;
       }
       const new_message = await getFirstMessage(db, event.rowId);
-      if (!new_message || new_message?.chatId !== Number(chatId)) {
+      if (!new_message || new_message?.chatId !== String(chatId)) {
         return;
       }
 
@@ -160,7 +164,7 @@ export default function ChatScreen() {
       >
         <SafeAreaView className="flex-1">
           <TopNavBarChat
-            contactId={Number(contactId)}
+            contactId={String(contactId)}
             clearSelectedMessages={() => {
               clearSelectedMessages();
             }}
@@ -189,7 +193,7 @@ export default function ChatScreen() {
           <HeaderComponent
             chat={chat}
             canCreateChatIfNull={String(canCreateChatIfNull)}
-            contactId={Number(contactId)}
+            contactId={String(contactId)}
             setChat={(chat: PrivateChat | null) => {
               setChat(chat);
             }}
@@ -205,7 +209,7 @@ const MessageItem = React.memo(function MessageItem({
   user,
 }: {
   item: MessageItemType;
-  user: Contact;
+  user: SessionUser;
 }) {
   const theme = useColorScheme() ?? "dark";
   const [isSelected, setIsSelected] = useState(item.isSelected);
@@ -267,7 +271,7 @@ const HeaderComponent = ({
 }: {
   chat: PrivateChat | null;
   canCreateChatIfNull: string;
-  contactId: number;
+  contactId: Contact["id"];
   setChat: (chat: PrivateChat | null) => void;
 }) => {
   const theme = useColorScheme() ?? "dark";
@@ -288,7 +292,7 @@ const HeaderComponent = ({
         chatId: chat.id,
         condition: Condition.NORMAL,
         receiverId: chat.contactId,
-        senderId: 999,
+        senderId: "999",
         receiverType: ReceiverType.PRIVATE_CHAT,
         senderReferenceId: -1,
         status: MessageStatus.PENDING,

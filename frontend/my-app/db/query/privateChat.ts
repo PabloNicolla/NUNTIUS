@@ -11,7 +11,7 @@ export const getAllPrivateChats = async (db: SQLiteDatabase) => {
 
 export const getFirstPrivateChat = async (
   db: SQLiteDatabase,
-  privateChatId: number,
+  privateChatId: PrivateChat["id"],
 ) => {
   try {
     return await db.getFirstAsync<PrivateChat>(
@@ -36,7 +36,8 @@ export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
             pc.lastMessageTimestamp,
             pc.notificationCount,
             c.imageURL,
-            c.name,
+            c.first_name,
+            c.last_name,
             c.username
         FROM private_chat pc
             JOIN contact c ON pc.contactId = c.id
