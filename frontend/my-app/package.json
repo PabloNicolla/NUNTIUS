@@ -17,6 +17,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@hookform/resolvers": "^3.9.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.3.1",
     "@react-native-google-signin/google-signin": "^12.2.1",
     "@react-navigation/native": "^6.0.2",
@@ -32,12 +33,14 @@
     "expo-linking": "~6.3.1",
     "expo-navigation-bar": "~3.0.7",
     "expo-router": "~3.5.18",
+    "expo-secure-store": "~13.0.2",
     "expo-splash-screen": "~0.27.5",
     "expo-sqlite": "~14.0.4",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
     "nativewind": "^2.0.11",
+    "query-string": "^9.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.52.1",
@@ -51,9 +54,7 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.10",
-    "zod": "^3.23.8",
-    "@react-native-async-storage/async-storage": "1.23.1",
-    "expo-secure-store": "~13.0.2"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
