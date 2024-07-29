@@ -13,9 +13,9 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 
-import SomethingSVG from "@/assets/images/landing/exploring.svg";
-import LoveItSVG from "@/assets/images/landing/love_it.svg";
-import UnlockSVG from "@/assets/images/landing/unlock.svg";
+import secure from "@/assets/images/landing/secure.svg";
+import send_messages from "@/assets/images/landing/send_messages.svg";
+import stay_connected from "@/assets/images/landing/stay_connected.svg";
 
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/themed-text";
@@ -50,7 +50,6 @@ export default function LandingScreen() {
 
   return (
     <View className="flex-1">
-      <StatusBar style="light" />
       <BottomNavbar bgColor={Colors.light.primary} styleColor="light" />
 
       <PagerView className="flex-1" initialPage={0}>
@@ -58,20 +57,26 @@ export default function LandingScreen() {
         <SecondaryPageTemplate
           key={2}
           currentPage={2}
-          Svg={SomethingSVG}
+          Svg={send_messages}
           onClick={handleOpenModal}
+          title="Speak!"
+          subtitle="Messaging made magical"
         />
         <SecondaryPageTemplate
           key={3}
           currentPage={3}
-          Svg={LoveItSVG}
+          Svg={stay_connected}
           onClick={handleOpenModal}
+          title="Connect!"
+          subtitle="Easily connect with anyone"
         />
         <SecondaryPageTemplate
           key={4}
           currentPage={4}
-          Svg={UnlockSVG}
+          Svg={secure}
           onClick={handleOpenModal}
+          title="Privacy!"
+          subtitle="Messages are stored on your device"
         />
       </PagerView>
       <ThemedView
@@ -92,7 +97,7 @@ const PrimaryPage = ({
 }) => {
   return (
     <ImageBackground
-      source={require("@/assets/images/landing/background-1.jpg")}
+      source={require("@/assets/images/landing/background.jpg")}
       className="flex-1"
       resizeMode="cover"
     >
@@ -103,15 +108,14 @@ const PrimaryPage = ({
         className="flex-1"
       >
         <SafeAreaView className="flex-1">
-          <View className="relative flex-1 items-center justify-end">
-            <TopBar />
-
-            <View className="mb-[10%] w-[80%] items-center justify-end">
+          <TopBar />
+          <View className="flex-1 items-center justify-end">
+            <View className="mb-[10%] w-[85%] items-center justify-end">
               <ThemedText className="mb-5 text-6xl font-bold text-white">
                 Hello!
               </ThemedText>
-              <ThemedText className="mb-20 text-xl text-white">
-                Let's improve your life style
+              <ThemedText className="mb-20 text-center text-xl text-white">
+                Let's connect with your friends
               </ThemedText>
               <View className="mb-4">
                 <CircleIndicator currentPage={currentPage} />
@@ -133,38 +137,43 @@ const SecondaryPageTemplate = ({
   currentPage,
   Svg,
   onClick,
+  title,
+  subtitle,
 }: {
   currentPage: number;
   Svg: React.FC<SvgProps>;
   onClick: () => void;
+  title: string;
+  subtitle: string;
 }) => {
   return (
     <View className="flex-1">
       <LinearGradient
         colors={["rgba(128,215,255,1)", "rgba(76,153,217,1)"]}
         locations={[0, 1]}
-        start={[0, 1]}
+        start={[0, 0.5]}
         className="flex-1"
       >
         <SafeAreaView className="flex-1">
-          <View className="flex-1 items-center justify-end">
+          <View className="flex-1 items-center">
             <TopBar />
 
-            <View className="mb-[10%] w-[80%] items-center justify-end">
-              <View className="bg-transparent">
-                <Svg
-                  width={width * 0.8}
-                  height={height * 0.4}
-                  className="mb-10"
-                />
+            <View className="mb-[10%] w-[85%] flex-1 items-center justify-end">
+              <Svg
+                width={width * 0.8}
+                height={height * 0.4}
+                className="mb-10"
+              />
+
+              <View className="flex-1 items-center justify-center">
+                <ThemedText className="mb-5 text-5xl font-bold text-white">
+                  {title}
+                </ThemedText>
+                <ThemedText className="mb-10 text-center text-xl text-white">
+                  {subtitle}
+                </ThemedText>
               </View>
 
-              <ThemedText className="mb-5 text-6xl font-bold text-white">
-                Hello!
-              </ThemedText>
-              <ThemedText className="mb-20 text-xl text-white">
-                Let's improve your life style
-              </ThemedText>
               <View className="mb-4">
                 <CircleIndicator currentPage={currentPage} />
               </View>
@@ -196,7 +205,7 @@ const CircleIndicator = ({ currentPage }: { currentPage: number }) => {
 };
 
 const TopBar = () => (
-  <View className="absolute top-0 z-10 w-full flex-row items-center justify-between px-2">
+  <View className="w-full flex-row items-center justify-between px-2">
     <View className="flex-row items-center">
       <Image
         source={require("@/assets/images/brand/Logo.png")}
