@@ -1,8 +1,15 @@
 import { Contact } from "@/db/schemaTypes";
-import React, { createContext, useState, useContext, useMemo } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 import * as SecureStore from "expo-secure-store";
 import { LoginResponseData } from "@/API/login";
 import { RegisterResponseData } from "@/API/register";
+import { ChangeNameResponseData } from "@/API/change-name";
 
 export type SessionUser = Contact & {
   email: string;
@@ -16,14 +23,13 @@ type SessionContextType = {
   signInWithGoogle: () => Promise<boolean>;
   resetPassword: () => Promise<boolean>;
   changePassword: () => Promise<boolean>;
-
+  changeName: (data: ChangeNameResponseData) => void;
   verifyIfAccessTokenIsValid: () => Promise<boolean>;
   refreshAccessToken: () => Promise<boolean>;
-
-  setAccessToken: (token: string) => Promise<boolean>;
-  getAccessToken: () => Promise<boolean>;
-  setRefreshToken: (token: string) => Promise<boolean>;
-  getRefreshToken: () => Promise<boolean>;
+  setAccessToken: (token: string) => void;
+  getAccessToken: () => Promise<string>;
+  setRefreshToken: (token: string) => void;
+  getRefreshToken: () => Promise<string>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -51,9 +57,8 @@ export function SessionProvider({
         username: data.user.username,
       };
     });
-
-    SecureStore.setItem("ACCESS_TOKEN", data.access);
-    SecureStore.setItem("REFRESH_TOKEN", data.refresh);
+    setAccessToken(data.access);
+    setRefreshToken(data.refresh);
   };
 
   const login = async (data: LoginResponseData) => {
@@ -67,8 +72,8 @@ export function SessionProvider({
       };
     });
 
-    SecureStore.setItem("ACCESS_TOKEN", data.access);
-    SecureStore.setItem("REFRESH_TOKEN", data.refresh);
+    setAccessToken(data.access);
+    setRefreshToken(data.refresh);
   };
 
   const logout = async () => {
@@ -83,6 +88,18 @@ export function SessionProvider({
   const changePassword = async () => {
     return false;
   };
+  const changeName = async (data: ChangeNameResponseData) => {
+    setUser((user) => {
+      if (!user) {
+        return null;
+      }
+      user.first_name = data.first_name;
+      user.last_name = data.last_name;
+      console.log(user);
+
+      return { ...user };
+    });
+  };
 
   const verifyIfAccessTokenIsValid = async () => {
     return false;
@@ -92,16 +109,24 @@ export function SessionProvider({
   };
 
   const setAccessToken = async (token: string) => {
-    return false;
+    SecureStore.setItem("ACCESS_TOKEN", token);
   };
   const getAccessToken = async () => {
-    return false;
+    const token = SecureStore.getItem("ACCESS_TOKEN");
+    if (!token) {
+      console.log("[SESSION_PROVIDER]: no access token found");
+    }
+    return token ?? "";
   };
   const setRefreshToken = async (token: string) => {
-    return false;
+    SecureStore.setItem("REFRESH_TOKEN", token);
   };
   const getRefreshToken = async () => {
-    return false;
+    const token = SecureStore.getItem("REFRESH_TOKEN");
+    if (!token) {
+      console.log("[SESSION_PROVIDER]: no access token found");
+    }
+    return token ?? "";
   };
 
   const contextMemo = useMemo(
@@ -113,6 +138,7 @@ export function SessionProvider({
       signInWithGoogle,
       resetPassword,
       changePassword,
+      changeName,
       verifyIfAccessTokenIsValid,
       refreshAccessToken,
       setAccessToken,

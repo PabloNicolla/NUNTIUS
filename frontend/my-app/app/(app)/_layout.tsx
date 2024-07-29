@@ -12,10 +12,14 @@ export default function AppLayout() {
   const { user } = useSession();
   const db = useRef(useSQLiteContext());
 
-  console.log("[APP_LAYOUT]: IS USER LOGGED IN:", !!user);
+  console.log("[APP_LAYOUT]: IS USER LOGGED IN:", user);
 
   if (!user) {
     return <Redirect href={"/landing"} />;
+  }
+
+  if (!user.first_name) {
+    return <Redirect href={"/change_name"} />;
   }
 
   return (

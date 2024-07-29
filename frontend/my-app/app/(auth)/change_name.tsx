@@ -25,87 +25,66 @@ import FormTextField from "@/components/form/form-text-field";
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 import { Colors } from "@/constants/Colors";
 import {
-  REGISTER_URL,
-  RegisterRequestData,
-  RegisterResponseData,
-} from "@/API/register";
-import {
-  CHECK_EMAIL_URL,
-  CheckEmailRequestData,
-  CheckEmailResponseData,
-} from "@/API/check-email";
+  CHANGE_NAME_URL,
+  ChangeNameRequestData,
+  ChangeNameResponseData,
+} from "@/API/change-name";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid Email format").min(1, "Email is required"),
-  username: z.string().min(1, "Username is required"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Password too short"),
+  first_name: z.string().min(1, "first_name is required"),
+  last_name: z.string(),
 });
 
-export default function SignUpScreen() {
+export default function ChangeNameScreen() {
   const theme = useColorScheme() ?? "light";
   const { email } = useLocalSearchParams<{ email: string }>();
-  const { register } = useSession();
-  const [registerErrorMessage, setRegisterErrorMessage] = useState("");
+  const { changeName, getAccessToken } = useSession();
+  const [changeNameErrorMessage, setChangeNameErrorMessage] = useState("");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: email ?? "",
-      username: "",
-      password: "",
+      first_name: "",
+      last_name: "",
     },
   });
 
   const isLoading = form.formState.isSubmitting;
 
-  const chekcIfEmailIsAvailable = async (email: string) => {
-    const requestData: CheckEmailRequestData = {
-      email: email,
-    };
-
-    const response: CheckEmailResponseData = (
-      await axios.post(CHECK_EMAIL_URL, requestData)
-    ).data;
-
-    if (response.code !== "AVAILABLE" && response.code !== "IN_USE") {
-      console.log("[SIGN_UP_SCREEN]: CHECK EMAIL ERROR");
-    }
-
-    return response.code === "AVAILABLE";
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("[SIGN_UP_SCREEN]: SUBMITTING SIGN UP FORM", values);
-      setRegisterErrorMessage("");
+      console.log("[CHANGE_NAME_SCREEN]: SUBMITTING CHANGE NAME FORM", values);
+      setChangeNameErrorMessage("");
 
-      if (!(await chekcIfEmailIsAvailable(values.email))) {
-        setRegisterErrorMessage("Email already registered");
-        return;
-      }
+      const accessToken = await getAccessToken();
 
-      const requestData: RegisterRequestData = {
-        username: values.username,
-        email: values.email,
-        password1: values.password,
-        password2: values.password,
+      console.log(accessToken);
+
+      const requestData: ChangeNameRequestData = {
+        first_name: values.first_name,
+        last_name: values.last_name,
       };
 
-      const response: RegisterResponseData = (
-        await axios.post(REGISTER_URL, requestData)
+      console.log(requestData);
+
+      const response: ChangeNameResponseData = (
+        await axios.patch(CHANGE_NAME_URL, requestData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
       ).data;
 
-      register(response);
+      changeName(response);
 
       form.reset();
-      router.dismissAll();
+      if (router.canGoBack()) {
+        router.dismissAll();
+      }
       router.replace("/");
     } catch (error) {
-      setRegisterErrorMessage("Username is already taken.");
-      console.log("[SIGN_UP_SCREEN]:", error);
+      setChangeNameErrorMessage("Something went wrong. Sorry.");
+      console.log("[CHANGE_NAME_SCREEN]:", error);
     }
   };
 
@@ -140,30 +119,24 @@ export default function SignUpScreen() {
           <View className="flex-1">
             <View className="w-full flex-row items-center justify-between px-2">
               <View className="flex-row items-center">
-                <Pressable
-                  onPress={() => {
-                    router.back();
-                  }}
-                >
-                  <MaterialIcons
-                    name="arrow-back"
-                    size={30}
-                    color={theme === "light" ? "black" : "white"}
-                  />
-                </Pressable>
+                {router.canGoBack() && (
+                  <Pressable
+                    onPress={() => {
+                      router.back();
+                    }}
+                  >
+                    <MaterialIcons
+                      name="arrow-back"
+                      size={30}
+                      color={theme === "light" ? "black" : "white"}
+                    />
+                  </Pressable>
+                )}
+
                 <Image
                   source={require("@/assets/images/brand/Logo.png")}
                   className="ml-4 h-[60] w-[60]"
                 />
-              </View>
-              <View className="items-center">
-                <Pressable
-                  onPress={() => {
-                    router.replace("/sign-in");
-                  }}
-                >
-                  <ThemedText className="text-lg font-bold">Log in</ThemedText>
-                </Pressable>
               </View>
             </View>
 
@@ -176,45 +149,23 @@ export default function SignUpScreen() {
             >
               <View className="w-[80%] pt-[10%]">
                 <ThemedText className="mb-5 text-3xl font-bold">
-                  Lets Get Started!
+                  Let choose a display name
                 </ThemedText>
                 <ThemedText className="mb-10 text-lg text-text-light/70 dark:text-text-dark/70">
-                  Create your account
+                  You can change your display name later
                 </ThemedText>
 
-                {!!registerErrorMessage && (
+                {!!changeNameErrorMessage && (
                   <View className="py-4">
                     <ThemedText className="text-center text-red-500">
-                      {registerErrorMessage}
+                      {changeNameErrorMessage}
                     </ThemedText>
                   </View>
                 )}
 
                 <Controller
                   control={form.control}
-                  name="email"
-                  disabled={isLoading}
-                  render={({
-                    field: { value, onChange, onBlur },
-                    fieldState: { error },
-                  }) => (
-                    <FormTextField
-                      ref={emailInputRef}
-                      className="mb-5"
-                      handleTextChange={onChange}
-                      titleTransformX={8}
-                      title="Email"
-                      value={value}
-                      error={error}
-                      isLoading={isLoading}
-                      keyboardType="email-address"
-                    />
-                  )}
-                />
-
-                <Controller
-                  control={form.control}
-                  name="username"
+                  name="first_name"
                   disabled={isLoading}
                   render={({
                     field: { value, onChange, onBlur },
@@ -224,8 +175,8 @@ export default function SignUpScreen() {
                       ref={usernameInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
-                      titleTransformX={16}
-                      title="Username"
+                      titleTransformX={19}
+                      title="First Name*"
                       value={value}
                       error={error}
                       isLoading={isLoading}
@@ -235,23 +186,21 @@ export default function SignUpScreen() {
 
                 <Controller
                   control={form.control}
-                  name="password"
+                  name="last_name"
                   disabled={isLoading}
                   render={({
                     field: { value, onChange, onBlur },
                     fieldState: { error },
                   }) => (
                     <FormTextField
+                      ref={usernameInputRef}
                       className="mb-5"
                       handleTextChange={onChange}
-                      title="Password"
+                      titleTransformX={18}
+                      title="Last Name"
                       value={value}
-                      isSecureText={true}
-                      titleTransformX={16}
-                      onBlur={onBlur}
                       error={error}
                       isLoading={isLoading}
-                      keyboardType="default"
                     />
                   )}
                 />
@@ -259,7 +208,7 @@ export default function SignUpScreen() {
                 <PrimaryButton
                   className="mb-20"
                   handlePress={form.handleSubmit((data: any) => onSubmit(data))}
-                  title="CREATE ACCOUNT"
+                  title="Update Name"
                   isLoading={isLoading}
                 />
               </View>
