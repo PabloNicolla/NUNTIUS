@@ -1,7 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
-
 from rest_framework.throttling import AnonRateThrottle
 from .models import CustomUser
 from rest_framework.views import APIView

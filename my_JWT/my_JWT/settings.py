@@ -202,10 +202,10 @@ ACCOUNT_USERNAME_REQUIRED = True
 
 ACCOUNT_UNIQUE_EMAIL = True
 
-REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'auth.serializers.CustomRegisterSerializer',
-    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',
-}
+# REST_AUTH_REGISTER_SERIALIZERS = {
+#     'REGISTER_SERIALIZER': 'auth.serializers.CustomRegisterSerializer',
+#     'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',
+# }
 
 # REST_AUTH_SERIALIZERS = {
 #     'LOGIN_SERIALIZER': 'auth.serializers.CustomLoginSerializer',
@@ -214,8 +214,6 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'your.smtp.server'
