@@ -35,7 +35,7 @@ POST http://192.168.214.206:8000/dj-rest-auth/registration/
 Content-Type: application/json
 
 {
-  "username": "NewestUser1",
+  "username": "NewestUser21",
   "email": "NewestUser@test.com",
   "password1": "test123!@#",
   "password2": "test123!@#"

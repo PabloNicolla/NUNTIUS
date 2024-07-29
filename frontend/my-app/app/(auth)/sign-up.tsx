@@ -8,7 +8,7 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Controller, useForm } from "react-hook-form";
 import { router, useLocalSearchParams } from "expo-router";
@@ -25,6 +25,16 @@ import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 import { Colors } from "@/constants/Colors";
+import {
+  REGISTER_URL,
+  RegisterRequestData,
+  RegisterResponseData,
+} from "@/API/register";
+import {
+  CHECK_EMAIL_URL,
+  CheckEmailRequestData,
+  CheckEmailResponseData,
+} from "@/API/check-email";
 
 const formSchema = z.object({
   email: z.string().email("Invalid Email format").min(1, "Email is required"),
@@ -34,13 +44,29 @@ const formSchema = z.object({
     .min(1, "Password is required")
     .min(8, "Password too short"),
 });
+/*
+      const url = qs.stringifyUrl({
+        url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/check-email/`,
+      });
 
+      const response: CheckEmailResponseData = (await axios.post(url, values))
+        .data;
+
+      let pathname = "/sign-up";
+      if (response.code === "IN_USE") {
+        pathname = "/sign-in";
+      } else if (response.code !== "AVAILABLE") {
+        console.log(
+          "[GetStartedModal]: ERROR: response.code not matching any correct value",
+        );
+      }
+
+*/
 export default function SignUpScreen() {
   const theme = useColorScheme() ?? "light";
-
   const { email } = useLocalSearchParams<{ email: string }>();
-
   const { register } = useSession();
+  const [registerErrorMessage, setRegisterErrorMessage] = useState("");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,15 +79,51 @@ export default function SignUpScreen() {
 
   const isLoading = form.formState.isSubmitting;
 
+  const chekcIfEmailIsAvailable = async (email: string) => {
+    const requestData: CheckEmailRequestData = {
+      email: email,
+    };
+
+    const response: CheckEmailResponseData = (
+      await axios.post(CHECK_EMAIL_URL, requestData)
+    ).data;
+
+    if (response.code !== "AVAILABLE" && response.code !== "IN_USE") {
+      console.log("[SIGN_UP_SCREEN]: CHECK EMAIL ERROR");
+    }
+
+    return response.code === "AVAILABLE";
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("SUBMITTING SIGN UP FORM", values);
+      console.log("[SIGN_UP_SCREEN]: SUBMITTING SIGN UP FORM", values);
+      setRegisterErrorMessage("");
+
+      if (!(await chekcIfEmailIsAvailable(values.email))) {
+        setRegisterErrorMessage("Email already registered");
+        return;
+      }
+
+      const requestData: RegisterRequestData = {
+        username: values.username,
+        email: values.email,
+        password1: values.password,
+        password2: values.password,
+      };
+
+      const response: RegisterResponseData = (
+        await axios.post(REGISTER_URL, requestData)
+      ).data;
+
+      register(response);
+
       form.reset();
-      register(values.username, values.password, values.email);
       router.dismissAll();
       router.replace("/");
     } catch (error) {
-      console.log(error);
+      setRegisterErrorMessage("Username is already taken.");
+      console.log("[SIGN_UP_SCREEN]:", error);
     }
   };
 
@@ -137,6 +199,14 @@ export default function SignUpScreen() {
                 <ThemedText className="mb-10 text-lg text-text-light/70 dark:text-text-dark/70">
                   Create your account
                 </ThemedText>
+
+                {!!registerErrorMessage && (
+                  <View className="py-4">
+                    <ThemedText className="text-center text-red-500">
+                      {registerErrorMessage}
+                    </ThemedText>
+                  </View>
+                )}
 
                 <Controller
                   control={form.control}

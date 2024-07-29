@@ -22,7 +22,11 @@ import { ThemedView } from "@/components/themed-view";
 import FormTextField from "@/components/form/form-text-field";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckEmailResponseData } from "@/API/check-email";
+import {
+  CHECK_EMAIL_URL,
+  CheckEmailRequestData,
+  CheckEmailResponseData,
+} from "@/API/check-email";
 
 type GetStartedModalProps = {
   isVisible: boolean;
@@ -56,12 +60,13 @@ export default function GetStartedModal({
       console.log("[GetStartedModal]: SUBMITTING GET STARTED FORM", values);
       form.reset();
 
-      const url = qs.stringifyUrl({
-        url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/check-email/`,
-      });
+      const requestData: CheckEmailRequestData = {
+        email: values.email,
+      };
 
-      const response: CheckEmailResponseData = (await axios.post(url, values))
-        .data;
+      const response: CheckEmailResponseData = (
+        await axios.post(CHECK_EMAIL_URL, requestData)
+      ).data;
 
       let pathname = "/sign-up";
       if (response.code === "IN_USE") {

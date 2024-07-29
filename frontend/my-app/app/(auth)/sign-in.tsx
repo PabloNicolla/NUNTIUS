@@ -24,7 +24,7 @@ import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 import { Colors } from "@/constants/Colors";
-import { LOGIN_URL, LoginResponseData } from "@/API/login";
+import { LOGIN_URL, LoginRequestData, LoginResponseData } from "@/API/login";
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid Email format"),
@@ -55,8 +55,14 @@ export default function SignIpScreen() {
       console.log("[SignIpScreen]: SUBMITTING SIGN IN FORM", values);
       setLoginErrorMessage("");
 
-      const response: LoginResponseData = (await axios.post(LOGIN_URL, values))
-        .data;
+      const requestData: LoginRequestData = {
+        password: values.password,
+        email: values.email,
+      };
+
+      const response: LoginResponseData = (
+        await axios.post(LOGIN_URL, requestData)
+      ).data;
 
       login(response);
 

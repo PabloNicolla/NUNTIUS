@@ -2,6 +2,7 @@ import { Contact } from "@/db/schemaTypes";
 import React, { createContext, useState, useContext, useMemo } from "react";
 import * as SecureStore from "expo-secure-store";
 import { LoginResponseData } from "@/API/login";
+import { RegisterResponseData } from "@/API/register";
 
 export type SessionUser = Contact & {
   email: string;
@@ -9,11 +10,7 @@ export type SessionUser = Contact & {
 
 type SessionContextType = {
   user: SessionUser | null;
-  register: (
-    username: string,
-    password: string,
-    email: string,
-  ) => Promise<boolean>;
+  register: (data: RegisterResponseData) => void;
   login: (data: LoginResponseData) => void;
   logout: () => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
@@ -44,17 +41,22 @@ export function SessionProvider({
 }: Readonly<{ children: React.ReactNode }>) {
   const [user, setUser] = useState<SessionUser | null>(null);
 
-  const register = async (
-    username: string,
-    password: string,
-    email: string,
-  ) => {
-    return false;
+  const register = async (data: RegisterResponseData) => {
+    setUser(() => {
+      return {
+        id: data.user.pk,
+        email: data.user.email,
+        first_name: data.user.first_name,
+        last_name: data.user.last_name,
+        username: data.user.username,
+      };
+    });
+
+    SecureStore.setItem("ACCESS_TOKEN", data.access);
+    SecureStore.setItem("REFRESH_TOKEN", data.refresh);
   };
 
   const login = async (data: LoginResponseData) => {
-    console.log(data);
-
     setUser(() => {
       return {
         id: data.user.pk,
