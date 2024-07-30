@@ -1,9 +1,17 @@
+from allauth.account import app_settings as allauth_account_settings
+from dj_rest_auth.app_settings import api_settings
+
 from dj_rest_auth.registration.views import SocialLoginView
+from dj_rest_auth.registration.views import RegisterView
+from dj_rest_auth.jwt_auth import TokenRefreshSerializer
+
 from dj_rest_auth.views import LoginView
+from dj_rest_auth.utils import jwt_encode
+from dj_rest_auth.models import get_token_model
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
-from .serializers import CustomLoginSerializer, CustomTokenRefreshSerializer
+from .serializers import CustomLoginSerializer, CustomTokenRefreshSerializer, CustomRegisterSerializer
 
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -11,8 +19,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, serializers
-
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from django.views.decorators.csrf import csrf_exempt
+
+from user_app.models import CustomUser
 
 
 class PublicView(APIView):
@@ -50,35 +60,80 @@ class CustomLoginView(LoginView):
     def get_serializer_class(self):
         return CustomLoginSerializer
 
+    def login(self):
+        self.user = self.serializer.validated_data['user']
+        self.user.device_id = self.serializer.validated_data['device_id']
+        token_model = get_token_model()
+
+        if api_settings.USE_JWT:
+            self.access_token, self.refresh_token = jwt_encode(self.user)
+        elif token_model:
+            self.token = api_settings.TOKEN_CREATOR(
+                token_model, self.user, self.serializer)
+
+        if api_settings.SESSION_LOGIN:
+            self.process_login()
+
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        if response.status_code == status.HTTP_200_OK:
-            user = self.request.user
-            device_id = request.data.get('device_id')
+        self.request = request
+        self.serializer = self.get_serializer(data=self.request.data)
+        self.serializer.is_valid(raise_exception=True)
+        self.serializer.save()
 
-            # Generate tokens and include the device_id in the payload
-            refresh = RefreshToken.for_user(user)
-            # Add device ID to the token payload
-            refresh['device_id'] = device_id
+        self.login()
+        return self.get_response()
 
-            # Update the response with the new tokens
-            response.data['refresh'] = str(refresh)
-            response.data['access'] = str(refresh.access_token)
+
+class CustomTokenRefreshView(APIView):
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
+    serializer_class = CustomTokenRefreshSerializer
+    token_class = RefreshToken
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_id = serializer.validated_data['user']['id']
+        old_refresh_token = serializer.validated_data['refresh']
+
+        # Blacklist the old refresh token
+        try:
+            old_refresh_token.blacklist()
+        except AttributeError:
+            pass
+
+        # Generate a new refresh token and access token
+        user = CustomUser.objects.get(id=user_id)
+        access_token, refresh_token = jwt_encode(user)
+
+        response_data = {
+            'refresh': str(refresh_token),
+            'access': str(access_token),
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+class CustomRegisterView(RegisterView):
+    serializer_class = CustomRegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        data = self.get_response_data(user)
+        data['user']['device_id'] = serializer.validated_data.get('device_id')
+
+        if data:
+            response = Response(
+                data,
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
+        else:
+            response = Response(
+                status=status.HTTP_204_NO_CONTENT, headers=headers)
 
         return response
-
-
-class CustomTokenRefreshView(TokenRefreshView):
-    def get_serializer_class(self):
-        return CustomTokenRefreshSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-        except serializers.ValidationError:
-            return Response({"detail": "Invalid device ID"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        data = serializer.validated_data
-
-        return Response(data, status=status.HTTP_200_OK)

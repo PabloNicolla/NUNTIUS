@@ -37,7 +37,7 @@ type SessionContextType = {
   getRefreshToken: () => Promise<string>;
   // storeUser: (user: SessionUser) => void;
   loadStoredUser: () => Promise<SessionUser | null | undefined>;
-  // getDeviceId: () => Promise<string>;
+  getDeviceId: () => Promise<string>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -233,7 +233,7 @@ export function SessionProvider({
       getRefreshToken,
       // storeUser,
       loadStoredUser,
-      // getDeviceId,
+      getDeviceId,
     }),
     [user],
   );

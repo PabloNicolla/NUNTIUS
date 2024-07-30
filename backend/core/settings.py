@@ -185,6 +185,9 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': None,
     'JWT_AUTH_SAMESITE': 'Lax',
     'JWT_AUTH_HTTPONLY': False,
+
+    'JWT_TOKEN_CLAIMS_SERIALIZER': 'auth_app.serializers.MyTokenObtainPairSerializer',
+    'JWT_SERIALIZER': 'dj_rest_auth.serializers.JWTSerializer',
 }
 
 SIMPLE_JWT = {
@@ -208,6 +211,8 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken', 'rest_framework_simplejwt.tokens.RefreshToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
     'JTI_CLAIM': 'jti',
+
+    "TOKEN_OBTAIN_SERIALIZER": "auth_app.serializers.MyTokenObtainPairSerializer"
 }
 
 LOGIN_REDIRECT_URL = "/"

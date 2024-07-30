@@ -1,6 +1,6 @@
 from .views import PublicView, PrivateView
 from django.urls import path, include
-from .views import GoogleLogin, CustomLoginView, CustomTokenRefreshView
+from .views import GoogleLogin, CustomLoginView, CustomTokenRefreshView, CustomRegisterView
 from dj_rest_auth.views import PasswordResetConfirmView
 
 urlpatterns = [
@@ -17,4 +17,5 @@ urlpatterns = [
     path('api/auth/login/', CustomLoginView.as_view(), name='custom_login'),
     path('api/token/refresh/', CustomTokenRefreshView.as_view(),
          name='custom_token_refresh'),
+    path('api/auth/register/', CustomRegisterView.as_view(), name='custom_register'),
 ]
