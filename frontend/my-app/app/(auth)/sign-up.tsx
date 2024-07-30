@@ -47,7 +47,7 @@ const formSchema = z.object({
 export default function SignUpScreen() {
   const theme = useColorScheme() ?? "light";
   const { email } = useLocalSearchParams<{ email: string }>();
-  const { register } = useSession();
+  const { register, getDeviceId } = useSession();
   const [registerErrorMessage, setRegisterErrorMessage] = useState("");
 
   const form = useForm({
@@ -61,7 +61,7 @@ export default function SignUpScreen() {
 
   const isLoading = form.formState.isSubmitting;
 
-  const chekcIfEmailIsAvailable = async (email: string) => {
+  const checkIfEmailIsAvailable = async (email: string) => {
     const requestData: CheckEmailRequestData = {
       email: email,
     };
@@ -71,7 +71,9 @@ export default function SignUpScreen() {
     ).data;
 
     if (response.code !== "AVAILABLE" && response.code !== "IN_USE") {
-      console.log("[SIGN_UP_SCREEN]: CHECK EMAIL ERROR");
+      console.log(
+        "[SIGN_UP_SCREEN]: CHECK EMAIL ERROR, response.code is invalid",
+      );
     }
 
     return response.code === "AVAILABLE";
@@ -82,16 +84,19 @@ export default function SignUpScreen() {
       console.log("[SIGN_UP_SCREEN]: SUBMITTING SIGN UP FORM", values);
       setRegisterErrorMessage("");
 
-      if (!(await chekcIfEmailIsAvailable(values.email))) {
+      if (!(await checkIfEmailIsAvailable(values.email))) {
         setRegisterErrorMessage("Email already registered");
         return;
       }
+
+      const device_id = await getDeviceId();
 
       const requestData: RegisterRequestData = {
         username: values.username,
         email: values.email,
         password1: values.password,
         password2: values.password,
+        device_id: device_id,
       };
 
       const response: RegisterResponseData = (
@@ -101,7 +106,9 @@ export default function SignUpScreen() {
       register(response);
 
       form.reset();
-      router.dismissAll();
+      if (router.canGoBack()) {
+        router.dismissAll();
+      }
       router.replace("/");
     } catch (error) {
       setRegisterErrorMessage("Username is already taken.");

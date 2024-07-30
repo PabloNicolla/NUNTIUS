@@ -33,7 +33,7 @@ import {
   GoogleAuthRequestData,
   GoogleAuthResponseData,
 } from "@/API/google-auth";
-import { GET_USER_URL, GetUserResponseData } from "@/API/get-user";
+import { GET_USER_URL } from "@/API/get-user";
 import { useSession } from "@/providers/session-provider";
 
 type GetStartedModalProps = {
@@ -47,7 +47,7 @@ const formSchema = z.object({
 export default function GetStartedModal({
   isVisible,
   onClose,
-}: GetStartedModalProps) {
+}: Readonly<GetStartedModalProps>) {
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
   const theme = useColorScheme() ?? "light";
@@ -66,7 +66,6 @@ export default function GetStartedModal({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log("[GET_STARTED_MODAL]: SUBMITTING GET STARTED FORM", values);
-      form.reset();
 
       const requestData: CheckEmailRequestData = {
         email: values.email,
@@ -85,6 +84,7 @@ export default function GetStartedModal({
         );
       }
 
+      form.reset();
       onClose();
       router.push({
         pathname: pathname,
