@@ -1,9 +1,8 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer
-from rest_framework_simplejwt.serializers import TokenRefreshSerializer, TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework import serializers, exceptions
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.translation import gettext_lazy as _
 from user_app.serializers import CustomUserSerializer
 
@@ -18,8 +17,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class CustomTokenRefreshSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
-    device_id = serializers.CharField()
+    refresh = serializers.CharField(required=True)
+    device_id = serializers.CharField(required=True)
 
     def validate(self, attrs):
         refresh = attrs['refresh']

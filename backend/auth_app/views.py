@@ -1,27 +1,18 @@
-from allauth.account import app_settings as allauth_account_settings
 from dj_rest_auth.app_settings import api_settings
-
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.registration.views import RegisterView
-from dj_rest_auth.jwt_auth import TokenRefreshSerializer
-
 from dj_rest_auth.views import LoginView
 from dj_rest_auth.utils import jwt_encode
 from dj_rest_auth.models import get_token_model
-
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-
-from .serializers import CustomLoginSerializer, CustomTokenRefreshSerializer, CustomRegisterSerializer
-
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status, serializers
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 
+from .serializers import CustomLoginSerializer, CustomTokenRefreshSerializer, CustomRegisterSerializer
 from user_app.models import CustomUser
 
 
@@ -124,7 +115,7 @@ class CustomRegisterView(RegisterView):
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         data = self.get_response_data(user)
-        data['user']['device_id'] = serializer.validated_data.get('device_id')
+        # data['user']['device_id'] = serializer.validated_data.get('device_id')
 
         if data:
             response = Response(
