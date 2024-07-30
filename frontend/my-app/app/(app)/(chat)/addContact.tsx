@@ -23,6 +23,9 @@ import {
   GetContactRequestData,
   GetContactResponseData,
 } from "@/API/get-contact";
+import { insertContact } from "@/db/statements";
+import { useSQLiteContext } from "expo-sqlite";
+import { router } from "expo-router";
 
 const formSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -33,6 +36,7 @@ type Props = {};
 const AddContact = (props: Props) => {
   const theme = useColorScheme() ?? "light";
   const { getAccessToken } = useSession();
+  const db = useSQLiteContext();
   const [getContactErrorMessage, setGetContactErrorMessage] = useState("");
 
   const form = useForm({
@@ -59,9 +63,12 @@ const AddContact = (props: Props) => {
 
       console.log(response);
 
-      // form.reset();
-      // router.dismissAll();
-      // router.replace("/");
+      await insertContact(db, response);
+
+      form.reset();
+      if (router.canGoBack()) {
+        router.back();
+      }
     } catch (error) {
       setGetContactErrorMessage("No user found with this username.");
       console.log("[SIGN_IN_SCREEN]:", error);
