@@ -4,6 +4,7 @@ export type LoginRequestData = {
   email?: string;
   username?: string;
   password: string;
+  device_id: string;
 };
 
 export type LoginResponseData = {
@@ -19,5 +20,5 @@ export type LoginResponseData = {
 };
 
 export const LOGIN_URL = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/dj-rest-auth/login/`,
+  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/auth/login/`,
 });

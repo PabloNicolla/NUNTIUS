@@ -8,5 +8,5 @@ export type GetContactRequestData = {
 export type GetContactResponseData = Contact;
 
 export const GET_CONTACT_URL = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/contact/`,
+  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/user/contact/`,
 });

@@ -5,6 +5,7 @@ export type RegisterRequestData = {
   username: string;
   password1: string;
   password2: string;
+  device_id: string;
 };
 
 export type RegisterResponseData = {
@@ -20,5 +21,5 @@ export type RegisterResponseData = {
 };
 
 export const REGISTER_URL = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/dj-rest-auth/registration/`,
+  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/auth/register/`,
 });
