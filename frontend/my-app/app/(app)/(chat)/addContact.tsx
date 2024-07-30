@@ -35,7 +35,6 @@ type Props = {};
 
 const AddContact = (props: Props) => {
   const theme = useColorScheme() ?? "light";
-  const { getAccessToken } = useSession();
   const db = useSQLiteContext();
   const [getContactErrorMessage, setGetContactErrorMessage] = useState("");
 

@@ -11,6 +11,10 @@ import { LoginResponseData } from "@/API/login";
 import { RegisterResponseData } from "@/API/register";
 import { ChangeNameResponseData } from "@/API/change-name";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { VERIFY_TOKEN_URL, VerifyTokenRequestData } from "@/API/verify-token";
+import { Platform } from "react-native";
+import * as Application from "expo-application";
 
 export type SessionUser = Contact & {
   email: string;
@@ -25,14 +29,15 @@ type SessionContextType = {
   resetPassword: () => Promise<boolean>;
   changePassword: () => Promise<boolean>;
   changeName: (data: ChangeNameResponseData) => void;
-  verifyIfAccessTokenIsValid: () => Promise<boolean>;
-  refreshAccessToken: () => Promise<boolean>;
-  setAccessToken: (token: string) => void;
+  // verifyIfAccessTokenIsValid: () => Promise<boolean>;
+  // refreshAccessToken: () => Promise<boolean>;
+  // setAccessToken: (token: string) => void;
   getAccessToken: () => Promise<string>;
-  setRefreshToken: (token: string) => void;
+  // setRefreshToken: (token: string) => void;
   getRefreshToken: () => Promise<string>;
-  storeUser: (user: SessionUser) => void;
+  // storeUser: (user: SessionUser) => void;
   loadStoredUser: () => Promise<SessionUser | null | undefined>;
+  // getDeviceId: () => Promise<string>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -59,8 +64,8 @@ export function SessionProvider({
       username: data.user.username,
     };
     setUser(newUser);
-    setAccessToken(data.access);
-    setRefreshToken(data.refresh);
+    await setAccessToken(data.access);
+    await setRefreshToken(data.refresh);
     await storeUser(newUser);
   };
 
@@ -73,8 +78,8 @@ export function SessionProvider({
       username: data.user.username,
     };
     setUser(newUser);
-    setAccessToken(data.access);
-    setRefreshToken(data.refresh);
+    await setAccessToken(data.access);
+    await setRefreshToken(data.refresh);
     await storeUser(newUser);
   };
 
@@ -119,33 +124,55 @@ export function SessionProvider({
     }
   };
 
-  const verifyIfAccessTokenIsValid = async () => {
-    return false;
+  const verifyIfAccessTokenIsValid = async (accessToken: string) => {
+    let isValid = false;
+    try {
+      const requestData: VerifyTokenRequestData = { token: accessToken };
+      await axios.post(VERIFY_TOKEN_URL, requestData);
+      isValid = true;
+    } catch (error) {
+      console.log("SESSION_PROVIDER]:", error);
+    }
+    return isValid;
   };
-  const refreshAccessToken = async () => {
-    return false;
+
+  const refreshAccessToken = async (refreshToken: string) => {
+    let newAccessToken = null;
+    try {
+    } catch (error) {
+      console.log("SESSION_PROVIDER]:", error);
+    }
   };
 
   const setAccessToken = async (token: string) => {
     SecureStore.setItem("ACCESS_TOKEN", token);
   };
+
   const getAccessToken = async () => {
-    const token = SecureStore.getItem("ACCESS_TOKEN");
+    let token = await SecureStore.getItemAsync("ACCESS_TOKEN");
     if (!token) {
       console.log("[SESSION_PROVIDER]: no access token found");
+      return "";
     }
-    return token ?? "";
+
+    if (!token) {
+    }
+
+    return token;
   };
+
   const setRefreshToken = async (token: string) => {
-    SecureStore.setItem("REFRESH_TOKEN", token);
+    await SecureStore.setItemAsync("REFRESH_TOKEN", token);
   };
+
   const getRefreshToken = async () => {
-    const token = SecureStore.getItem("REFRESH_TOKEN");
+    const token = await SecureStore.getItemAsync("REFRESH_TOKEN");
     if (!token) {
       console.log("[SESSION_PROVIDER]: no access token found");
     }
     return token ?? "";
   };
+
   const storeUser = async (user: SessionUser) => {
     try {
       const jsonValue = JSON.stringify(user);
@@ -154,6 +181,7 @@ export function SessionProvider({
       console.log("[SESSION_PROVIDER]: failed in storing STORED_USER", error);
     }
   };
+
   const loadStoredUser = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("STORED_USER");
@@ -171,6 +199,22 @@ export function SessionProvider({
     }
   };
 
+  const getDeviceId = async () => {
+    let deviceId = await SecureStore.getItemAsync("device_id");
+    if (!deviceId) {
+      if (Platform.OS === "ios") {
+        deviceId = await Application.getIosIdForVendorAsync();
+      } else {
+        deviceId = Application.getAndroidId();
+      }
+      if (!deviceId) {
+        throw new Error("[SESSION_PROVIDER]: failed to retrieve deviceId");
+      }
+      await SecureStore.setItemAsync("device_id", deviceId);
+    }
+    return deviceId;
+  };
+
   const contextMemo = useMemo(
     () => ({
       user,
@@ -181,14 +225,15 @@ export function SessionProvider({
       resetPassword,
       changePassword,
       changeName,
-      verifyIfAccessTokenIsValid,
-      refreshAccessToken,
-      setAccessToken,
+      // verifyIfAccessTokenIsValid,
+      // refreshAccessToken,
+      // setAccessToken,
       getAccessToken,
-      setRefreshToken,
+      // setRefreshToken,
       getRefreshToken,
-      storeUser,
+      // storeUser,
       loadStoredUser,
+      // getDeviceId,
     }),
     [user],
   );
