@@ -37,7 +37,7 @@ const formSchema = z.object({
 export default function SignInScreen() {
   const theme = useColorScheme() ?? "light";
   const { email } = useLocalSearchParams<{ email: string }>();
-  const { login } = useSession();
+  const { login, getDeviceId } = useSession();
   const [loginErrorMessage, setLoginErrorMessage] = useState("");
 
   const form = useForm({
@@ -55,9 +55,12 @@ export default function SignInScreen() {
       console.log("[SIGN_IN_SCREEN]: SUBMITTING SIGN IN FORM", values);
       setLoginErrorMessage("");
 
+      const device_id = await getDeviceId();
+
       const requestData: LoginRequestData = {
         password: values.password,
         email: values.email,
+        device_id: device_id,
       };
 
       const response: LoginResponseData = (
@@ -67,7 +70,9 @@ export default function SignInScreen() {
       login(response);
 
       form.reset();
-      router.dismissAll();
+      if (router.canGoBack()) {
+        router.dismissAll();
+      }
       router.replace("/");
     } catch (error) {
       setLoginErrorMessage(
