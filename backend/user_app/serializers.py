@@ -1,5 +1,23 @@
 from rest_framework import serializers
 from .models import CustomUser
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
+
+
+class ProfileImageSerializer(serializers.Serializer):
+    imageURL = serializers.CharField(
+        required=False,  # Make the field optional
+        allow_blank=True,  # Allow empty strings
+        validators=[URLValidator()]  # Use URLValidator for URL validation
+    )
+
+    def validate_imageURL(self, value):
+        if value:
+            try:
+                URLValidator()(value)
+            except ValidationError:
+                raise serializers.ValidationError("Invalid URL format.")
+        return value
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

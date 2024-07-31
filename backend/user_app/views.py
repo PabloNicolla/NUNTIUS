@@ -1,5 +1,7 @@
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.throttling import AnonRateThrottle
 from .models import CustomUser
+from .serializers import ProfileImageSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,6 +19,27 @@ class CheckEmailView(APIView):
             return Response({"message": "Email is already in use.", "code": "IN_USE"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Email is available.", "code": "AVAILABLE"}, status=status.HTTP_200_OK)
+
+
+class ProfileImageView(APIView):
+    permission_classes = (IsAuthenticated,)
+    throttle_classes = [AnonRateThrottle]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        serializer = ProfileImageSerializer(data={'imageURL': user.imageURL})
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ProfileImageSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            user.imageURL = serializer.validated_data['imageURL']
+            user.save()
+            return Response({'message': 'Profile image updated successfully.'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ContactView(APIView):

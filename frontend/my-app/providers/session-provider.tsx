@@ -15,6 +15,10 @@ import axios from "axios";
 import { VERIFY_TOKEN_URL, VerifyTokenRequestData } from "@/API/verify-token";
 import { Platform } from "react-native";
 import * as Application from "expo-application";
+import {
+  GET_ProfileImageResponseData,
+  PROFILE_IMAGE_URL,
+} from "@/API/profile-image";
 
 export type SessionUser = Contact & {
   email: string;
@@ -25,7 +29,6 @@ type SessionContextType = {
   register: (data: RegisterResponseData) => void;
   login: (data: LoginResponseData) => void;
   logout: () => void;
-  signInWithGoogle: () => Promise<boolean>;
   resetPassword: () => Promise<boolean>;
   changePassword: () => Promise<boolean>;
   changeName: (data: ChangeNameResponseData) => void;
@@ -70,12 +73,19 @@ export function SessionProvider({
   };
 
   const login = async (data: LoginResponseData) => {
+    const imageURL: GET_ProfileImageResponseData = (
+      await axios.get(PROFILE_IMAGE_URL, {
+        headers: { Authorization: `Bearer ${data.access}` },
+      })
+    ).data;
+
     const newUser: SessionUser = {
       id: data.user.pk,
       email: data.user.email,
       first_name: data.user.first_name,
       last_name: data.user.last_name,
       username: data.user.username,
+      imageURL: imageURL.imageURL,
     };
     setUser(newUser);
     await setAccessToken(data.access);
@@ -89,15 +99,14 @@ export function SessionProvider({
     setRefreshToken("");
     await AsyncStorage.removeItem("STORED_USER");
   };
-  const signInWithGoogle = async () => {
-    return false;
-  };
+
   const resetPassword = async () => {
     return false;
   };
   const changePassword = async () => {
     return false;
   };
+
   const changeName = async (data: ChangeNameResponseData) => {
     try {
       if (!user) {
@@ -221,7 +230,6 @@ export function SessionProvider({
       register,
       login,
       logout,
-      signInWithGoogle,
       resetPassword,
       changePassword,
       changeName,
