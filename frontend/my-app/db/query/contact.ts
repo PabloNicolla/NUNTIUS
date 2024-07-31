@@ -1,9 +1,9 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { Contact, PrivateChat } from "../schemaTypes";
 
-export const getAllContacts = async (db: SQLiteDatabase) => {
+export const getAllContacts = async (db: SQLiteDatabase, dbPrefix: string) => {
   try {
-    return await db.getAllAsync<Contact>(`SELECT * FROM contact`);
+    return await db.getAllAsync<Contact>(`SELECT * FROM ${dbPrefix}_contact`);
   } catch (error) {
     console.log("[STATEMENTS]: getAllContacts", error);
   }
@@ -11,11 +11,12 @@ export const getAllContacts = async (db: SQLiteDatabase) => {
 
 export const getFirstContact = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   contactId: PrivateChat["id"],
 ) => {
   try {
     return await db.getFirstAsync<Contact>(
-      `SELECT * FROM contact WHERE $id = id`,
+      `SELECT * FROM ${dbPrefix}_contact WHERE $id = id`,
       {
         $id: contactId,
       },

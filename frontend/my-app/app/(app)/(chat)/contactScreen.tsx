@@ -20,22 +20,30 @@ import useContactReducer from "@/reducers/useContactReducer";
 import { getAllContacts } from "@/db/statements";
 import { Contact } from "@/db/schemaTypes";
 import ContactListItem from "@/components/contacts/contact-list-item";
+import { useSession } from "@/providers/session-provider";
 
 type Props = {};
 
 const ChatOptions = (props: Props) => {
   const theme = useColorScheme();
   const db = useSQLiteContext();
+  const { getDbPrefix } = useSession();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useContactReducer();
 
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[ADD_CONTACT]: ERROR: invalid dbPrefix");
+  }
+
   const fetchAllContacts = useCallback(async () => {
-    const allContacts = await getAllContacts(db);
+    const allContacts = await getAllContacts(db, dbPrefix);
     if (!allContacts) {
       console.log("[CONTACT_SCREEN]: getAllContacts queried undefined");
     }
     dispatch({ type: "SET_CONTACTS", payload: allContacts ?? [] });
-  }, [db, dispatch]);
+  }, [db, dispatch, dbPrefix]);
 
   useEffect(() => {
     console.log("[CONTACT_SCREEN]: db contact initial load");

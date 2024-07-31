@@ -3,12 +3,13 @@ import { Message, PrivateChat } from "../schemaTypes";
 
 export const deleteAllMessagesByChatId = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   chatId: PrivateChat["id"],
 ) => {
   try {
     return await db.runAsync(
       `
-        DELETE FROM message 
+        DELETE FROM ${dbPrefix}_message 
         WHERE $chatId = chatId;
       `,
       {
@@ -22,12 +23,13 @@ export const deleteAllMessagesByChatId = async (
 
 export const deleteMessageById = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   id: Message["id"],
 ) => {
   try {
     return await db.runAsync(
       `
-        DELETE FROM message 
+        DELETE FROM ${dbPrefix}_message 
         WHERE $id = id;
       `,
       {

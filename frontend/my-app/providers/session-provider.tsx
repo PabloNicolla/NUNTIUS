@@ -49,6 +49,7 @@ type SessionContextType = {
   // storeUser: (user: SessionUser) => void;
   loadStoredUser: () => Promise<SessionUser | null | undefined>;
   getDeviceId: () => Promise<string>;
+  getDbPrefix: () => string | null;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -317,6 +318,14 @@ export function SessionProvider({
     return deviceId;
   };
 
+  const getDbPrefix = () => {
+    let dbPrefix = null;
+    if (user) {
+      dbPrefix = user.id.replaceAll("-", "_");
+    }
+    return dbPrefix;
+  }
+
   const contextMemo = useMemo(
     () => ({
       user,
@@ -335,6 +344,7 @@ export function SessionProvider({
       // storeUser,
       loadStoredUser,
       getDeviceId,
+      getDbPrefix,
     }),
     [user],
   );

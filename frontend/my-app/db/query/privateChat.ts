@@ -1,9 +1,14 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { PrivateChat, PrivateChatJoinContact } from "../schemaTypes";
 
-export const getAllPrivateChats = async (db: SQLiteDatabase) => {
+export const getAllPrivateChats = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+) => {
   try {
-    return await db.getAllAsync<PrivateChat>(`SELECT * FROM private_chat`);
+    return await db.getAllAsync<PrivateChat>(
+      `SELECT * FROM ${dbPrefix}_private_chat`,
+    );
   } catch (error) {
     console.log("[STATEMENTS]: getAllPrivateChats", error);
   }
@@ -11,11 +16,12 @@ export const getAllPrivateChats = async (db: SQLiteDatabase) => {
 
 export const getFirstPrivateChat = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   privateChatId: PrivateChat["id"],
 ) => {
   try {
     return await db.getFirstAsync<PrivateChat>(
-      `SELECT * FROM private_chat WHERE $id = id`,
+      `SELECT * FROM ${dbPrefix}_private_chat WHERE $id = id`,
       {
         $id: privateChatId,
       },
@@ -25,7 +31,10 @@ export const getFirstPrivateChat = async (
   }
 };
 
-export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
+export const getAllPrivateChatsJoinContacts = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+) => {
   try {
     return await db.getAllAsync<PrivateChatJoinContact>(`
         SELECT 
@@ -39,8 +48,8 @@ export const getAllPrivateChatsJoinContacts = async (db: SQLiteDatabase) => {
             c.first_name,
             c.last_name,
             c.username
-        FROM private_chat pc
-            JOIN contact c ON pc.contactId = c.id
+        FROM ${dbPrefix}_private_chat pc
+            JOIN ${dbPrefix}_contact c ON pc.contactId = c.id
       `);
   } catch (error) {
     console.log("[STATEMENTS]: getAllPrivateChatsJoinContacts", error);

@@ -1,10 +1,14 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { Message } from "../schemaTypes";
 
-export const updateMessage = async (db: SQLiteDatabase, message: Message) => {
+export const updateMessage = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  message: Message,
+) => {
   try {
     return await db.runAsync(
-      `UPDATE message
+      `UPDATE ${dbPrefix}_message
           SET
             value = $value,
             condition = $condition

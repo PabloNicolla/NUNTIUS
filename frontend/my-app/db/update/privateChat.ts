@@ -3,6 +3,7 @@ import { PrivateChat } from "../schemaTypes";
 
 export const updatePrivateChatById = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   chat: PrivateChat,
   updateNotificationCount?: boolean,
 ) => {
@@ -16,7 +17,7 @@ export const updatePrivateChatById = async (
     if (updateNotificationCount) {
       return await db.runAsync(
         `
-            UPDATE private_chat
+            UPDATE ${dbPrefix}_private_chat
               SET 
                 lastMessageId = $lastMessageId,
                 lastMessageValue = $lastMessageValue,
@@ -35,7 +36,7 @@ export const updatePrivateChatById = async (
     } else {
       return await db.runAsync(
         `
-            UPDATE private_chat
+            UPDATE ${dbPrefix}_private_chat
               SET 
                 lastMessageId = $lastMessageId,
                 lastMessageValue = $lastMessageValue,
@@ -58,12 +59,13 @@ export const updatePrivateChatById = async (
 
 export const resetPrivateChatNotificationCount = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   chatId: string,
 ) => {
   try {
     return await db.runAsync(
       `
-          UPDATE private_chat
+          UPDATE ${dbPrefix}_private_chat
             SET 
               notificationCount = 0
             WHERE

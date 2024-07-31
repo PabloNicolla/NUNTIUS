@@ -1,10 +1,14 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { Message } from "../schemaTypes";
 
-export const insertMessage = async (db: SQLiteDatabase, message: Message) => {
+export const insertMessage = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  message: Message,
+) => {
   try {
     return await db.runAsync(
-      `INSERT INTO message (
+      `INSERT INTO ${dbPrefix}_message (
                 senderId,
                 receiverId,
     

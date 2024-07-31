@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { WebSocketProvider } from "@/providers/websocket-provider";
 import { ChatSelectedProvider } from "@/providers/chat-selection-provider copy";
 import SplashScreenL from "@/components/splash-screen";
+import { migrateDbIfNeeded } from "@/db/migration";
 
 export default function AppLayout() {
   const { user, loadStoredUser } = useSession();
@@ -19,6 +20,7 @@ export default function AppLayout() {
       if (!user) {
         await loadStoredUser();
       }
+      await migrateDbIfNeeded(db.current);
       setLoading(false);
     };
 
@@ -36,6 +38,8 @@ export default function AppLayout() {
   if (!user.first_name) {
     return <Redirect href="/change_name" />;
   }
+
+  console.log("app layout");
 
   return (
     <WebSocketProvider db={db}>

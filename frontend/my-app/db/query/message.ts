@@ -1,9 +1,9 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { Contact, Message, PrivateChat, ReceiverType } from "../schemaTypes";
 
-export const getAllMessages = async (db: SQLiteDatabase) => {
+export const getAllMessages = async (db: SQLiteDatabase, dbPrefix: string) => {
   try {
-    return await db.getAllAsync<Message>(`SELECT * FROM message`);
+    return await db.getAllAsync<Message>(`SELECT * FROM ${dbPrefix}_message`);
   } catch (error) {
     console.log("[STATEMENTS]: getAllMessages", error);
   }
@@ -11,11 +11,12 @@ export const getAllMessages = async (db: SQLiteDatabase) => {
 
 export const getFirstMessage = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   messageId: Message["id"],
 ) => {
   try {
     return await db.getFirstAsync<Message>(
-      `SELECT * FROM message WHERE $id = id`,
+      `SELECT * FROM ${dbPrefix}_message WHERE $id = id`,
       {
         $id: messageId,
       },
@@ -27,6 +28,7 @@ export const getFirstMessage = async (
 
 export const getAllMessagesByChatIdWithPagination = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   chatId: PrivateChat["id"],
   receiverType: ReceiverType,
   limit: number,
@@ -37,7 +39,7 @@ export const getAllMessagesByChatIdWithPagination = async (
     return await db.getAllAsync<Message>(
       `
         SELECT *
-        FROM message
+        FROM ${dbPrefix}_message
         WHERE 
           $chatId = chatId
           AND $receiverType = receiverType 
@@ -59,6 +61,7 @@ export const getAllMessagesByChatIdWithPagination = async (
 
 export const getFirstMessageBySenderRef = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   chatId: PrivateChat["id"],
   senderReferenceId: Message["senderReferenceId"],
   senderId: Contact["id"],
@@ -67,7 +70,7 @@ export const getFirstMessageBySenderRef = async (
     return await db.getFirstAsync<Message>(
       `
       SELECT * 
-      FROM message 
+      FROM ${dbPrefix}_message 
       WHERE 
         $chatId = chatId
         AND $senderReferenceId = senderReferenceId

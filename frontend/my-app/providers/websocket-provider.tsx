@@ -37,7 +37,8 @@ export const WebSocketProvider: React.FC<{
   children: React.ReactNode;
   db: MutableRefObject<SQLiteDatabase>;
 }> = ({ children, db }) => {
-  const { loadStoredUser, getAccessToken, getRefreshToken } = useSession();
+  const { loadStoredUser, getAccessToken, getRefreshToken, getDbPrefix } =
+    useSession();
 
   const { changeConnectionStatus, changeSocket, connectionStatus, socket } =
     useWebSocketController();
@@ -55,6 +56,7 @@ export const WebSocketProvider: React.FC<{
     let socket: null | WebSocket = null;
     const refreshToken = await getRefreshToken();
     const user = await loadStoredUser();
+    const dbPrefix = getDbPrefix();
 
     if (!user) {
       console.log("[WEB_SOCKET]: User not logged in");
@@ -64,6 +66,12 @@ export const WebSocketProvider: React.FC<{
 
     if (!refreshToken) {
       console.log("[WEB_SOCKET]: Access token not found");
+      retryGetAuth();
+      return;
+    }
+
+    if (!dbPrefix) {
+      console.log("[WEB_SOCKET]: invalid dbPrefix");
       retryGetAuth();
       return;
     }
@@ -95,7 +103,7 @@ export const WebSocketProvider: React.FC<{
 
       socket.onmessage = async (event) => {
         const wsMessage = JSON.parse(event.data);
-        await routeMessage(wsMessage, db);
+        await routeMessage(wsMessage, db, dbPrefix);
         console.log("[WEB_SOCKET]: Message received: ", wsMessage);
       };
     } catch (error) {

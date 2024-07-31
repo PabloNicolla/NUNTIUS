@@ -3,11 +3,12 @@ import { PrivateChat } from "../schemaTypes";
 
 export const insertPrivateChat = async (
   db: SQLiteDatabase,
+  dbPrefix: string,
   chat: PrivateChat,
 ) => {
   try {
     return await db.runAsync(
-      `INSERT INTO private_chat (
+      `INSERT INTO ${dbPrefix}_private_chat (
                 id,
                 contactId,
                 lastMessageId,

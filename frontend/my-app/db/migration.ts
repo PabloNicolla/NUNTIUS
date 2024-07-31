@@ -4,9 +4,12 @@ import { insertContact, insertMessage, insertPrivateChat } from "./statements";
 import { users } from "@/test-data/contact-data";
 import { privateChats } from "@/test-data/private-chat-data";
 import { messages } from "@/test-data/message-data";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SessionUser } from "@/providers/session-provider";
 
 export async function migrateDbIfNeeded(db: SQLiteDatabase) {
-  const DATABASE_VERSION = 3;
+  const user = await CustomGetUser();
+  const DATABASE_VERSION = 2;
 
   let version = await db.getFirstAsync<{ user_version: number }>(
     "PRAGMA user_version",
@@ -18,46 +21,44 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
   if (currentDbVersion >= DATABASE_VERSION) {
     return;
   }
-  if (currentDbVersion === 0) {
-    console.log(
-      "[DATABASE_MIGRATION]: ----------------------------------------------------0v",
-    );
 
-    await loadDatabaseSchema(db);
+  try {
+    if (currentDbVersion === 0) {
+      console.log("[DATABASE_MIGRATION]: 0v");
+      await db.execAsync(`PRAGMA journal_mode = WAL;`);
+      await db.execAsync(`PRAGMA user_version = 1`);
+    }
 
-    currentDbVersion = 1;
+    if (!user) {
+      console.log("[DATABASE_MIGRATION]: No user to load");
+      await db.execAsync(`PRAGMA user_version = 1`);
+      return;
+    }
+    const dbPrefix = user.id.replaceAll("-", "_");
+    console.log("[DATABASE_MIGRATION]: DB PREFIX: %s", dbPrefix);
+
+    if (currentDbVersion === 1) {
+      console.log("[DATABASE_MIGRATION]: 1v");
+      await loadDatabaseSchema(db, dbPrefix);
+      await addMessageTableIndexes(db, dbPrefix);
+      currentDbVersion = 2;
+    }
+
+    await db.execAsync(`PRAGMA user_version = ${currentDbVersion}`);
+  } catch (error) {
+    console.log("[DATABASE_MIGRATION]: Migration transaction error", error);
   }
-  if (currentDbVersion === 1) {
-    console.log(
-      "[DATABASE_MIGRATION]: ----------------------------------------------------1v",
-    );
-
-    users.forEach(async (user) => {
-      await insertContact(db, user);
-    });
-
-    privateChats.forEach(async (pChat) => {
-      await insertPrivateChat(db, pChat);
-    });
-
-    messages.forEach(async (msg) => {
-      await insertMessage(db, msg);
-    });
-
-    currentDbVersion = 2;
-  }
-  if (currentDbVersion === 2) {
-    console.log(
-      "[DATABASE_MIGRATION]: ----------------------------------------------------2v",
-    );
-    await addMessageTableIndexes(db);
-    currentDbVersion = 3;
-  }
-  if (currentDbVersion === 3) {
-    console.log(
-      "[DATABASE_MIGRATION]: ----------------------------------------------------3v",
-    );
-    //TODO
-  }
-  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
 }
+
+const CustomGetUser = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("STORED_USER");
+    if (jsonValue != null) {
+      const user: SessionUser = JSON.parse(jsonValue);
+      return user.id ? user : null;
+    }
+    return null;
+  } catch (error) {
+    console.log("[SESSION_PROVIDER]: failed in retrieving STORED_USER", error);
+  }
+};

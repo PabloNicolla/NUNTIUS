@@ -1,11 +1,11 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { PaperProvider } from "react-native-paper";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SQLiteProvider } from "expo-sqlite";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { SessionProvider } from "@/providers/session-provider";
+import { SessionProvider, SessionUser } from "@/providers/session-provider";
 import { migrateDbIfNeeded } from "@/db/migration";
 import SplashScreenL from "@/components/splash-screen";
 import { WebsocketControllerProvider } from "@/providers/ws-controller-provider";
@@ -28,10 +28,12 @@ export default function RootLayout() {
     return null;
   }
 
+  console.log("root layout");
+
   return (
     <Suspense fallback={<SplashScreenL />}>
       <SQLiteProvider
-        databaseName="local56.db"
+        databaseName="local.db"
         onInit={migrateDbIfNeeded}
         options={{ enableChangeListener: true }}
         useSuspense

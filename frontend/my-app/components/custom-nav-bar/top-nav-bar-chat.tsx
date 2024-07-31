@@ -11,6 +11,7 @@ import { Contact } from "@/db/schemaTypes";
 import { deleteMessageById, getFirstContact } from "@/db/statements";
 import { useMessageSelection } from "@/providers/message-selection-provider";
 import { useMessageSelected } from "@/providers/message-selected-provider";
+import { useSession } from "@/providers/session-provider";
 
 type Props = {
   contactId?: Contact["id"];
@@ -25,7 +26,14 @@ const TopNavBarChat = ({
 }: Props) => {
   const theme = useColorScheme() ?? "light";
   const [contact, setContact] = useState<Contact | null>(null);
+  const { getDbPrefix } = useSession();
   const db = useSQLiteContext();
+
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[TOP_NAV_BAR_CHAT] ERROR: invalid dbPrefix");
+  }
 
   const { isSelectionActive } = useMessageSelection();
   const { clearSelected, selectedMessages } = useMessageSelected();
@@ -33,16 +41,21 @@ const TopNavBarChat = ({
   useEffect(() => {
     console.log("[TOP_NAV_BAR_CHAT]: for user_id:", contactId);
     async function getChatAndContact() {
-      if (contactId) {
-        const contact = await getFirstContact(db, contactId);
-        if (!contact) {
-          console.log("TopNavBarChat ERROR invalid contactId");
-        }
-        setContact(contact ?? null);
+      if (!contactId) {
+        console.log("[TOP_NAV_BAR_CHAT]: ERROR invalid contactId");
+        return;
       }
+
+      const contact = await getFirstContact(db, dbPrefix!, contactId);
+      if (!contact) {
+        console.log(
+          "[TOP_NAV_BAR_CHAT]: ERROR contactId not found in db query",
+        );
+      }
+      setContact(contact ?? null);
     }
     getChatAndContact();
-  }, [contactId, db]);
+  }, [contactId, db, dbPrefix]);
 
   return (
     <ThemedView className="h-14 w-full flex-row items-center border-b-[1px] border-primary-light/50 px-2">
@@ -80,9 +93,8 @@ const TopNavBarChat = ({
           <View className="overflow-hidden rounded-full">
             <TouchableRipple
               onPress={async () => {
-                console.log("trash");
                 selectedMessages.forEach(async (messageId) => {
-                  await deleteMessageById(db, messageId);
+                  await deleteMessageById(db, dbPrefix, messageId);
                 });
                 deleteSelectedMessages();
                 clearSelected();

@@ -36,7 +36,14 @@ type Props = {};
 const AddContact = (props: Props) => {
   const theme = useColorScheme() ?? "light";
   const db = useSQLiteContext();
+  const { getDbPrefix } = useSession();
   const [getContactErrorMessage, setGetContactErrorMessage] = useState("");
+
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[ADD_CONTACT]: ERROR: invalid dbPrefix");
+  }
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -62,7 +69,7 @@ const AddContact = (props: Props) => {
 
       console.log(response);
 
-      await insertContact(db, response);
+      await insertContact(db, dbPrefix, response);
 
       form.reset();
       if (router.canGoBack()) {

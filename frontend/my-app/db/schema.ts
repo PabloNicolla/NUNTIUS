@@ -1,10 +1,12 @@
 import { SQLiteDatabase } from "expo-sqlite";
 
-export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
-  await db.execAsync(`
-    PRAGMA journal_mode = WAL;
-
-    CREATE TABLE IF NOT EXISTS contact (
+export const loadDatabaseSchema = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+) => {
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    await txn.execAsync(`
+    CREATE TABLE IF NOT EXISTS ${dbPrefix}_contact (
         id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
         first_name TEXT NOT NULL,
@@ -12,7 +14,7 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
         imageURL TEXT
     );
 
-    CREATE TABLE IF NOT EXISTS private_chat (
+    CREATE TABLE IF NOT EXISTS ${dbPrefix}_private_chat (
         id TEXT PRIMARY KEY,
         contactId TEXT NOT NULL,
         lastMessageId INTEGER,
@@ -21,7 +23,7 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
         notificationCount INTEGER
     );
     
-    CREATE TABLE IF NOT EXISTS message (
+    CREATE TABLE IF NOT EXISTS ${dbPrefix}_message (
         id INTEGER PRIMARY KEY,
         senderId TEXT NOT NULL,
         receiverId TEXT NOT NULL,
@@ -37,12 +39,18 @@ export const loadDatabaseSchema = async (db: SQLiteDatabase) => {
         condition INTEGER NOT NULL
     );
     `);
+  });
 };
 
-export const addMessageTableIndexes = async (db: SQLiteDatabase) => {
-  await db.execAsync(`
-        CREATE INDEX idx_status ON message(status);
-        CREATE INDEX idx_timestamp ON message(timestamp);
-        CREATE INDEX idx_chatId ON message(chatId);
+export const addMessageTableIndexes = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+) => {
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    await txn.execAsync(`
+        CREATE INDEX idx_status ON ${dbPrefix}_message(status);
+        CREATE INDEX idx_timestamp ON ${dbPrefix}_message(timestamp);
+        CREATE INDEX idx_chatId ON ${dbPrefix}_message(chatId);
     `);
+  });
 };

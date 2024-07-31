@@ -13,6 +13,7 @@ import { MutableRefObject } from "react";
 export async function handlePrivateMessage(
   wsMessage: { message: Message; type: string },
   db: MutableRefObject<SQLiteDatabase>,
+  dbPrefix: string,
 ) {
   const message: Message = wsMessage.message;
 
@@ -20,20 +21,24 @@ export async function handlePrivateMessage(
     message.timestamp = Date.now();
     message.chatId = message.senderId;
 
-    const msgOutcome = await insertMessage(db.current, message);
+    const msgOutcome = await insertMessage(db.current, dbPrefix, message);
 
     if (!msgOutcome) {
       console.log("[handlePrivateMessage]: ERROR message outcome is undefined");
     }
 
-    const chat = await getFirstPrivateChat(db.current, message.senderId);
+    const chat = await getFirstPrivateChat(
+      db.current,
+      dbPrefix,
+      message.senderId,
+    );
 
     if (!chat) {
       // axios call get contact from backend
 
       // insert contact
 
-      await insertPrivateChat(db.current, {
+      await insertPrivateChat(db.current, dbPrefix, {
         id: message.senderId,
         contactId: message.senderId,
         lastMessageId: msgOutcome!.lastInsertRowId,
@@ -44,6 +49,7 @@ export async function handlePrivateMessage(
     } else {
       await updatePrivateChatById(
         db.current,
+        dbPrefix,
         {
           contactId: message.senderId,
           id: message.senderId,
@@ -55,10 +61,15 @@ export async function handlePrivateMessage(
       );
     }
   } else {
-    await updateMessage(db.current, message);
-    const chat = await getFirstPrivateChat(db.current, message.senderId);
+    await updateMessage(db.current, dbPrefix, message);
+    const chat = await getFirstPrivateChat(
+      db.current,
+      dbPrefix,
+      message.senderId,
+    );
     const localMessage = await getFirstMessageBySenderRef(
       db.current,
+      dbPrefix,
       message.senderId,
       message.senderReferenceId,
       message.senderId,
@@ -73,6 +84,7 @@ export async function handlePrivateMessage(
     if (chat?.lastMessageId === localMessage?.id) {
       await updatePrivateChatById(
         db.current,
+        dbPrefix,
         {
           contactId: message.senderId,
           id: message.chatId,

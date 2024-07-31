@@ -22,20 +22,28 @@ import {
   getAllPrivateChatsJoinContacts,
 } from "@/db/statements";
 import { useChatSelected } from "@/providers/chat-selection-provider copy";
+import { useSession } from "@/providers/session-provider";
 const headerHeight = 50;
 
 const App = () => {
   const db = useSQLiteContext();
+  const { getDbPrefix } = useSession();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const [state, dispatch] = useChatReducer();
 
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[GROUPS] ERROR: invalid dbPrefix");
+  }
+
   const fetchAllPrivateChats = useCallback(async () => {
-    const allChats = await getAllPrivateChatsJoinContacts(db);
+    const allChats = await getAllPrivateChatsJoinContacts(db, dbPrefix);
     if (!allChats) {
       console.log("[GROUPS]: fetchAllPrivateChats queried undefined");
     }
     dispatch({ type: "SET_CHATS_FULL", payload: allChats ?? [] });
-  }, [db, dispatch]);
+  }, [db, dispatch, dbPrefix]);
 
   useEffect(() => {
     console.log("[CHAT_LIST]: db chat initial load");
@@ -158,6 +166,14 @@ const ActionsHeaderOnSelect = () => {
   const { isSelectionActive } = useChatSelection();
   const { clearSelected, selectedChats } = useChatSelected();
   const db = useSQLiteContext();
+  const { getDbPrefix } = useSession();
+
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[GROUPS] ERROR: invalid dbPrefix");
+  }
+
   return (
     <View
       className={`absolute left-0 right-0 top-0 ${isSelectionActive ? "" : "hidden"}`}
@@ -170,10 +186,9 @@ const ActionsHeaderOnSelect = () => {
           <View className="overflow-hidden rounded-full">
             <TouchableRipple
               onPress={async () => {
-                console.log("trash");
                 selectedChats.forEach(async (chatId) => {
-                  await deletePrivateChat(db, chatId);
-                  await deleteAllMessagesByChatId(db, chatId);
+                  await deletePrivateChat(db, dbPrefix, chatId);
+                  await deleteAllMessagesByChatId(db, dbPrefix, chatId);
                 });
                 clearSelected();
               }}
@@ -259,7 +274,7 @@ const HeaderComponent = ({
 const ListFooterComponent = () => {
   return (
     <ThemedView className="h-[80] w-max items-center justify-center border-t-[1px] border-primary-light/50">
-      <ThemedText>[APP-NAME]</ThemedText>
+      <ThemedText>NUNTIUS</ThemedText>
     </ThemedView>
   );
 };

@@ -7,10 +7,11 @@ import { Message } from "@/db/schemaTypes";
 export async function routeMessage(
   wsMessage: { message: any; type: string },
   db: MutableRefObject<SQLiteDatabase>,
+  dbPrefix: string,
 ) {
   switch (wsMessage.type) {
     case "PRIVATE_CHAT":
-      await handlePrivateMessage(wsMessage, db);
+      await handlePrivateMessage(wsMessage, db, dbPrefix);
       break;
     case "GROUP_CHAT":
       handleGroupMessage(wsMessage);

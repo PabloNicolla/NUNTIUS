@@ -55,10 +55,16 @@ export default function ChatScreen() {
   const { id: chatId, contactId, canCreateChatIfNull } = useLocalSearchParams();
   const theme = useColorScheme();
   const db = useSQLiteContext();
-  const { user } = useSession();
+  const { user, getDbPrefix } = useSession();
+
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[CHAT_SCREEN]: ERROR: invalid dbPrefix");
+  }
 
   if (!user) {
-    throw Error("[CHAT_SCREEN]: ERROR: user most be logged in");
+    throw new Error("[CHAT_SCREEN]: ERROR: user most be logged in");
   }
 
   if (!contactId) {
@@ -86,7 +92,7 @@ export default function ChatScreen() {
 
   useEffect(() => {
     return () => {
-      resetPrivateChatNotificationCount(db, String(chatId));
+      resetPrivateChatNotificationCount(db, dbPrefix, String(chatId));
     };
   }, []);
 
@@ -98,6 +104,7 @@ export default function ChatScreen() {
       setLoadingMore(true);
       const newMessages = await getAllMessagesByChatIdWithPagination(
         db,
+        dbPrefix!,
         String(chatId),
         ReceiverType.PRIVATE_CHAT,
         PAGE_LIMIT,
@@ -111,19 +118,19 @@ export default function ChatScreen() {
       setLoadingMore(false);
     }
     loadMessages();
-  }, [chatId, db, requestMoreMsg]);
+  }, [chatId, db, requestMoreMsg, dbPrefix]);
 
   useEffect(() => {
     console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", String(chatId));
     async function getChat() {
-      const chat = await getFirstPrivateChat(db, String(chatId));
+      const chat = await getFirstPrivateChat(db, dbPrefix!, String(chatId));
       if (!chat) {
-        console.log("[CHAT_SCREEN]: TopNavBarChat ERROR: invalid chatId");
+        console.log("[CHAT_SCREEN]: getFirstPrivateChat ERROR: invalid chatId");
       }
       setChat(chat ?? null);
     }
     getChat();
-    resetPrivateChatNotificationCount(db, String(chatId));
+    resetPrivateChatNotificationCount(db, dbPrefix, String(chatId));
   }, []);
 
   useEffect(() => {
@@ -131,7 +138,7 @@ export default function ChatScreen() {
       if (event.tableName !== "message") {
         return;
       }
-      const new_message = await getFirstMessage(db, event.rowId);
+      const new_message = await getFirstMessage(db, dbPrefix, event.rowId);
       if (!new_message || new_message?.chatId !== String(chatId)) {
         return;
       }
@@ -148,7 +155,7 @@ export default function ChatScreen() {
     });
 
     return () => listener.remove();
-  }, [db, chatId]);
+  }, [db, chatId, dbPrefix]);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return <MessageItem item={item} user={user} />;
@@ -180,9 +187,9 @@ export default function ChatScreen() {
               inverted={true}
               initialNumToRender={PAGE_LIMIT}
               maxToRenderPerBatch={PAGE_LIMIT}
-              windowSize={11}
+              windowSize={21}
               nestedScrollEnabled={true}
-              onEndReachedThreshold={0.5}
+              onEndReachedThreshold={1}
               onEndReached={() => {
                 if (!loadingMore) {
                   setRequestMoreMsg(true);
@@ -274,44 +281,57 @@ const HeaderComponent = ({
   contactId: Contact["id"];
   setChat: (chat: PrivateChat | null) => void;
 }) => {
+  const { user, getDbPrefix } = useSession();
   const theme = useColorScheme() ?? "dark";
   const [messageValue, setMessageValue] = useState("");
   const { sendMessage } = useWebSocket();
   const db = useSQLiteContext();
 
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[CHAT_SCREEN]: ERROR: invalid dbPrefix");
+  }
+
   const handleSendMessage = async (messageValue: string) => {
     if (canCreateChatIfNull === "yes" && !chat) {
-      await insertPrivateChat(db, { id: contactId, contactId });
-      chat = (await getFirstPrivateChat(db, contactId)) ?? null;
+      await insertPrivateChat(db, dbPrefix, { id: contactId, contactId });
+      chat = (await getFirstPrivateChat(db, dbPrefix, contactId)) ?? null;
       setChat(chat);
     }
 
-    if (chat) {
+    if (chat && user) {
       const message: Message = {
         id: -1,
         chatId: chat.id,
         condition: Condition.NORMAL,
         receiverId: chat.contactId,
-        senderId: "999",
+        senderId: user.id,
         receiverType: ReceiverType.PRIVATE_CHAT,
-        senderReferenceId: -1,
+        senderReferenceId: Date.now(),
         status: MessageStatus.PENDING,
         timestamp: Date.now(),
         type: MessageType.TEXT,
         value: messageValue,
       };
-      const ret = await insertMessage(db, message);
+      const ret = await insertMessage(db, dbPrefix, message);
 
       if (!ret) {
-        throw Error("[CHAT_SCREEN]: ERROR: failed to insert new message in DB");
+        throw new Error(
+          "[CHAT_SCREEN]: ERROR: failed to insert new message in DB",
+        );
       }
 
       message.id = ret.lastInsertRowId;
-      message.senderReferenceId = ret.lastInsertRowId;
+      // message.senderReferenceId = ret.lastInsertRowId;
 
-      sendMessage({ message, type: "PRIVATE_CHAT" });
+      if (message.senderId === message.chatId) {
+        message.status = MessageStatus.SENT;
+      } else {
+        sendMessage({ message, type: "PRIVATE_CHAT" });
+      }
 
-      await updatePrivateChatById(db, {
+      await updatePrivateChatById(db, dbPrefix, {
         contactId: message.receiverId,
         id: message.chatId,
         lastMessageId: ret.lastInsertRowId,
@@ -319,7 +339,7 @@ const HeaderComponent = ({
         lastMessageValue: message.value,
       });
     } else {
-      console.log("[CHAT_SCREEN]: ERROR: chat is null");
+      console.log("[CHAT_SCREEN]: ERROR: chat or user is not defined");
     }
   };
 
