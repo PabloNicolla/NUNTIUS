@@ -1,11 +1,5 @@
 import { Contact } from "@/db/schemaTypes";
-import React, {
-  createContext,
-  useState,
-  useContext,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { createContext, useState, useContext, useMemo } from "react";
 import * as SecureStore from "expo-secure-store";
 import { LoginResponseData } from "@/API/login";
 import { RegisterResponseData } from "@/API/register";
@@ -24,7 +18,6 @@ import {
   RefreshTokenRequestData,
   RefreshTokenResponseData,
 } from "@/API/refresh-token";
-import { boolean } from "zod";
 import {
   REFRESH_JWT_URL,
   RefreshJWTRequestData,
@@ -182,6 +175,7 @@ export function SessionProvider({
       const responseData: RefreshTokenResponseData = (
         await axios.post(REFRESH_TOKEN_URL, requestData)
       ).data;
+      await setAccessToken(responseData.access);
       newAccessToken = responseData.access;
     } catch (error) {
       console.log("[SESSION_PROVIDER]: error refreshAccessToken:", error);
