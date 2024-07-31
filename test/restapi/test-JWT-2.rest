@@ -70,7 +70,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 
 {"first_name": "asd","last_name": "dsa"}
 ###
-POST http://192.168.214.206:8000/api/v1/user/profile/imageURL/
+GET http://192.168.214.206:8000/api/v1/user/profile/imageURL/
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIyMzg1MDUwLCJpYXQiOjE3MjIzODM4NTAsImp0aSI6IjM4ZTkxOTQxNzIzZjQ1NjM4ZWFhMzkxNTBiZjZkNmRmIiwidXNlcl9pZCI6Ijk1MzMyYWRjLWM3NzctNGM1MS04ODdhLWI5NzJlNDY4OWJlMCIsInVzZXIiOnsiaWQiOiI5NTMzMmFkYy1jNzc3LTRjNTEtODg3YS1iOTcyZTQ2ODliZTAiLCJ1c2VybmFtZSI6InBhYmxvMSIsImVtYWlsIjoicGFibG9AdGVzdC5jb20iLCJpbWFnZVVSTCI6IiIsImRldmljZV9pZCI6InAxIiwiZmlyc3RfbmFtZSI6IiIsImxhc3RfbmFtZSI6IiIsImlzX3N0YWZmIjpmYWxzZX19.I47boB0GJ2uXBk4IaV_ZABIUrCCpDQiz8gow7D66ERc
 

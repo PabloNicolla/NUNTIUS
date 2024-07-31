@@ -23,6 +23,10 @@ import {
   RefreshJWTRequestData,
   RefreshJWTResponseData,
 } from "@/API/refresh-jwt";
+import {
+  ConnectionStatus,
+  useWebSocketController,
+} from "./ws-controller-provider";
 
 export type SessionUser = Contact & {
   email: string;
@@ -61,6 +65,7 @@ export function SessionProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [user, setUser] = useState<SessionUser | null>(null);
+  const { changeConnectionStatus } = useWebSocketController();
 
   const register = async (data: RegisterResponseData) => {
     const newUser: SessionUser = {
@@ -107,6 +112,7 @@ export function SessionProvider({
 
   const logout = async () => {
     setUser(null);
+    changeConnectionStatus(ConnectionStatus.DISCONNECTED);
     await setAccessToken("");
     await setRefreshToken("");
     await AsyncStorage.removeItem("STORED_USER");
@@ -258,13 +264,13 @@ export function SessionProvider({
   };
 
   const setRefreshToken = async (token: string) => {
-    await SecureStore.setItemAsync("REFRESH_TOKEN", token);
+    SecureStore.setItem("REFRESH_TOKEN", token);
   };
 
   const getRefreshToken = async () => {
     const token = await SecureStore.getItemAsync("REFRESH_TOKEN");
     if (!token) {
-      console.log("[SESSION_PROVIDER]: no access token found");
+      console.log("[SESSION_PROVIDER]: no refresh token found");
     }
     return token ?? "";
   };

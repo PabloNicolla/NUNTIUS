@@ -1,26 +1,22 @@
 import {
   createContext,
   MutableRefObject,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
-  useRef,
-  useState,
 } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { useSession } from "./session-provider";
 import { SQLiteDatabase } from "expo-sqlite";
 import { routeMessage } from "@/websocket/ws-routeHandler";
-
-enum ConnectionStatus {
-  CONNECTED,
-  DISCONNECTED,
-}
+import {
+  ConnectionStatus,
+  useWebSocketController,
+} from "./ws-controller-provider";
 
 type WebSocketContextType = {
-  socket: WebSocket | null;
   sendMessage: (message: any) => void;
-  connectionStatus: ConnectionStatus;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -41,94 +37,93 @@ export const WebSocketProvider: React.FC<{
   children: React.ReactNode;
   db: MutableRefObject<SQLiteDatabase>;
 }> = ({ children, db }) => {
-  const { user } = useSession();
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
-    ConnectionStatus.DISCONNECTED,
-  );
-  const socket = useRef<WebSocket | null>(null);
-  const isConnecting = useRef<boolean>(false);
-  const isReconnecting = useRef<boolean>(false);
+  const { loadStoredUser, getAccessToken, getRefreshToken } = useSession();
+
+  const { changeConnectionStatus, changeSocket, connectionStatus, socket } =
+    useWebSocketController();
 
   useEffect(() => {
-    if (user) {
-      console.log("[WEB_SOCKET]: Initial connection");
+    console.log("[WEB_SOCKET]: Websocket initial check");
+    if (connectionStatus === ConnectionStatus.DISCONNECTED) {
+      console.log("[WEB_SOCKET]: No socket initialized... creating one");
+      changeConnectionStatus(ConnectionStatus.CONNECTING);
       connect();
-      return () => {
-        socket.current?.close();
-      };
     }
-  }, [user?.id]);
+  }, [connectionStatus]);
 
   const connect = async () => {
+    let socket: null | WebSocket = null;
+    const refreshToken = await getRefreshToken();
+    const user = await loadStoredUser();
+
     if (!user) {
       console.log("[WEB_SOCKET]: User not logged in");
+      retryGetAuth();
       return;
     }
 
-    if (isConnecting.current || isReconnecting.current) {
-      console.log("[WEB_SOCKET]: Already connecting or reconnecting");
+    if (!refreshToken) {
+      console.log("[WEB_SOCKET]: Access token not found");
+      retryGetAuth();
       return;
     }
 
-    isConnecting.current = true;
     try {
-      socket.current = new WebSocket(
+      socket = new WebSocket(
         `ws://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/ws/user/${user.id}/`,
       );
 
-      socket.current.onopen = () => {
+      socket.onopen = () => {
         console.log("[WEB_SOCKET]: Connected");
-        setConnectionStatus(ConnectionStatus.CONNECTED);
-        isConnecting.current = false;
+        changeConnectionStatus(ConnectionStatus.CONNECTED);
       };
 
-      socket.current.onclose = () => {
+      socket.onclose = () => {
         console.log("[WEB_SOCKET]: Disconnected");
-        setConnectionStatus(ConnectionStatus.DISCONNECTED);
-        retryConnection();
-        isConnecting.current = false;
+        changeConnectionStatus(ConnectionStatus.RECONNECTING);
+        if (connectionStatus !== ConnectionStatus.DISCONNECTED) {
+          retryConnection();
+        }
       };
 
-      socket.current.onerror = (error) => {
+      socket.onerror = (error) => {
         console.error("[WEB_SOCKET]: Error: ", error);
-        socket.current?.close();
-        isConnecting.current = false;
+        socket?.close();
+        changeConnectionStatus(ConnectionStatus.ERROR);
+        changeSocket(null);
       };
 
-      socket.current.onmessage = async (event) => {
+      socket.onmessage = async (event) => {
         const wsMessage = JSON.parse(event.data);
         await routeMessage(wsMessage, db);
         console.log("[WEB_SOCKET]: Message received: ", wsMessage);
       };
     } catch (error) {
       console.error("[WEB_SOCKET]: Connection error: ", error);
-      isConnecting.current = false;
+      changeConnectionStatus(ConnectionStatus.ERROR);
+      changeSocket(null);
     }
+    changeSocket(socket);
   };
 
-  const sendMessage = (message: any) => {
-    if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-      console.log("[WEB_SOCKET]: Message sent: ", message);
-      socket.current.send(JSON.stringify(message));
-    } else {
-      console.warn("[WEB_SOCKET]: WebSocket is not connected");
-    }
-  };
+  const sendMessage = useCallback(
+    (message: any) => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        console.log("[WEB_SOCKET]: Message sent: ", message);
+        socket.send(JSON.stringify(message));
+      } else {
+        console.warn("[WEB_SOCKET]: WebSocket is not connected");
+      }
+    },
+    [socket],
+  );
 
   const retryConnection = () => {
-    if (isReconnecting.current || isConnecting.current) {
-      console.log("[WEB_SOCKET]: Already reconnecting or connecting");
-      return;
-    }
-
-    isReconnecting.current = true;
-
     const retryInterval = 5000;
     const checkNetworkAndReconnect = () => {
       NetInfo.fetch().then((state) => {
         if (state.isConnected) {
           console.log("[WEB_SOCKET]: Reconnecting");
-          isReconnecting.current = false;
           connect();
         } else {
           setTimeout(checkNetworkAndReconnect, retryInterval);
@@ -139,10 +134,23 @@ export const WebSocketProvider: React.FC<{
     setTimeout(checkNetworkAndReconnect, retryInterval);
   };
 
-  const contextValue = useMemo(
-    () => ({ socket: socket.current, sendMessage, connectionStatus }),
-    [connectionStatus],
-  );
+  const retryGetAuth = () => {
+    const retryInterval = 5000;
+    const checkNetworkAndReconnect = () => {
+      NetInfo.fetch().then((state) => {
+        if (state.isConnected) {
+          console.log("[WEB_SOCKET]: Getting user/token");
+          connect();
+        } else {
+          setTimeout(checkNetworkAndReconnect, retryInterval);
+        }
+      });
+    };
+
+    setTimeout(checkNetworkAndReconnect, retryInterval);
+  };
+
+  const contextValue = useMemo(() => ({ sendMessage }), [sendMessage]);
 
   return (
     <WebSocketContext.Provider value={contextValue}>
