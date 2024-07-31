@@ -7,15 +7,20 @@ import { ThemedText } from "../themed-text";
 
 type Props = {
   title: string;
+  customBack?: () => void;
 };
 
-const TopNavBar = ({ title }: Props) => {
+const TopNavBar = ({ title, customBack }: Props) => {
   const theme = useColorScheme() ?? "dark";
   return (
     <ThemedView className="h-14 w-full flex-row items-center border-b-[1px] border-primary-light/50 px-2">
       <Pressable
         onPress={() => {
-          router.back();
+          if (customBack) {
+            customBack();
+          } else {
+            router.back();
+          }
         }}
       >
         <MaterialIcons

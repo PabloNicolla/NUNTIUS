@@ -9,6 +9,8 @@ import { SessionProvider, SessionUser } from "@/providers/session-provider";
 import { migrateDbIfNeeded } from "@/db/migration";
 import SplashScreenL from "@/components/splash-screen";
 import { WebsocketControllerProvider } from "@/providers/ws-controller-provider";
+import { ErrorBoundary } from "@/components/errors/simple-error-boundary";
+import { Try } from "expo-router/build/views/Try";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -31,33 +33,38 @@ export default function RootLayout() {
   console.log("root layout");
 
   return (
-    <Suspense fallback={<SplashScreenL />}>
-      <SQLiteProvider
-        databaseName="local.db"
-        onInit={migrateDbIfNeeded}
-        options={{ enableChangeListener: true }}
-        useSuspense
-      >
-        <WebsocketControllerProvider>
-          <SessionProvider>
-            <PaperProvider>
-              <KeyboardProvider statusBarTranslucent={true}>
-                <Stack>
-                  <Stack.Screen name="(app)" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="(landing)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
-              </KeyboardProvider>
-            </PaperProvider>
-          </SessionProvider>
-        </WebsocketControllerProvider>
-      </SQLiteProvider>
-    </Suspense>
+    <Try catch={ErrorBoundary}>
+      <Suspense fallback={<SplashScreenL />}>
+        <SQLiteProvider
+          databaseName="local.db"
+          onInit={migrateDbIfNeeded}
+          options={{ enableChangeListener: true }}
+          useSuspense
+        >
+          <WebsocketControllerProvider>
+            <SessionProvider>
+              <PaperProvider>
+                <KeyboardProvider statusBarTranslucent={true}>
+                  <Stack>
+                    <Stack.Screen
+                      name="(app)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(landing)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{ headerShown: false }}
+                    />
+                  </Stack>
+                </KeyboardProvider>
+              </PaperProvider>
+            </SessionProvider>
+          </WebsocketControllerProvider>
+        </SQLiteProvider>
+      </Suspense>
+    </Try>
   );
 }
