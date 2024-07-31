@@ -73,13 +73,16 @@ const App = () => {
 
     const listener = addDatabaseChangeListener((event) => {
       console.log("[CHAT_LIST]: db chat run Listener", event);
-      if (event.tableName === "contact" || event.tableName === "private_chat") {
+      if (
+        event.tableName === `_${dbPrefix}_contact` ||
+        event.tableName === `_${dbPrefix}_private_chat`
+      ) {
         debouncedFetchAllChats();
       }
     });
 
     return () => listener.remove();
-  }, [db, dispatch, debouncedFetchAllChats]);
+  }, [db, dispatch, debouncedFetchAllChats, dbPrefix]);
 
   const handleSearch = useCallback(
     (query: string) => {

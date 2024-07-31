@@ -8,7 +8,7 @@ export const insertPrivateChat = async (
 ) => {
   try {
     return await db.runAsync(
-      `INSERT INTO ${dbPrefix}_private_chat (
+      `INSERT INTO _${dbPrefix}_private_chat (
                 id,
                 contactId,
                 lastMessageId,

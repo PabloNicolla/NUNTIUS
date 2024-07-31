@@ -27,6 +27,7 @@ import {
   ConnectionStatus,
   useWebSocketController,
 } from "./ws-controller-provider";
+import { useSQLiteContext } from "expo-sqlite";
 
 export type SessionUser = Contact & {
   email: string;
@@ -65,6 +66,7 @@ export const useSession = () => {
 export function SessionProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const db = useSQLiteContext();
   const [user, setUser] = useState<SessionUser | null>(null);
   const { changeConnectionStatus } = useWebSocketController();
 
@@ -117,6 +119,7 @@ export function SessionProvider({
     await setAccessToken("");
     await setRefreshToken("");
     await AsyncStorage.removeItem("STORED_USER");
+    await db.execAsync(`PRAGMA user_version = 1`);
   };
 
   const resetPassword = async () => {
@@ -324,7 +327,7 @@ export function SessionProvider({
       dbPrefix = user.id.replaceAll("-", "_");
     }
     return dbPrefix;
-  }
+  };
 
   const contextMemo = useMemo(
     () => ({

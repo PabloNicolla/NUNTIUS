@@ -8,7 +8,7 @@ export const insertMessage = async (
 ) => {
   try {
     return await db.runAsync(
-      `INSERT INTO ${dbPrefix}_message (
+      `INSERT INTO _${dbPrefix}_message (
                 senderId,
                 receiverId,
     

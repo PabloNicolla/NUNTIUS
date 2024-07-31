@@ -7,7 +7,7 @@ export const getAllPrivateChats = async (
 ) => {
   try {
     return await db.getAllAsync<PrivateChat>(
-      `SELECT * FROM ${dbPrefix}_private_chat`,
+      `SELECT * FROM _${dbPrefix}_private_chat`,
     );
   } catch (error) {
     console.log("[STATEMENTS]: getAllPrivateChats", error);
@@ -21,7 +21,7 @@ export const getFirstPrivateChat = async (
 ) => {
   try {
     return await db.getFirstAsync<PrivateChat>(
-      `SELECT * FROM ${dbPrefix}_private_chat WHERE $id = id`,
+      `SELECT * FROM _${dbPrefix}_private_chat WHERE $id = id`,
       {
         $id: privateChatId,
       },
@@ -48,8 +48,8 @@ export const getAllPrivateChatsJoinContacts = async (
             c.first_name,
             c.last_name,
             c.username
-        FROM ${dbPrefix}_private_chat pc
-            JOIN ${dbPrefix}_contact c ON pc.contactId = c.id
+        FROM _${dbPrefix}_private_chat pc
+            JOIN _${dbPrefix}_contact c ON pc.contactId = c.id
       `);
   } catch (error) {
     console.log("[STATEMENTS]: getAllPrivateChatsJoinContacts", error);

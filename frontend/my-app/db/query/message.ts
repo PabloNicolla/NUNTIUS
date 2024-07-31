@@ -3,7 +3,7 @@ import { Contact, Message, PrivateChat, ReceiverType } from "../schemaTypes";
 
 export const getAllMessages = async (db: SQLiteDatabase, dbPrefix: string) => {
   try {
-    return await db.getAllAsync<Message>(`SELECT * FROM ${dbPrefix}_message`);
+    return await db.getAllAsync<Message>(`SELECT * FROM _${dbPrefix}_message`);
   } catch (error) {
     console.log("[STATEMENTS]: getAllMessages", error);
   }
@@ -16,7 +16,7 @@ export const getFirstMessage = async (
 ) => {
   try {
     return await db.getFirstAsync<Message>(
-      `SELECT * FROM ${dbPrefix}_message WHERE $id = id`,
+      `SELECT * FROM _${dbPrefix}_message WHERE $id = id`,
       {
         $id: messageId,
       },
@@ -39,7 +39,7 @@ export const getAllMessagesByChatIdWithPagination = async (
     return await db.getAllAsync<Message>(
       `
         SELECT *
-        FROM ${dbPrefix}_message
+        FROM _${dbPrefix}_message
         WHERE 
           $chatId = chatId
           AND $receiverType = receiverType 
@@ -70,7 +70,7 @@ export const getFirstMessageBySenderRef = async (
     return await db.getFirstAsync<Message>(
       `
       SELECT * 
-      FROM ${dbPrefix}_message 
+      FROM _${dbPrefix}_message 
       WHERE 
         $chatId = chatId
         AND $senderReferenceId = senderReferenceId

@@ -9,7 +9,7 @@ export const deleteAllMessagesByChatId = async (
   try {
     return await db.runAsync(
       `
-        DELETE FROM ${dbPrefix}_message 
+        DELETE FROM _${dbPrefix}_message 
         WHERE $chatId = chatId;
       `,
       {
@@ -29,7 +29,7 @@ export const deleteMessageById = async (
   try {
     return await db.runAsync(
       `
-        DELETE FROM ${dbPrefix}_message 
+        DELETE FROM _${dbPrefix}_message 
         WHERE $id = id;
       `,
       {

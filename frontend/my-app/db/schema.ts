@@ -6,7 +6,7 @@ export const loadDatabaseSchema = async (
 ) => {
   await db.withExclusiveTransactionAsync(async (txn) => {
     await txn.execAsync(`
-    CREATE TABLE IF NOT EXISTS ${dbPrefix}_contact (
+    CREATE TABLE IF NOT EXISTS _${dbPrefix}_contact (
         id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
         first_name TEXT NOT NULL,
@@ -14,7 +14,7 @@ export const loadDatabaseSchema = async (
         imageURL TEXT
     );
 
-    CREATE TABLE IF NOT EXISTS ${dbPrefix}_private_chat (
+    CREATE TABLE IF NOT EXISTS _${dbPrefix}_private_chat (
         id TEXT PRIMARY KEY,
         contactId TEXT NOT NULL,
         lastMessageId INTEGER,
@@ -23,7 +23,7 @@ export const loadDatabaseSchema = async (
         notificationCount INTEGER
     );
     
-    CREATE TABLE IF NOT EXISTS ${dbPrefix}_message (
+    CREATE TABLE IF NOT EXISTS _${dbPrefix}_message (
         id INTEGER PRIMARY KEY,
         senderId TEXT NOT NULL,
         receiverId TEXT NOT NULL,
@@ -48,9 +48,9 @@ export const addMessageTableIndexes = async (
 ) => {
   await db.withExclusiveTransactionAsync(async (txn) => {
     await txn.execAsync(`
-        CREATE INDEX idx_status ON ${dbPrefix}_message(status);
-        CREATE INDEX idx_timestamp ON ${dbPrefix}_message(timestamp);
-        CREATE INDEX idx_chatId ON ${dbPrefix}_message(chatId);
+        CREATE INDEX IF NOT EXISTS idx_status ON _${dbPrefix}_message(status);
+        CREATE INDEX IF NOT EXISTS idx_timestamp ON _${dbPrefix}_message(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_chatId ON _${dbPrefix}_message(chatId);
     `);
   });
 };

@@ -9,7 +9,7 @@ export const deletePrivateChat = async (
   try {
     return await db.runAsync(
       `
-        DELETE FROM ${dbPrefix}_private_chat
+        DELETE FROM _${dbPrefix}_private_chat
         WHERE id = $id;
       `,
       {

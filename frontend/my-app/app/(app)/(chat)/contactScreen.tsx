@@ -54,12 +54,12 @@ const ChatOptions = (props: Props) => {
     console.log("[CONTACT_SCREEN]: db contact add listener");
     const listener = addDatabaseChangeListener((event) => {
       console.log("[CONTACT_SCREEN]: db contact run Listener", event);
-      if (event.tableName === "contact") {
+      if (event.tableName === `_${dbPrefix}_contact`) {
         fetchAllContacts();
       }
     });
     return () => listener.remove();
-  }, [db, dispatch, fetchAllContacts]);
+  }, [db, dispatch, fetchAllContacts, dbPrefix]);
 
   const handleSearch = useCallback(
     (query: string) => {

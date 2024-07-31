@@ -8,7 +8,7 @@ export const insertContact = async (
 ) => {
   try {
     return await db.runAsync(
-      `INSERT INTO ${dbPrefix}_contact (
+      `INSERT INTO _${dbPrefix}_contact (
                 id,
                 username,
                 first_name,

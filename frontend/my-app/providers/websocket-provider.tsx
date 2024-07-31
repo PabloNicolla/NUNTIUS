@@ -45,6 +45,7 @@ export const WebSocketProvider: React.FC<{
 
   useEffect(() => {
     console.log("[WEB_SOCKET]: Websocket initial check");
+    console.log(connectionStatus);
     if (connectionStatus === ConnectionStatus.DISCONNECTED) {
       console.log("[WEB_SOCKET]: No socket initialized... creating one");
       changeConnectionStatus(ConnectionStatus.CONNECTING);
@@ -88,8 +89,8 @@ export const WebSocketProvider: React.FC<{
 
       socket.onclose = () => {
         console.log("[WEB_SOCKET]: Disconnected");
-        changeConnectionStatus(ConnectionStatus.RECONNECTING);
         if (connectionStatus !== ConnectionStatus.DISCONNECTED) {
+          changeConnectionStatus(ConnectionStatus.RECONNECTING);
           retryConnection();
         }
       };

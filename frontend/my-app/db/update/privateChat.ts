@@ -17,7 +17,7 @@ export const updatePrivateChatById = async (
     if (updateNotificationCount) {
       return await db.runAsync(
         `
-            UPDATE ${dbPrefix}_private_chat
+            UPDATE _${dbPrefix}_private_chat
               SET 
                 lastMessageId = $lastMessageId,
                 lastMessageValue = $lastMessageValue,
@@ -36,7 +36,7 @@ export const updatePrivateChatById = async (
     } else {
       return await db.runAsync(
         `
-            UPDATE ${dbPrefix}_private_chat
+            UPDATE _${dbPrefix}_private_chat
               SET 
                 lastMessageId = $lastMessageId,
                 lastMessageValue = $lastMessageValue,
@@ -65,7 +65,7 @@ export const resetPrivateChatNotificationCount = async (
   try {
     return await db.runAsync(
       `
-          UPDATE ${dbPrefix}_private_chat
+          UPDATE _${dbPrefix}_private_chat
             SET 
               notificationCount = 0
             WHERE

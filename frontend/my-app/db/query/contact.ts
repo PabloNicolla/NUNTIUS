@@ -3,7 +3,7 @@ import { Contact, PrivateChat } from "../schemaTypes";
 
 export const getAllContacts = async (db: SQLiteDatabase, dbPrefix: string) => {
   try {
-    return await db.getAllAsync<Contact>(`SELECT * FROM ${dbPrefix}_contact`);
+    return await db.getAllAsync<Contact>(`SELECT * FROM _${dbPrefix}_contact`);
   } catch (error) {
     console.log("[STATEMENTS]: getAllContacts", error);
   }
@@ -16,7 +16,7 @@ export const getFirstContact = async (
 ) => {
   try {
     return await db.getFirstAsync<Contact>(
-      `SELECT * FROM ${dbPrefix}_contact WHERE $id = id`,
+      `SELECT * FROM _${dbPrefix}_contact WHERE $id = id`,
       {
         $id: contactId,
       },

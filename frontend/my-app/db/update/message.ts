@@ -8,7 +8,7 @@ export const updateMessage = async (
 ) => {
   try {
     return await db.runAsync(
-      `UPDATE ${dbPrefix}_message
+      `UPDATE _${dbPrefix}_message
           SET
             value = $value,
             condition = $condition

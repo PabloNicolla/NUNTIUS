@@ -135,7 +135,7 @@ export default function ChatScreen() {
 
   useEffect(() => {
     const listener = addDatabaseChangeListener(async (event) => {
-      if (event.tableName !== "message") {
+      if (event.tableName !== `_${dbPrefix}_message`) {
         return;
       }
       const new_message = await getFirstMessage(db, dbPrefix, event.rowId);
