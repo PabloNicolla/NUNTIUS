@@ -37,7 +37,7 @@ import { TouchableRipple } from "react-native-paper";
 import { useWebSocket } from "@/providers/websocket-provider";
 import React from "react";
 import EditMessageModal from "@/components/modals/edit-message-modal";
-import MessageItem from "@/components/chat/chat-list-message";
+import MessageItem from "@/components/chat/message-list-item";
 
 export type MessageItemType = Message & {
   isSelected?: boolean;
@@ -49,7 +49,7 @@ export default function ChatScreen() {
   const [page, setPage] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [requestMoreMsg, setRequestMoreMsg] = useState(false);
-  const [openEditMsgModal, setOpenEditMsgModal] = useState(true);
+  const [openEditMsgModal, setOpenEditMsgModal] = useState(false);
   const PAGE_LIMIT = 50;
 
   const { id: chatId, contactId, canCreateChatIfNull } = useLocalSearchParams();
@@ -165,7 +165,7 @@ export default function ChatScreen() {
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
     return <MessageItem item={item} user={user} />;
   };
-  console.log("---------------------------------------");
+
   return (
     <ThemedView className="flex-1">
       <KeyboardAvoidingView
