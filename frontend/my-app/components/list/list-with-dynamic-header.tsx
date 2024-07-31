@@ -21,7 +21,7 @@ const ListWithDynamicHeader = ({
   DynamicHeaderComponent,
   headerHeight,
 }: ListWithDynamicHeaderProps<any>) => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const ref = useRef<FlatList>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 

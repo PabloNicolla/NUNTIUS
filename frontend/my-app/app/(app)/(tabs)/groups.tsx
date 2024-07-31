@@ -137,7 +137,7 @@ const App = () => {
 };
 
 const Header = () => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
 
   return (
     <ThemedView
@@ -165,7 +165,7 @@ const Header = () => {
 };
 
 const ActionsHeaderOnSelect = () => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const { isSelectionActive } = useChatSelection();
   const { clearSelected, selectedChats } = useChatSelected();
   const db = useSQLiteContext();
@@ -237,7 +237,7 @@ const HeaderComponent = ({
 }: {
   handleSearch: (query: string) => void;
 }) => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const { selectedChats } = useChatSelected();
   const [searchQuery, setSearchQuery] = useState("");
 

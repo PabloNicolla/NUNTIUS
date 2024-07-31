@@ -36,7 +36,7 @@ const formSchema = z.object({
 });
 
 export default function ChangeNameScreen() {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
   const { email } = useLocalSearchParams<{ email: string }>();
   const { changeName, getAccessToken } = useSession();
   const [changeNameErrorMessage, setChangeNameErrorMessage] = useState("");

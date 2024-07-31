@@ -23,7 +23,7 @@ import { SessionUser, useSession } from "@/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FlatList,
   Platform,
@@ -34,7 +34,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
-import { TouchableRipple, TouchableRippleProps } from "react-native-paper";
+import { TouchableRipple } from "react-native-paper";
 import { useWebSocket } from "@/providers/websocket-provider";
 import React from "react";
 import { useMessageSelection } from "@/providers/message-selection-provider";
@@ -50,10 +50,11 @@ export default function ChatScreen() {
   const [page, setPage] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [requestMoreMsg, setRequestMoreMsg] = useState(false);
+  const [openEditMsgModal, setOpenEditMsgModal] = useState(true);
   const PAGE_LIMIT = 50;
 
   const { id: chatId, contactId, canCreateChatIfNull } = useLocalSearchParams();
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const db = useSQLiteContext();
   const { user, getDbPrefix } = useSession();
 
@@ -88,6 +89,11 @@ export default function ChatScreen() {
       });
       return [...newMessages];
     });
+  };
+
+  const editSelectedMessage = () => {
+    setOpenEditMsgModal(true);
+    clearSelectedMessages();
   };
 
   useEffect(() => {
@@ -175,7 +181,12 @@ export default function ChatScreen() {
             clearSelectedMessages={() => {
               clearSelectedMessages();
             }}
-            deleteSelectedMessages={deleteSelectedMessages}
+            deleteSelectedMessages={() => {
+              deleteSelectedMessages();
+            }}
+            editSelectedMessage={() => {
+              editSelectedMessage();
+            }}
           />
           <View className="flex-1">
             <FlatList
@@ -197,7 +208,7 @@ export default function ChatScreen() {
               }}
             />
           </View>
-          <HeaderComponent
+          <FooterComponent
             chat={chat}
             canCreateChatIfNull={String(canCreateChatIfNull)}
             contactId={String(contactId)}
@@ -270,7 +281,7 @@ const MessageItem = React.memo(function MessageItem({
   );
 });
 
-const HeaderComponent = ({
+const FooterComponent = ({
   chat,
   canCreateChatIfNull,
   contactId,

@@ -55,7 +55,7 @@ const FormTextField = forwardRef<TextInput, FormTextFieldProps>(
     const [isFocused, setIsFocused] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    const theme = useColorScheme() ?? "light";
+    const theme = useColorScheme() ?? "dark";
 
     const animationValue = useRef(new Animated.Value(0)).current;
 

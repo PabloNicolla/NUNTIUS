@@ -23,7 +23,7 @@ const ChatListItem = React.memo(function ChatListItem({
   last_name,
   imageURL,
 }: ChatListItemProps) {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
   const { isSelectionActive, selectModeHandler } = useChatSelection();
   const [isSelected, setIsSelected] = useState(false);
 

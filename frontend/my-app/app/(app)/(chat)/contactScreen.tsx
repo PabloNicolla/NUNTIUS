@@ -25,7 +25,7 @@ import { useSession } from "@/providers/session-provider";
 type Props = {};
 
 const ChatOptions = (props: Props) => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const db = useSQLiteContext();
   const { getDbPrefix } = useSession();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
@@ -110,7 +110,7 @@ const HeaderComponent = ({
 }: {
   handleSearch: (query: string) => void;
 }) => {
-  const theme = useColorScheme();
+  const theme = useColorScheme() ?? "dark";
   const [searchQuery, setSearchQuery] = useState("");
 
   return (

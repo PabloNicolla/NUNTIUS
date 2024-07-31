@@ -11,7 +11,7 @@ export type ChatOptionProps = {
 };
 
 const ChatOption = ({ title, icon, handlePress }: ChatOptionProps) => {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
 
   return (
     <View className="h-[80] w-full">

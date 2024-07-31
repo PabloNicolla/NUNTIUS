@@ -34,7 +34,7 @@ const formSchema = z.object({
 type Props = {};
 
 const AddContact = (props: Props) => {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
   const db = useSQLiteContext();
   const { getDbPrefix } = useSession();
   const [getContactErrorMessage, setGetContactErrorMessage] = useState("");

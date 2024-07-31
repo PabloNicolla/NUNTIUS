@@ -45,7 +45,7 @@ const formSchema = z.object({
 });
 
 export default function SignUpScreen() {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
   const { email } = useLocalSearchParams<{ email: string }>();
   const { register, getDeviceId } = useSession();
   const [registerErrorMessage, setRegisterErrorMessage] = useState("");

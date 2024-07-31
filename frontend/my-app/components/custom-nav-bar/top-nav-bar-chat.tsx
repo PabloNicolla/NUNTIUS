@@ -7,8 +7,13 @@ import { ThemedText } from "../themed-text";
 import { Avatar, TouchableRipple } from "react-native-paper";
 import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { useSQLiteContext } from "expo-sqlite";
-import { Contact } from "@/db/schemaTypes";
-import { deleteMessageById, getFirstContact } from "@/db/statements";
+import { Contact, Message } from "@/db/schemaTypes";
+import {
+  deleteMessageById,
+  deleteMessagesByIds,
+  getFirstContact,
+  getFirstMessage,
+} from "@/db/statements";
 import { useMessageSelection } from "@/providers/message-selection-provider";
 import { useMessageSelected } from "@/providers/message-selected-provider";
 import { useSession } from "@/providers/session-provider";
@@ -17,14 +22,16 @@ type Props = {
   contactId?: Contact["id"];
   clearSelectedMessages: () => void;
   deleteSelectedMessages: () => void;
+  editSelectedMessage: () => void;
 };
 
 const TopNavBarChat = ({
   contactId,
   deleteSelectedMessages,
   clearSelectedMessages,
+  editSelectedMessage,
 }: Props) => {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
   const [contact, setContact] = useState<Contact | null>(null);
   const { getDbPrefix } = useSession();
   const db = useSQLiteContext();
@@ -56,6 +63,20 @@ const TopNavBarChat = ({
     }
     getChatAndContact();
   }, [contactId, db, dbPrefix]);
+
+  const handleDelete = async () => {
+    const messageIds = Array.from(selectedMessages);
+    await deleteMessagesByIds(db, dbPrefix, messageIds);
+    // selectedMessages.forEach(async (messageId) => {
+    //   await deleteMessageById(db, dbPrefix, messageId);
+    // });
+    deleteSelectedMessages();
+    clearSelected();
+  };
+
+  const handleEdit = async () => {
+    editSelectedMessage();
+  };
 
   return (
     <ThemedView className="h-14 w-full flex-row items-center border-b-[1px] border-primary-light/50 px-2">
@@ -89,29 +110,24 @@ const TopNavBarChat = ({
         style={{ display: isSelectionActive ? "flex" : "none" }}
         className="flex-1 items-end justify-center"
       >
-        <View className="flex-row space-x-2">
-          <View className="overflow-hidden rounded-full">
-            <TouchableRipple
-              onPress={async () => {
-                selectedMessages.forEach(async (messageId) => {
-                  await deleteMessageById(db, dbPrefix, messageId);
-                });
-                deleteSelectedMessages();
-                clearSelected();
+        <View className="flex-row">
+          {selectedMessages.size === 1 && (
+            <CustomIcon
+              icon="pencil-outline"
+              handlePress={() => {
+                handleEdit();
               }}
-              rippleColor={
-                theme === "dark"
-                  ? "rgba(255, 255, 255, .32)"
-                  : "rgba(0, 0, 0, .15)"
-              }
-            >
-              <Ionicons
-                name="trash-outline"
-                color={theme === "dark" ? "white" : "black"}
-                size={25}
-              />
-            </TouchableRipple>
-          </View>
+              showIfOwner={true}
+            />
+          )}
+
+          <CustomIcon
+            icon="trash-outline"
+            handlePress={() => {
+              handleDelete();
+            }}
+          />
+
           <View className="overflow-hidden rounded-full">
             <TouchableRipple
               onPress={async () => {
@@ -173,6 +189,69 @@ const CustomAvatar = ({
         )}
       </Pressable>
     </View>
+  );
+};
+
+const CustomIcon = ({
+  handlePress,
+  icon,
+  showIfOwner,
+}: {
+  handlePress: () => void;
+  icon: keyof typeof Ionicons.glyphMap;
+  showIfOwner?: boolean;
+}) => {
+  const [show, setShow] = useState(false);
+  const theme = useColorScheme() ?? "dark";
+  const db = useSQLiteContext();
+  const { selectedMessages } = useMessageSelected();
+  const { getDbPrefix, user } = useSession();
+
+  const dbPrefix = getDbPrefix();
+
+  if (!dbPrefix) {
+    throw new Error("[TOP_NAV_BAR_CHAT] ERROR: invalid dbPrefix");
+  }
+
+  useEffect(() => {
+    const isMessageOwner = async (messageId: number) => {
+      let isOwner = false;
+      const message = await getFirstMessage(db, dbPrefix, messageId);
+      if (message) {
+        isOwner = message.senderId === user?.id;
+      }
+      setShow(isOwner);
+    };
+    if (showIfOwner) {
+      isMessageOwner(selectedMessages.values().next().value);
+    } else {
+      setShow(true);
+    }
+  }, [db, dbPrefix, selectedMessages, user?.id, showIfOwner]);
+
+  return (
+    <>
+      {show && (
+        <View className="mr-2 overflow-hidden rounded-full">
+          <TouchableRipple
+            onPress={async () => {
+              handlePress();
+            }}
+            rippleColor={
+              theme === "dark"
+                ? "rgba(255, 255, 255, .32)"
+                : "rgba(0, 0, 0, .15)"
+            }
+          >
+            <Ionicons
+              name={icon}
+              color={theme === "dark" ? "white" : "black"}
+              size={25}
+            />
+          </TouchableRipple>
+        </View>
+      )}
+    </>
   );
 };
 

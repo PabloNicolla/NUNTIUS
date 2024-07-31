@@ -7,7 +7,7 @@ import { useColorScheme, View } from "react-native";
 import { BottomNavigation, TouchableRipple } from "react-native-paper";
 
 export default function TabsLayout() {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
 
   const navBgColor = useThemeColor({}, "background");
   const navLabelColor = useThemeColor({}, "text");

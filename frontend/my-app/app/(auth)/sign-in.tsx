@@ -35,7 +35,7 @@ const formSchema = z.object({
 });
 
 export default function SignInScreen() {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
   const { email } = useLocalSearchParams<{ email: string }>();
   const { login, getDeviceId } = useSession();
   const [loginErrorMessage, setLoginErrorMessage] = useState("");

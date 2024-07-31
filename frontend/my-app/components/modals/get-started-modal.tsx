@@ -50,7 +50,7 @@ export default function GetStartedModal({
 }: Readonly<GetStartedModalProps>) {
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
 
   const EmailInputRef = useRef<TextInput | null>(null);
 

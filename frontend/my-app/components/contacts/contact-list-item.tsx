@@ -15,7 +15,7 @@ const ContactListItem = React.memo(function ContactListItem({
   last_name,
   imageURL,
 }: ContactListItemProps) {
-  const theme = useColorScheme() ?? "light";
+  const theme = useColorScheme() ?? "dark";
 
   console.log("[CONTACT_LIST_ITEM]: MOUNTING: %d", id);
 
