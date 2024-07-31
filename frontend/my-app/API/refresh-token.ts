@@ -6,6 +6,7 @@ export type RefreshTokenRequestData = {
 
 export type RefreshTokenResponseData = {
   access: string;
+  access_expiration: string;
 };
 
 export const REFRESH_TOKEN_URL = qs.stringifyUrl({

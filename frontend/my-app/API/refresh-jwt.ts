@@ -1,15 +1,15 @@
 import qs from "query-string";
 
-export type RefreshTokenRequestData = {
+export type RefreshJWTRequestData = {
   refresh: string;
   device_id: string;
 };
 
-export type RefreshTokenResponseData = {
+export type RefreshJWTResponseData = {
   access: string;
   refresh: string;
 };
 
-export const REFRESH_TOKEN_URL = qs.stringifyUrl({
+export const REFRESH_JWT_URL = qs.stringifyUrl({
   url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/auth/jwt/refresh/`,
 });

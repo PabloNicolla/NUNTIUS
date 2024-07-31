@@ -19,6 +19,17 @@ import {
   GET_ProfileImageResponseData,
   PROFILE_IMAGE_URL,
 } from "@/API/profile-image";
+import {
+  REFRESH_TOKEN_URL,
+  RefreshTokenRequestData,
+  RefreshTokenResponseData,
+} from "@/API/refresh-token";
+import { boolean } from "zod";
+import {
+  REFRESH_JWT_URL,
+  RefreshJWTRequestData,
+  RefreshJWTResponseData,
+} from "@/API/refresh-jwt";
 
 export type SessionUser = Contact & {
   email: string;
@@ -73,11 +84,19 @@ export function SessionProvider({
   };
 
   const login = async (data: LoginResponseData) => {
-    const imageURL: GET_ProfileImageResponseData = (
-      await axios.get(PROFILE_IMAGE_URL, {
-        headers: { Authorization: `Bearer ${data.access}` },
-      })
-    ).data;
+    let imageURL = "";
+
+    try {
+      const responseData: GET_ProfileImageResponseData = (
+        await axios.get(PROFILE_IMAGE_URL, {
+          headers: { Authorization: `Bearer ${data.access}` },
+        })
+      ).data;
+
+      imageURL = responseData.imageURL;
+    } catch (error) {
+      console.log("[SESSION_PROVIDER]: Error get profile image", error);
+    }
 
     const newUser: SessionUser = {
       id: data.user.pk,
@@ -85,7 +104,7 @@ export function SessionProvider({
       first_name: data.user.first_name,
       last_name: data.user.last_name,
       username: data.user.username,
-      imageURL: imageURL.imageURL,
+      imageURL: imageURL,
     };
     setUser(newUser);
     await setAccessToken(data.access);
@@ -129,7 +148,7 @@ export function SessionProvider({
       });
       await storeUser(newUser);
     } catch (error) {
-      console.log("[ACCESS_TOKEN]:", error);
+      console.log("[SESSION_PROVIDER]: Error change name:", error);
     }
   };
 
@@ -140,17 +159,62 @@ export function SessionProvider({
       await axios.post(VERIFY_TOKEN_URL, requestData);
       isValid = true;
     } catch (error) {
-      console.log("SESSION_PROVIDER]:", error);
+      console.log(
+        "[SESSION_PROVIDER]: error verifyIfAccessTokenIsValid:",
+        error,
+      );
     }
     return isValid;
   };
 
-  const refreshAccessToken = async (refreshToken: string) => {
+  const refreshAccessToken = async () => {
     let newAccessToken = null;
     try {
+      const refreshToken = await getRefreshToken();
+      if (!refreshToken) {
+        console.log(
+          "[SESSION_PROVIDER]: Error, refreshAccessToken: no refresh token found",
+        );
+        logout();
+        return "";
+      }
+      const requestData: RefreshTokenRequestData = { refresh: refreshToken };
+      const responseData: RefreshTokenResponseData = (
+        await axios.post(REFRESH_TOKEN_URL, requestData)
+      ).data;
+      newAccessToken = responseData.access;
     } catch (error) {
-      console.log("SESSION_PROVIDER]:", error);
+      console.log("[SESSION_PROVIDER]: error refreshAccessToken:", error);
     }
+    return newAccessToken;
+  };
+
+  const refreshJWT = async () => {
+    let newAccessToken = null;
+    try {
+      const deviceId = await getDeviceId();
+      const refreshToken = await getRefreshToken();
+      if (!refreshToken) {
+        console.log(
+          "[SESSION_PROVIDER]: Error, refreshJWT: no refresh token found",
+        );
+        logout();
+        return "";
+      }
+      const requestData: RefreshJWTRequestData = {
+        device_id: deviceId,
+        refresh: refreshToken,
+      };
+      const responseData: RefreshJWTResponseData = (
+        await axios.post(REFRESH_JWT_URL, requestData)
+      ).data;
+      await setRefreshToken(responseData.refresh);
+      await setAccessToken(responseData.access);
+      newAccessToken = responseData.access;
+    } catch (error) {
+      console.log("[SESSION_PROVIDER]: error refreshJWT:", error);
+    }
+    return newAccessToken;
   };
 
   const setAccessToken = async (token: string) => {
@@ -158,16 +222,34 @@ export function SessionProvider({
   };
 
   const getAccessToken = async () => {
-    let token = await SecureStore.getItemAsync("ACCESS_TOKEN");
-    if (!token) {
-      console.log("[SESSION_PROVIDER]: no access token found");
+    let accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
+    if (!accessToken) {
+      console.log(
+        "[SESSION_PROVIDER]: Error, getAccessToken: no access token found",
+      );
+      logout();
       return "";
     }
 
-    if (!token) {
+    if (!(await verifyIfAccessTokenIsValid(accessToken))) {
+      let newAccessToken = await refreshAccessToken();
+      if (newAccessToken) {
+        accessToken = newAccessToken;
+      } else {
+        newAccessToken = await refreshJWT();
+        if (newAccessToken) {
+          accessToken = newAccessToken;
+        } else {
+          console.log(
+            "[SESSION_PROVIDER]: Error, getAccessToken: failed to refresh JWT",
+          );
+          logout();
+          return "";
+        }
+      }
     }
 
-    return token;
+    return accessToken;
   };
 
   const setRefreshToken = async (token: string) => {
