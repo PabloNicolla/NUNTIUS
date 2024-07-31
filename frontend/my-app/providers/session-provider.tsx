@@ -107,8 +107,8 @@ export function SessionProvider({
 
   const logout = async () => {
     setUser(null);
-    setAccessToken("");
-    setRefreshToken("");
+    await setAccessToken("");
+    await setRefreshToken("");
     await AsyncStorage.removeItem("STORED_USER");
   };
 
@@ -196,8 +196,8 @@ export function SessionProvider({
         return "";
       }
       const requestData: RefreshJWTRequestData = {
-        device_id: deviceId,
         refresh: refreshToken,
+        device_id: deviceId,
       };
       const responseData: RefreshJWTResponseData = (
         await axios.post(REFRESH_JWT_URL, requestData)
@@ -226,20 +226,31 @@ export function SessionProvider({
     }
 
     if (!(await verifyIfAccessTokenIsValid(accessToken))) {
-      let newAccessToken = await refreshAccessToken();
+      // let newAccessToken = await refreshAccessToken();
+      // if (newAccessToken) {
+      //   accessToken = newAccessToken;
+      // } else {
+      //   newAccessToken = await refreshJWT();
+      //   if (newAccessToken) {
+      //     accessToken = newAccessToken;
+      //   } else {
+      //     console.log(
+      //       "[SESSION_PROVIDER]: Error, getAccessToken: failed to refresh JWT",
+      //     );
+      //     logout();
+      //     return "";
+      //   }
+      // }
+
+      let newAccessToken = await refreshJWT();
       if (newAccessToken) {
         accessToken = newAccessToken;
       } else {
-        newAccessToken = await refreshJWT();
-        if (newAccessToken) {
-          accessToken = newAccessToken;
-        } else {
-          console.log(
-            "[SESSION_PROVIDER]: Error, getAccessToken: failed to refresh JWT",
-          );
-          logout();
-          return "";
-        }
+        console.log(
+          "[SESSION_PROVIDER]: Error, getAccessToken: failed to refresh JWT",
+        );
+        logout();
+        return "";
       }
     }
 

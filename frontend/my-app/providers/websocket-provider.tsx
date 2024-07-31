@@ -57,7 +57,7 @@ export const WebSocketProvider: React.FC<{
         socket.current?.close();
       };
     }
-  }, []);
+  }, [user?.id]);
 
   const connect = async () => {
     if (!user) {
