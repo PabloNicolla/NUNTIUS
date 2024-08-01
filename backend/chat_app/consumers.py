@@ -58,45 +58,53 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         print("received it", text_data)
-        data = json.loads(text_data)
-        message_type = data.get('type')
+        message = json.loads(text_data)
+        message_type = message.get('type')
+        data = message.get('data')
+        receiver_id = message.get('receiver_id')
 
-        if message_type != "PRIVATE_CHAT":
+        if not message_type:
+            print("Message must have type")
+            return
+        if not receiver_id:
+            print("Message must have receiver_id")
             return
 
-        message = data.get('message')
-        receiver_id = message.get('receiverId')
+        receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
 
-        print("-------", receiver_id)
+        if not receiver_channel_name:
+            # Store in database to deliver when receiver_id gets online
+            print("Storing message in db")
+            return
 
-        if receiver_id:
-            receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
-            if receiver_channel_name:
-                await self.channel_layer.send(
-                    receiver_channel_name,
-                    {
-                        'type': 'private_message',
-                        'message': message
-                    }
-                )
+        if message_type not in ["private_chat", "private_chat_batch"]:
+            print("message_type not supported")
+            return
 
-        # if receiver_id:
-        #     receiver_group_name = f"user_{receiver_id}"
-        #     await self.channel_layer.group_send(
-        #         receiver_group_name,
-        #         {
-        #             'type': 'private_message',
-        #             'message': text_data
-        #         }
-        #     )
+        await self.channel_layer.send(
+            receiver_channel_name,
+            {
+                'type': message_type,
+                'message': data
+            }
+        )
 
-    async def private_message(self, event):
-        message = event['message']
+    async def private_chat(self, event):
+        data = event['message']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "message": message,
-            "type": "PRIVATE_CHAT"
+            "message": data,
+            "type": "private_chat"
+        }))
+
+    async def private_chat_batch(self, event):
+        data = event['message']
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({
+            "message": data,
+            "type": "private_chat_batch"
         }))
 
     async def close_connection(self, event):
