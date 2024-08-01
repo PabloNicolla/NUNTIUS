@@ -40,6 +40,7 @@ import EditMessageModal from "@/components/modals/edit-message-modal";
 import MessageItem from "@/components/chat/message-list-item";
 import DeleteMessageModal from "@/components/modals/delete-message-modal";
 import DateDivider from "@/components/chat/date-divider";
+import { Colors } from "@/constants/Colors";
 
 export type MessageItemType = Message & {
   isSelected?: boolean;
@@ -408,6 +409,7 @@ const FooterComponent = ({
               multiline={true}
               scrollEnabled={true}
               placeholder="Message"
+              placeholderTextColor={Colors[theme].text + "90"}
             ></TextInput>
           </View>
         </View>

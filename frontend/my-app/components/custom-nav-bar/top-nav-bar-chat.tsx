@@ -1,22 +1,17 @@
-import { Image, Pressable, useColorScheme, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ThemedView } from "../themed-view";
 import { router } from "expo-router";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "../themed-text";
-import { Avatar, TouchableRipple } from "react-native-paper";
-import { useAvatarModal } from "@/providers/avatarModal-provider";
+import { TouchableRipple } from "react-native-paper";
 import { useSQLiteContext } from "expo-sqlite";
-import { Contact, Message } from "@/db/schemaTypes";
-import {
-  deleteMessageById,
-  deleteMessagesByIds,
-  getFirstContact,
-  getFirstMessage,
-} from "@/db/statements";
+import { Contact } from "@/db/schemaTypes";
+import { getFirstContact, getFirstMessage } from "@/db/statements";
 import { useMessageSelection } from "@/providers/message-selection-provider";
 import { useMessageSelected } from "@/providers/message-selected-provider";
 import { useSession } from "@/providers/session-provider";
+import UserAvatar from "../profile/avatar";
 
 type Props = {
   contactId?: Contact["id"];
@@ -92,9 +87,10 @@ const TopNavBarChat = ({
         />
       </Pressable>
       {!isSelectionActive && (
-        <CustomAvatar
-          username={contact?.first_name ?? ""}
+        <UserAvatar
+          firstName={contact?.first_name ?? ""}
           imageURl={contact?.imageURL}
+          size={40}
         />
       )}
       <ThemedText className="pl-4">
@@ -143,46 +139,6 @@ const TopNavBarChat = ({
         </View>
       </View>
     </ThemedView>
-  );
-};
-
-const CustomAvatar = ({
-  username,
-  imageURl,
-}: {
-  username: string;
-  imageURl?: string;
-}) => {
-  const [imageError, setImageError] = useState(false);
-  const { showModal } = useAvatarModal();
-
-  const getInitials = (name: string) => {
-    const initials = name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("");
-    return initials.slice(0, 2).toUpperCase();
-  };
-
-  return (
-    <View>
-      <Pressable
-        onPress={() => {
-          if (imageURl) showModal(imageURl ?? "");
-        }}
-      >
-        {imageError || !imageURl ? (
-          <Avatar.Text label={getInitials(username)} size={40} />
-        ) : (
-          <Image
-            source={{ uri: imageURl }}
-            style={{ width: 40, height: 40, borderRadius: 25 }}
-            onError={() => setImageError(true)}
-            resizeMode="cover"
-          />
-        )}
-      </Pressable>
-    </View>
   );
 };
 

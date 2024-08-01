@@ -1,10 +1,10 @@
-import { Image, Pressable, useColorScheme, View } from "react-native";
-import React, { useState } from "react";
-import { Avatar, TouchableRipple } from "react-native-paper";
+import { useColorScheme, View } from "react-native";
+import React from "react";
+import { TouchableRipple } from "react-native-paper";
 import { ThemedText } from "../themed-text";
-import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { router } from "expo-router";
 import { Contact } from "@/db/schemaTypes";
+import UserAvatar from "../profile/avatar";
 
 export type ContactListItemProps = Contact;
 
@@ -37,11 +37,11 @@ const ContactListItem = React.memo(function ContactListItem({
       >
         <View className="flex-1 flex-row items-center gap-x-2 px-2">
           <View className="relative">
-            <CustomAvatar username={username} imageURl={imageURL} />
+            <UserAvatar firstName={first_name} size={50} imageURl={imageURL} />
           </View>
 
           <View className="h-[50] flex-1 flex-col">
-            <ChatDetails chatName={first_name} />
+            <ChatDetails username={username} firstName={first_name} />
           </View>
         </View>
       </TouchableRipple>
@@ -49,56 +49,31 @@ const ContactListItem = React.memo(function ContactListItem({
   );
 });
 
-const CustomAvatar = ({
+const ChatDetails = ({
   username,
-  imageURl,
+  firstName,
 }: {
   username: string;
-  imageURl?: string;
+  firstName: string;
 }) => {
-  const [imageError, setImageError] = useState(false);
-  const { showModal } = useAvatarModal();
-
-  const getInitials = (name: string) => {
-    const initials = name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("");
-    return initials.slice(0, 2).toUpperCase();
-  };
-
   return (
-    <View>
-      <Pressable
-        onPress={() => {
-          if (imageURl) showModal(imageURl ?? "");
-        }}
-      >
-        {imageError || !imageURl ? (
-          <Avatar.Text label={getInitials(username)} size={50} />
-        ) : (
-          <Image
-            source={{ uri: imageURl }}
-            style={{ width: 50, height: 50, borderRadius: 25 }}
-            onError={() => setImageError(true)}
-            resizeMode="cover"
-          />
-        )}
-      </Pressable>
-    </View>
-  );
-};
-
-const ChatDetails = ({ chatName }: { chatName: string }) => {
-  return (
-    <View className="h-1/2 w-full flex-row justify-between">
+    <View className="h-full w-full justify-between">
       <View className="flex-1 justify-center overflow-hidden">
         <ThemedText
           className="overflow-ellipsis"
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {chatName}
+          {firstName}
+        </ThemedText>
+      </View>
+      <View className="flex-1 justify-center overflow-hidden">
+        <ThemedText
+          className="overflow-ellipsis text-text-light/50 dark:text-text-dark/70"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          @{username}
         </ThemedText>
       </View>
     </View>

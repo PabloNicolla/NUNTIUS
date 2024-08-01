@@ -44,8 +44,10 @@ export const WebSocketProvider: React.FC<{
     useWebSocketController();
 
   useEffect(() => {
-    console.log("[WEB_SOCKET]: Websocket initial check");
-    console.log(connectionStatus);
+    console.log(
+      "[WEB_SOCKET]: Websocket initial check, status:",
+      connectionStatus,
+    );
     if (connectionStatus === ConnectionStatus.DISCONNECTED) {
       console.log("[WEB_SOCKET]: No socket initialized... creating one");
       changeConnectionStatus(ConnectionStatus.CONNECTING);

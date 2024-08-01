@@ -1,13 +1,12 @@
-import { Image, Pressable, useColorScheme, View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Avatar, TouchableRipple } from "react-native-paper";
+import { TouchableRipple } from "react-native-paper";
 import { useChatSelection } from "@/providers/chat-selection-provider";
 import { ThemedText } from "../themed-text";
-import { Ionicons } from "@expo/vector-icons";
-import { useAvatarModal } from "@/providers/avatarModal-provider";
 import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
 import { PrivateChatJoinContact } from "@/db/schemaTypes";
+import UserAvatar from "../profile/avatar";
 
 export type ChatListItemProps = PrivateChatJoinContact;
 
@@ -31,7 +30,7 @@ const ChatListItem = React.memo(function ChatListItem({
     selectModeHandler(id, isSelected);
   }, [isSelected, selectModeHandler, id]);
 
-  console.log("[CHAT_LIST_ITEM]: MOUNTING: %d", id);
+  console.log("[CHAT_LIST_ITEM]: MOUNTING:", id);
 
   return (
     <View className="h-[80] w-full">
@@ -59,11 +58,12 @@ const ChatListItem = React.memo(function ChatListItem({
       >
         <View className="flex-1 flex-row items-center gap-x-2 px-2">
           <View className="relative">
-            <CustomAvatar
-              username={username}
+            <UserAvatar
+              firstName={first_name}
               isSelectionActive={isSelectionActive}
               isSelected={isSelected}
               imageURl={imageURL}
+              size={50}
             />
           </View>
 
@@ -82,61 +82,6 @@ const ChatListItem = React.memo(function ChatListItem({
     </View>
   );
 });
-
-const CustomAvatar = ({
-  username,
-  isSelectionActive,
-  isSelected,
-  imageURl,
-}: {
-  username: string;
-  isSelectionActive: boolean;
-  isSelected: boolean;
-  imageURl?: string;
-}) => {
-  const [imageError, setImageError] = useState(false);
-  const { showModal } = useAvatarModal();
-
-  const getInitials = (name: string) => {
-    const initials = name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("");
-    return initials.slice(0, 2).toUpperCase();
-  };
-
-  return (
-    <View>
-      <Pressable
-        onPress={() => {
-          if (imageURl) showModal(imageURl ?? "");
-        }}
-        disabled={isSelectionActive}
-      >
-        {imageError || !imageURl ? (
-          <Avatar.Text label={getInitials(username)} size={50} />
-        ) : (
-          <Image
-            source={{ uri: imageURl }}
-            style={{ width: 50, height: 50, borderRadius: 25 }}
-            onError={() => setImageError(true)}
-            resizeMode="cover"
-          />
-        )}
-        {isSelected && (
-          <View className="absolute bottom-0 right-0 z-20 h-[20] w-[20] rounded-full bg-primary-light">
-            <Ionicons
-              name="checkmark"
-              color={"white"}
-              className="z-20"
-              size={20}
-            />
-          </View>
-        )}
-      </Pressable>
-    </View>
-  );
-};
 
 const ChatDetails = ({
   chatName,

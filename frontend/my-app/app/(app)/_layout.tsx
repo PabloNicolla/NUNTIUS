@@ -48,6 +48,7 @@ export default function AppLayout() {
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(chat)" options={{ headerShown: false }} />
+              <Stack.Screen name="(profile)" options={{ headerShown: false }} />
             </Stack>
           </AvatarModalProvider>
         </ChatSelectionProvider>
