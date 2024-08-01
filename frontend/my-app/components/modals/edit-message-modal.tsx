@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Modal,
-  Pressable,
   View,
-  Image,
   useColorScheme,
   TextInput,
   Platform,
@@ -19,13 +17,11 @@ import {
   Message,
   MessageStatus,
   MessageType,
-  ReceiverType,
 } from "@/db/schemaTypes";
 import { useSQLiteContext } from "expo-sqlite";
 import { useWebSocket } from "@/providers/websocket-provider";
 import { useSession } from "@/providers/session-provider";
 import { useMessageSelected } from "@/providers/message-selected-provider";
-import { number } from "zod";
 import {
   getFirstMessage,
   updateMessage,
@@ -180,7 +176,11 @@ const FooterComponent = ({
       if (editedMsg.senderId === editedMsg.chatId) {
         editedMsg.status = MessageStatus.SENT;
       } else {
-        sendMessage({ message: editedMsg, type: "PRIVATE_CHAT" });
+        sendMessage({
+          data: editedMsg,
+          type: "private_chat",
+          receiver_id: editedMsg.receiverId,
+        });
       }
 
       if (ret.lastInsertRowId === editedMsg.id) {

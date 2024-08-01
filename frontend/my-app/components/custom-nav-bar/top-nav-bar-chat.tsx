@@ -65,13 +65,7 @@ const TopNavBarChat = ({
   }, [contactId, db, dbPrefix]);
 
   const handleDelete = async () => {
-    const messageIds = Array.from(selectedMessages);
-    await deleteMessagesByIds(db, dbPrefix, messageIds);
-    // selectedMessages.forEach(async (messageId) => {
-    //   await deleteMessageById(db, dbPrefix, messageId);
-    // });
     deleteSelectedMessages();
-    clearSelected();
   };
 
   const handleEdit = async () => {

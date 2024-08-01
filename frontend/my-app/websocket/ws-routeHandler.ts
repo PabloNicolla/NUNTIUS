@@ -10,8 +10,11 @@ export async function routeMessage(
   dbPrefix: string,
 ) {
   switch (wsMessage.type) {
-    case "PRIVATE_CHAT":
+    case "private_chat":
       await handlePrivateMessage(wsMessage, db, dbPrefix);
+      break;
+    case "private_chat_batch":
+      console.log("batch received");
       break;
     case "GROUP_CHAT":
       handleGroupMessage(wsMessage);

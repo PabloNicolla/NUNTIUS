@@ -86,3 +86,22 @@ export const getFirstMessageBySenderRef = async (
     console.log("[STATEMENTS]: getFirstMessage", error);
   }
 };
+
+export const getMessagesByIds = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  ids: Message["id"][],
+) => {
+  try {
+    const placeholders = ids.map(() => "?").join(",");
+    const query = `
+      SELECT
+        *
+      FROM _${dbPrefix}_message 
+      WHERE id IN (${placeholders});
+    `;
+    return await db.getAllAsync<Message>(query, ids);
+  } catch (error) {
+    console.log("[STATEMENTS]: deleteMessagesByIds", error);
+  }
+};

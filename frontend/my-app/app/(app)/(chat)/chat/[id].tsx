@@ -38,6 +38,7 @@ import { useWebSocket } from "@/providers/websocket-provider";
 import React from "react";
 import EditMessageModal from "@/components/modals/edit-message-modal";
 import MessageItem from "@/components/chat/message-list-item";
+import DeleteMessageModal from "@/components/modals/delete-message-modal";
 
 export type MessageItemType = Message & {
   isSelected?: boolean;
@@ -50,6 +51,7 @@ export default function ChatScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [requestMoreMsg, setRequestMoreMsg] = useState(false);
   const [openEditMsgModal, setOpenEditMsgModal] = useState(false);
+  const [openDeleteMsgModal, setOpenDeleteMsgModal] = useState(false);
   const PAGE_LIMIT = 50;
 
   const { id: chatId, contactId, canCreateChatIfNull } = useLocalSearchParams();
@@ -82,6 +84,10 @@ export default function ChatScreen() {
   };
 
   const deleteSelectedMessages = () => {
+    setOpenDeleteMsgModal(true);
+  };
+
+  const confirmMessagesDeletion = () => {
     setMessages((prevMessages) => {
       const newMessages = prevMessages.filter((message) => {
         return !message.isSelected;
@@ -224,6 +230,16 @@ export default function ChatScreen() {
           setOpenEditMsgModal(false);
         }}
       />
+
+      <DeleteMessageModal
+        isVisible={openDeleteMsgModal}
+        onClose={() => {
+          setOpenDeleteMsgModal(false);
+        }}
+        confirmDeletion={() => {
+          confirmMessagesDeletion();
+        }}
+      />
     </ThemedView>
   );
 }
@@ -286,7 +302,11 @@ const FooterComponent = ({
       if (message.senderId === message.chatId) {
         message.status = MessageStatus.SENT;
       } else {
-        sendMessage({ message, type: "PRIVATE_CHAT" });
+        sendMessage({
+          data: message,
+          type: "private_chat",
+          receiver_id: message.receiverId,
+        });
       }
 
       await updatePrivateChatById(db, dbPrefix, {
