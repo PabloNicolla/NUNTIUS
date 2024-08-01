@@ -4,3 +4,4 @@ test.db-wal
 test.session.sql
 diagram.drawio
 webscoket.code-workspace
+test/test.json

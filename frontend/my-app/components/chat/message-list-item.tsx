@@ -54,7 +54,7 @@ const MessageItem = React.memo(function MessageItem({
       }}
     >
       <View
-        className={`max-w-[80%] items-start rounded-md${
+        className={`max-w-[80%] items-start rounded-md ${
           item.senderId === user.id
             ? "items-end bg-blue-500/40"
             : "items-start bg-gray-500/40"
@@ -66,7 +66,10 @@ const MessageItem = React.memo(function MessageItem({
               ? "[message was deleted]"
               : item.value}
           </ThemedText>
-          <ThemedText style={styles.dateText}>{formattedTime}</ThemedText>
+          <ThemedText className="text-right" style={styles.dateText}>
+            {formattedTime}{" "}
+            {item.condition === Condition.EDITED ? "edited" : ""}
+          </ThemedText>
         </View>
       </View>
     </TouchableRipple>
@@ -76,16 +79,13 @@ const MessageItem = React.memo(function MessageItem({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 8,
-    paddingTop: 8,
+    paddingTop: 4,
     position: "relative",
   },
   messageText: {
-    marginBottom: 16,
+    marginBottom: 0,
   },
   dateText: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
     fontSize: 12,
   },
 });

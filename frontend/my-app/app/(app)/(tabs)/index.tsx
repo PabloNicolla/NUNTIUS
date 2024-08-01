@@ -238,7 +238,6 @@ const HeaderComponent = ({
   handleSearch: (query: string) => void;
 }) => {
   const theme = useColorScheme() ?? "dark";
-  const { selectedChats } = useChatSelected();
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -246,7 +245,7 @@ const HeaderComponent = ({
       <View className="my-2 h-12 w-[95%] rounded-3xl bg-black/5 px-4 dark:bg-white/10">
         <Pressable
           onPress={async () => {
-            console.log(selectedChats);
+            console.log("Pressed");
           }}
           className="flex-1 flex-row items-center"
         >

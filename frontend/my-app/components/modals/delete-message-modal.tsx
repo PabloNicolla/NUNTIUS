@@ -11,6 +11,7 @@ import { deleteMessagesByIds, getMessagesByIds } from "@/db/statements";
 import { ThemedView } from "../themed-view";
 import { ThemedText } from "../themed-text";
 import { TouchableRipple } from "react-native-paper";
+import { Condition, Message } from "@/db/schemaTypes";
 
 const DeleteMessageModal = ({
   isVisible,
@@ -56,8 +57,19 @@ const DeleteMessageModal = ({
 
     await deleteMessagesByIds(db, dbPrefix, messageIds);
 
+    const messagesToDelete = messages.reduce<Message[]>((acc, msg) => {
+      if (msg.senderId === user.id) {
+        acc.push({
+          ...msg,
+          condition: Condition.DELETED,
+          value: "",
+        });
+      }
+      return acc;
+    }, []);
+
     sendMessage({
-      data: messages,
+      data: messagesToDelete,
       type: "private_chat_batch",
       receiver_id: messages[0].receiverId,
     });
