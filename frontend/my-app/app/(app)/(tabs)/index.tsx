@@ -143,7 +143,7 @@ const Header = () => {
     <ThemedView
       className={`h-[${headerHeight}] flex-row items-center justify-between px-2`}
     >
-      <ThemedText>Conversations</ThemedText>
+      <ThemedText>NUNTIUS</ThemedText>
       <View className="overflow-hidden rounded-full">
         <TouchableRipple
           onPress={async () => {
@@ -184,7 +184,7 @@ const ActionsHeaderOnSelect = () => {
       <ThemedView
         className={`h-[${headerHeight}] flex-row items-center justify-between px-2`}
       >
-        <ThemedText className="flex-grow">Conversations</ThemedText>
+        <ThemedText className="flex-grow">NUNTIUS</ThemedText>
         <View className="flex-row space-x-2">
           <View className="overflow-hidden rounded-full">
             <TouchableRipple
