@@ -86,19 +86,19 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "chat",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               color={color}
               focused={focused}
-              icon="home"
-              iconFocused="home-outline"
+              icon="chatbox-ellipses"
+              iconFocused="chatbox-ellipses-outline"
             />
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="groups"
         options={{
           title: "groups",
@@ -112,8 +112,8 @@ export default function TabsLayout() {
             />
           ),
         }}
-      />
-      <Tabs.Screen
+      /> */}
+      {/* <Tabs.Screen
         name="chat"
         options={{
           title: "chat",
@@ -127,7 +127,7 @@ export default function TabsLayout() {
             />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="profile"
         options={{
