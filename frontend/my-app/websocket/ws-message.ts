@@ -1,12 +1,19 @@
+import {
+  GET_CONTACT_URL,
+  GetContactRequestData,
+  GetContactResponseData,
+} from "@/API/get-contact";
 import { Condition, Message } from "@/db/schemaTypes";
 import {
   getFirstMessageBySenderRef,
   getFirstPrivateChat,
+  insertContact,
   insertMessage,
   insertPrivateChat,
   updateMessage,
   updatePrivateChatById,
 } from "@/db/statements";
+import axios from "axios";
 import { SQLiteDatabase } from "expo-sqlite";
 import { MutableRefObject } from "react";
 
@@ -34,9 +41,15 @@ export async function handlePrivateMessage(
     );
 
     if (!chat) {
-      // axios call get contact from backend
+      const requestData: GetContactRequestData = {
+        pk: message.senderId,
+      };
 
-      // insert contact
+      const response: GetContactResponseData = (
+        await axios.post(GET_CONTACT_URL, requestData)
+      ).data;
+
+      await insertContact(db.current, dbPrefix, response);
 
       await insertPrivateChat(db.current, dbPrefix, {
         id: message.senderId,
@@ -61,6 +74,7 @@ export async function handlePrivateMessage(
       );
     }
   } else {
+    message.chatId = message.senderId;
     await updateMessage(db.current, dbPrefix, message);
     const chat = await getFirstPrivateChat(
       db.current,
@@ -70,7 +84,7 @@ export async function handlePrivateMessage(
     const localMessage = await getFirstMessageBySenderRef(
       db.current,
       dbPrefix,
-      message.senderId,
+      message.chatId,
       message.senderReferenceId,
       message.senderId,
     );

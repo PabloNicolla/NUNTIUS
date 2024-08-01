@@ -41,3 +41,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 setattr(instance, attr, value)
         instance.save()
         return instance
+
+
+class ContactRequestSerializer(serializers.Serializer):
+    username = serializers.CharField(required=False, allow_blank=True)
+    pk = serializers.UUIDField(required=False)
+
+    def validate(self, data):
+        if not data.get('username') and not data.get('pk'):
+            raise serializers.ValidationError(
+                "Either username or pk is required.")
+        return data

@@ -1,9 +1,9 @@
 import { Contact } from "@/db/schemaTypes";
 import qs from "query-string";
 
-export type GetContactRequestData = {
-  username: string;
-};
+export type GetContactRequestData =
+  | { pk: string; username?: never }
+  | { pk?: never; username: string };
 
 export type GetContactResponseData = Contact;
 

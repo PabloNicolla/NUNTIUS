@@ -30,8 +30,6 @@ export default function RootLayout() {
     return null;
   }
 
-  console.log("root layout");
-
   return (
     <Try catch={ErrorBoundary}>
       <Suspense fallback={<SplashScreenL />}>

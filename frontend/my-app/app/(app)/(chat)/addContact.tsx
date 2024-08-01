@@ -67,8 +67,6 @@ const AddContact = (props: Props) => {
         await axios.post(GET_CONTACT_URL, requestData)
       ).data;
 
-      console.log(response);
-
       await insertContact(db, dbPrefix, response);
 
       form.reset();

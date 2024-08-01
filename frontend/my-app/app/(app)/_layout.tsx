@@ -39,8 +39,6 @@ export default function AppLayout() {
     return <Redirect href="/change_name" />;
   }
 
-  console.log("app layout");
-
   return (
     <WebSocketProvider db={db}>
       <ChatSelectedProvider>
