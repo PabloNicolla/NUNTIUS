@@ -300,7 +300,7 @@ const FooterComponent = ({
         receiverId: chat.contactId,
         senderId: user.id,
         receiverType: ReceiverType.PRIVATE_CHAT,
-        senderReferenceId: Date.now() - 10000,
+        senderReferenceId: Date.now(),
         status: MessageStatus.PENDING,
         timestamp: Date.now(),
         type: MessageType.TEXT,
