@@ -39,6 +39,7 @@ import React from "react";
 import EditMessageModal from "@/components/modals/edit-message-modal";
 import MessageItem from "@/components/chat/message-list-item";
 import DeleteMessageModal from "@/components/modals/delete-message-modal";
+import DateDivider from "@/components/chat/date-divider";
 
 export type MessageItemType = Message & {
   isSelected?: boolean;
@@ -169,7 +170,24 @@ export default function ChatScreen() {
   }, [db, chatId, dbPrefix]);
 
   const renderItem = ({ item, index }: { item: Message; index: number }) => {
-    return <MessageItem item={item} user={user} />;
+    const currentMessageDate = new Date(item.timestamp);
+    const previousMessageDate =
+      index < messages.length - 1
+        ? new Date(messages[index + 1].timestamp)
+        : null;
+
+    const showDateDivider =
+      !previousMessageDate ||
+      currentMessageDate.getDate() !== previousMessageDate.getDate() ||
+      currentMessageDate.getMonth() !== previousMessageDate.getMonth() ||
+      currentMessageDate.getFullYear() !== previousMessageDate.getFullYear();
+
+    return (
+      <View>
+        {showDateDivider && <DateDivider date={currentMessageDate} />}
+        <MessageItem item={item} user={user} />
+      </View>
+    );
   };
 
   return (
@@ -282,7 +300,7 @@ const FooterComponent = ({
         receiverId: chat.contactId,
         senderId: user.id,
         receiverType: ReceiverType.PRIVATE_CHAT,
-        senderReferenceId: Date.now(),
+        senderReferenceId: Date.now() - 10000,
         status: MessageStatus.PENDING,
         timestamp: Date.now(),
         type: MessageType.TEXT,
@@ -389,6 +407,7 @@ const FooterComponent = ({
               }}
               multiline={true}
               scrollEnabled={true}
+              placeholder="Message"
             ></TextInput>
           </View>
         </View>
