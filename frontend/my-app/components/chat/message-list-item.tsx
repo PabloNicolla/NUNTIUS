@@ -2,12 +2,13 @@ import { ThemedText } from "@/components/themed-text";
 import { Condition } from "@/db/schemaTypes";
 import { SessionUser } from "@/providers/session-provider";
 import { useEffect, useState } from "react";
-import { useColorScheme, View } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { TouchableRipple } from "react-native-paper";
 import React from "react";
 import { useMessageSelection } from "@/providers/message-selection-provider";
 import { Colors } from "@/constants/Colors";
 import { MessageItemType } from "@/app/(app)/(chat)/chat/[id]";
+import { format } from "date-fns";
 
 const MessageItem = React.memo(function MessageItem({
   item,
@@ -25,6 +26,8 @@ const MessageItem = React.memo(function MessageItem({
   }, [item.isSelected]);
 
   console.log("MMM", item.id, item.isSelected);
+
+  const formattedTime = format(new Date(item.timestamp), "HH:mm");
 
   return (
     <TouchableRipple
@@ -51,20 +54,39 @@ const MessageItem = React.memo(function MessageItem({
       }}
     >
       <View
-        className={`max-w-[80%] items-start rounded-md bg-gray-500/40 p-2 ${
+        className={`max-w-[80%] items-start rounded-md${
           item.senderId === user.id
             ? "items-end bg-blue-500/40"
             : "items-start bg-gray-500/40"
         }`}
       >
-        <ThemedText>
-          {item.condition === Condition.DELETED
-            ? "[message was deleted]"
-            : item.value}
-        </ThemedText>
+        <View style={styles.container}>
+          <ThemedText style={styles.messageText}>
+            {item.condition === Condition.DELETED
+              ? "[message was deleted]"
+              : item.value}
+          </ThemedText>
+          <ThemedText style={styles.dateText}>{formattedTime}</ThemedText>
+        </View>
       </View>
     </TouchableRipple>
   );
 });
 
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    position: "relative",
+  },
+  messageText: {
+    marginBottom: 16,
+  },
+  dateText: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    fontSize: 12,
+  },
+});
 export default MessageItem;
