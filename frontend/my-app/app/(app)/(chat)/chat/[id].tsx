@@ -258,6 +258,7 @@ export default function ChatScreen() {
         confirmDeletion={() => {
           confirmMessagesDeletion();
         }}
+        chat={chat}
       />
     </ThemedView>
   );

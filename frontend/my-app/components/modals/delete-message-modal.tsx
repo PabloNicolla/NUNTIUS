@@ -7,20 +7,32 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useWebSocket } from "@/providers/websocket-provider";
 import { useSession } from "@/providers/session-provider";
 import { useMessageSelected } from "@/providers/message-selected-provider";
-import { deleteMessagesByIds, getMessagesByIds } from "@/db/statements";
+import {
+  deleteMessagesByIds,
+  getMessagesByIds,
+  getNewestMessageByChatId,
+  updatePrivateChatById,
+} from "@/db/statements";
 import { ThemedView } from "../themed-view";
 import { ThemedText } from "../themed-text";
 import { TouchableRipple } from "react-native-paper";
-import { Condition, Message } from "@/db/schemaTypes";
+import {
+  Condition,
+  Message,
+  PrivateChat,
+  ReceiverType,
+} from "@/db/schemaTypes";
 
 const DeleteMessageModal = ({
   isVisible,
   onClose,
   confirmDeletion,
+  chat,
 }: Readonly<{
   isVisible: boolean;
   onClose: () => void;
   confirmDeletion: () => void;
+  chat: PrivateChat | null;
 }>) => {
   const theme = useColorScheme() ?? "dark";
   const db = useSQLiteContext();
@@ -38,11 +50,35 @@ const DeleteMessageModal = ({
     throw new Error("[DELETE_MESSAGE_MODAL]: ERROR: user most be logged in");
   }
 
+  const updateChatDetails = async () => {
+    if (!chat) {
+      console.log("[DELETE_MESSAGE_MODAL]: ERROR: no chat object was received");
+      return;
+    }
+    const newestMessage = await getNewestMessageByChatId(
+      db,
+      dbPrefix,
+      chat.id,
+      ReceiverType.PRIVATE_CHAT,
+    );
+    if (!newestMessage) {
+      console.log("[DELETE_MESSAGE_MODAL]: chat is empty");
+    }
+    await updatePrivateChatById(db, dbPrefix, {
+      contactId: chat.contactId,
+      id: chat.id,
+      lastMessageId: newestMessage?.id,
+      lastMessageTimestamp: newestMessage?.timestamp,
+      lastMessageValue: newestMessage?.value,
+    });
+  };
+
   const deleteForMe = async () => {
     const messageIds = Array.from(selectedMessages);
     await deleteMessagesByIds(db, dbPrefix, messageIds);
     confirmDeletion();
     clearSelected();
+    await updateChatDetails();
     onClose();
   };
   const deleteForEveryone = async () => {
@@ -76,6 +112,7 @@ const DeleteMessageModal = ({
 
     confirmDeletion();
     clearSelected();
+    await updateChatDetails();
     onClose();
   };
 
