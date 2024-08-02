@@ -22,9 +22,18 @@ export type Ws_private_chat = {
 };
 
 export type Ws_private_chat_status = {
-  data: { message: Message; status: "RECEIVED" | "SENT" };
+  data:
+    | {
+        message: Message[];
+        status: "RECEIVED" | "SENT";
+        message_type: "private_chat_batch";
+      }
+    | {
+        message: Message;
+        status: "RECEIVED" | "SENT";
+        message_type: "private_chat";
+      };
   type: "private_chat_status";
-  // receiver_id: string;
 };
 
 export type Ws_private_chat_batch = {

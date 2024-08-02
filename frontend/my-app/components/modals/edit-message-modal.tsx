@@ -204,7 +204,7 @@ const FooterComponent = ({
   };
 
   return (
-    <View className="flex-row">
+    <View className="mt-2 flex-row">
       <View className="mx-2 mb-2 justify-end overflow-hidden rounded-full">
         <TouchableRipple
           className="rounded-full bg-primary-light/50 p-3 dark:bg-primary-light"

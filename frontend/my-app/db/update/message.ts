@@ -52,3 +52,32 @@ export const updateMessageStatus = async (
     console.log("[STATEMENTS]: updateMessage", error);
   }
 };
+
+export const updateMessagesStatusBulk = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  messages: Message[],
+) => {
+  const updateQueries = messages.map((message) => {
+    return db.runAsync(
+      `UPDATE _${dbPrefix}_message
+          SET
+            status = $status,
+            condition = $condition
+          WHERE
+            id = $id;
+            `,
+      {
+        $status: message.status,
+        $condition: message.condition,
+        $id: message.id,
+      },
+    );
+  });
+
+  try {
+    await Promise.all(updateQueries);
+  } catch (error) {
+    console.log("[STATEMENTS]: updateMessagesBulk", error);
+  }
+};

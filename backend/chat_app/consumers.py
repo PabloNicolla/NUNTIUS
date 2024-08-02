@@ -107,7 +107,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'type': message_type,
                         'receiver_id': receiver_id,
                         'sender_id': sender_id,
-                        'confirmation_id': confirmation_id
+                        'confirmation_id': confirmation_id,
                     }
                 )
             return
@@ -165,16 +165,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def private_chat_status(self, event):
         data = event['data']
+        message_type = 'private_chat'
+        receiver_id = event['receiver_id']
+        sender_id = event['sender_id']
         status = event['status']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "data": {"message": data, "status": status},
-            "type": "private_chat_status"
+            'data': {'message': data, 'status': status, 'message_type': message_type},
+            'receiver_id': receiver_id,
+            'sender_id': sender_id,
+            'type': 'private_chat_status'
         }))
 
     async def private_chat_batch(self, event):
-        data = event['message']
+        data = event['data']
+        message_type = 'private_chat_batch'
+        receiver_id = event['receiver_id']
+        sender_id = event['sender_id']
+        confirmation_id = event['confirmation_id']
 
         current_time_js_format = int(time.time() * 1000)
         for message in data:
@@ -182,8 +191,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "data": data,
-            "type": "private_chat_batch"
+            'data': data,
+            'type': message_type,
+            'receiver_id': receiver_id,
+            'sender_id': sender_id,
+            'confirmation_id': confirmation_id
         }))
 
     async def close_connection(self, event):
