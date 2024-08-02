@@ -43,7 +43,7 @@ export const getAllMessagesByChatIdWithPagination = async (
         WHERE 
           $chatId = chatId
           AND $receiverType = receiverType 
-        ${sort ? "ORDER BY timestamp DESC" : ""}
+          ${sort ? "ORDER BY timestamp DESC, senderReferenceId DESC" : ""}
         LIMIT $limit
         OFFSET $offset;
         `,
@@ -103,5 +103,31 @@ export const getMessagesByIds = async (
     return await db.getAllAsync<Message>(query, ids);
   } catch (error) {
     console.log("[STATEMENTS]: deleteMessagesByIds", error);
+  }
+};
+
+export const getNewestMessageByChatId = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  chatId: PrivateChat["id"],
+  receiverType: ReceiverType,
+) => {
+  try {
+    return await db.getFirstAsync<Message>(
+      `
+        SELECT *
+        FROM _${dbPrefix}_message
+        WHERE 
+          $chatId = chatId
+          AND $receiverType = receiverType
+        ORDER BY timestamp DESC, senderReferenceId DESC
+        `,
+      {
+        $chatId: chatId,
+        $receiverType: receiverType,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: getNewestMessageByChatId", error);
   }
 };
