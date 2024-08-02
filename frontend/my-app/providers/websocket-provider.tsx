@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { useSession } from "./session-provider";
@@ -14,6 +15,7 @@ import {
   ConnectionStatus,
   useWebSocketController,
 } from "./ws-controller-provider";
+import { SendWsMessage } from "@/websocket/ws-types";
 
 type WebSocketContextType = {
   sendMessage: (message: any) => void;
@@ -43,17 +45,25 @@ export const WebSocketProvider: React.FC<{
   const { changeConnectionStatus, changeSocket, connectionStatus, socket } =
     useWebSocketController();
 
+  const connectionStatusRef = useRef(connectionStatus);
+
+  useEffect(() => {
+    connectionStatusRef.current = connectionStatus;
+  }, [connectionStatus]);
+
   useEffect(() => {
     console.log(
       "[WEB_SOCKET]: Websocket initial check, status:",
-      connectionStatus,
+      connectionStatusRef.current,
     );
-    if (connectionStatus === ConnectionStatus.DISCONNECTED) {
+    if (connectionStatusRef.current === ConnectionStatus.DISCONNECTED) {
       console.log("[WEB_SOCKET]: No socket initialized... creating one");
       changeConnectionStatus(ConnectionStatus.CONNECTING);
       connect();
     }
   }, [connectionStatus]);
+
+  // Use a ref to keep track of the latest connectionStatus
 
   const connect = async () => {
     let socket: null | WebSocket = null;
@@ -91,7 +101,7 @@ export const WebSocketProvider: React.FC<{
 
       socket.onclose = () => {
         console.log("[WEB_SOCKET]: Disconnected");
-        if (connectionStatus !== ConnectionStatus.DISCONNECTED) {
+        if (connectionStatusRef.current !== ConnectionStatus.DISCONNECTED) {
           changeConnectionStatus(ConnectionStatus.RECONNECTING);
           retryConnection();
         }
@@ -106,8 +116,8 @@ export const WebSocketProvider: React.FC<{
 
       socket.onmessage = async (event) => {
         const wsMessage = JSON.parse(event.data);
-        await routeMessage(wsMessage, db, dbPrefix);
         console.log("[WEB_SOCKET]: Message received: ", wsMessage);
+        await routeMessage(wsMessage, db, dbPrefix);
       };
     } catch (error) {
       console.error("[WEB_SOCKET]: Connection error: ", error);
@@ -118,7 +128,7 @@ export const WebSocketProvider: React.FC<{
   };
 
   const sendMessage = useCallback(
-    (message: any) => {
+    (message: SendWsMessage) => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         console.log("[WEB_SOCKET]: Message sent: ", message);
         socket.send(JSON.stringify(message));
@@ -132,16 +142,18 @@ export const WebSocketProvider: React.FC<{
   const retryConnection = () => {
     const retryInterval = 5000;
     const checkNetworkAndReconnect = () => {
+      console.log("[WEB_SOCKET]: Reconnecting Loop");
       NetInfo.fetch().then((state) => {
         if (state.isConnected) {
-          console.log("[WEB_SOCKET]: Reconnecting");
-          connect();
+          if (connectionStatusRef.current === ConnectionStatus.RECONNECTING) {
+            console.log("[WEB_SOCKET]: Reconnecting");
+            connect();
+          }
         } else {
           setTimeout(checkNetworkAndReconnect, retryInterval);
         }
       });
     };
-
     setTimeout(checkNetworkAndReconnect, retryInterval);
   };
 
@@ -149,7 +161,10 @@ export const WebSocketProvider: React.FC<{
     const retryInterval = 5000;
     const checkNetworkAndReconnect = () => {
       NetInfo.fetch().then((state) => {
-        if (state.isConnected) {
+        if (
+          state.isConnected &&
+          connectionStatusRef.current === ConnectionStatus.CONNECTING
+        ) {
           console.log("[WEB_SOCKET]: Getting user/token");
           connect();
         } else {
