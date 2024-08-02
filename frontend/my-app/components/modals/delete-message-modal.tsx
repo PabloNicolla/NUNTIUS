@@ -108,6 +108,7 @@ const DeleteMessageModal = ({
       data: messagesToDelete,
       type: "private_chat_batch",
       receiver_id: messages[0].receiverId,
+      sender_id: user.id,
     });
 
     confirmDeletion();

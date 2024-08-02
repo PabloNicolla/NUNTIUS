@@ -41,6 +41,10 @@ import MessageItem from "@/components/chat/message-list-item";
 import DeleteMessageModal from "@/components/modals/delete-message-modal";
 import DateDivider from "@/components/chat/date-divider";
 import { Colors } from "@/constants/Colors";
+import {
+  ConnectionStatus,
+  useWebSocketController,
+} from "@/providers/ws-controller-provider";
 
 export type MessageItemType = Message & {
   isSelected?: boolean;
@@ -281,6 +285,7 @@ const FooterComponent = ({
   contactId: Contact["id"];
   setChat: (chat: PrivateChat | null) => void;
 }) => {
+  const { connectionStatus } = useWebSocketController();
   const { user, getDbPrefix } = useSession();
   const theme = useColorScheme() ?? "dark";
   const [messageValue, setMessageValue] = useState("");
@@ -314,6 +319,11 @@ const FooterComponent = ({
         type: MessageType.TEXT,
         value: messageValue,
       };
+
+      if (message.senderId === message.chatId) {
+        message.status = MessageStatus.SENT;
+      }
+
       const ret = await insertMessage(db, dbPrefix, message);
 
       if (!ret) {
@@ -323,16 +333,18 @@ const FooterComponent = ({
       }
 
       message.id = ret.lastInsertRowId;
-      // message.senderReferenceId = ret.lastInsertRowId;
 
-      if (message.senderId === message.chatId) {
-        message.status = MessageStatus.SENT;
-      } else {
-        sendMessage({
-          data: message,
-          type: "private_chat",
-          receiver_id: message.receiverId,
-        });
+      if (message.senderId !== message.chatId) {
+        if (connectionStatus === ConnectionStatus.CONNECTED) {
+          sendMessage({
+            data: message,
+            type: "private_chat",
+            receiver_id: message.receiverId,
+            sender_id: message.senderId,
+          });
+        } else {
+          console.log("[CHAT_SCREEN]: Message stored in db for later delivery");
+        }
       }
 
       await updatePrivateChatById(db, dbPrefix, {

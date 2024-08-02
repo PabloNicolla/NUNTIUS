@@ -38,6 +38,10 @@ export async function handlePrivateMessageBatch(
       case Condition.EDITED:
         await updateMessage(db.current, dbPrefix, message);
         break;
+      default:
+        console.log(
+          "[HANDLE_PRIVATE_MESSAGE_BATCH]: Error invalid message condition",
+        );
     }
   }
 

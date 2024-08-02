@@ -27,3 +27,28 @@ export const updateMessage = async (
     console.log("[STATEMENTS]: updateMessage", error);
   }
 };
+
+export const updateMessageStatus = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  message: Message,
+) => {
+  try {
+    return await db.runAsync(
+      `UPDATE _${dbPrefix}_message
+          SET
+            status = $status,
+            condition = $condition
+          WHERE
+            id = $id;
+            `,
+      {
+        $status: message.status,
+        $condition: message.condition,
+        $id: message.id,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: updateMessage", error);
+  }
+};

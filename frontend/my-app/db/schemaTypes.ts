@@ -49,6 +49,7 @@ export enum Condition {
   NORMAL,
   DELETED,
   EDITED,
+  STATUS_CHANGED,
 }
 
 export type Message = {

@@ -18,7 +18,7 @@ import {
 import { SendWsMessage } from "@/websocket/ws-types";
 
 type WebSocketContextType = {
-  sendMessage: (message: any) => void;
+  sendMessage: (message: SendWsMessage) => void;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(

@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { Condition } from "@/db/schemaTypes";
+import { Condition, MessageStatus } from "@/db/schemaTypes";
 import { SessionUser } from "@/providers/session-provider";
 import { useEffect, useState } from "react";
 import { StyleSheet, useColorScheme, View } from "react-native";
@@ -9,6 +9,7 @@ import { useMessageSelection } from "@/providers/message-selection-provider";
 import { Colors } from "@/constants/Colors";
 import { MessageItemType } from "@/app/(app)/(chat)/chat/[id]";
 import { format } from "date-fns";
+import { Ionicons } from "@expo/vector-icons";
 
 const MessageItem = React.memo(function MessageItem({
   item,
@@ -71,12 +72,38 @@ const MessageItem = React.memo(function MessageItem({
           </ThemedText>
           <ThemedText className="text-right text-xs">
             {formattedTime}{" "}
-            {item.condition === Condition.EDITED ? "edited" : ""}
+            {item.condition === Condition.EDITED ? "edited" : ""}{" "}
+            {item.senderId === user.id && (
+              <MessageStatusIcon status={item.status} />
+            )}
           </ThemedText>
         </View>
       </View>
     </TouchableRipple>
   );
 });
+
+const MessageStatusIcon = ({ status }: { status: MessageStatus }) => {
+  const theme = useColorScheme() ?? "dark";
+  let icon: keyof typeof Ionicons.glyphMap;
+  let color = null;
+  switch (status) {
+    case MessageStatus.PENDING:
+      icon = "ellipsis-horizontal-outline";
+      break;
+    case MessageStatus.SENT:
+      icon = "checkmark-outline";
+      break;
+    case MessageStatus.RECEIVED:
+      icon = "checkmark-done-outline";
+      break;
+    case MessageStatus.READ:
+      icon = "checkmark-done-outline";
+      color = "#00ff00";
+      break;
+  }
+
+  return <Ionicons name={icon} size={10} color={color || Colors[theme].text} />;
+};
 
 export default MessageItem;

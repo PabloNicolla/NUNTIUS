@@ -113,7 +113,11 @@ const EditMessageModal = ({
               className="w-full pt-4"
             >
               <View>
-                <MessageItem item={message} user={user} />
+                <MessageItem
+                  item={message}
+                  user={user}
+                  previousMessageSender={null}
+                />
               </View>
               <FooterComponent
                 message={message}
@@ -180,6 +184,7 @@ const FooterComponent = ({
           data: editedMsg,
           type: "private_chat",
           receiver_id: editedMsg.receiverId,
+          sender_id: editedMsg.senderId,
         });
       }
 

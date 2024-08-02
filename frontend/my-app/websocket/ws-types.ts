@@ -4,21 +4,28 @@ export type SendWsMessage = {
   data: any;
   type: "private_chat_batch" | "private_chat";
   receiver_id: string;
+  sender_id: string;
 };
 
 export type ReceiveWsMessage = {
   data: any;
-  type: "private_chat_batch" | "private_chat";
+  type: "private_chat_batch" | "private_chat" | "private_chat_status";
 };
 
 export type Ws_private_chat = {
   data: Message;
   type: "private_chat";
-  receiver_id: string;
+  // receiver_id: string;
+};
+
+export type Ws_private_chat_status = {
+  data: { message: Message; status: "RECEIVED" | "SENT" };
+  type: "private_chat_status";
+  // receiver_id: string;
 };
 
 export type Ws_private_chat_batch = {
   data: Message[];
   type: "private_chat_batch";
-  receiver_id: string;
+  // receiver_id: string;
 };

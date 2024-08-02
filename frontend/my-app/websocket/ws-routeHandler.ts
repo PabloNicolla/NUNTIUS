@@ -6,7 +6,9 @@ import {
   Ws_private_chat,
   Ws_private_chat_batch,
   ReceiveWsMessage,
+  Ws_private_chat_status,
 } from "./ws-types";
+import { handlePrivateMessageStatus } from "./ws-private_chat_status";
 
 export async function routeMessage(
   wsMessage: ReceiveWsMessage,
@@ -20,6 +22,13 @@ export async function routeMessage(
     case "private_chat_batch":
       await handlePrivateMessageBatch(
         wsMessage as Ws_private_chat_batch,
+        db,
+        dbPrefix,
+      );
+      break;
+    case "private_chat_status":
+      await handlePrivateMessageStatus(
+        wsMessage as Ws_private_chat_status,
         db,
         dbPrefix,
       );
