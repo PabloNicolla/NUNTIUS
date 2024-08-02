@@ -15,7 +15,7 @@ import {
   ConnectionStatus,
   useWebSocketController,
 } from "./ws-controller-provider";
-import { SendWsMessage } from "@/websocket/ws-types";
+import { ReceiveWsMessage, SendWsMessage } from "@/websocket/ws-types";
 
 type WebSocketContextType = {
   sendMessage: (message: SendWsMessage) => void;
@@ -115,7 +115,16 @@ export const WebSocketProvider: React.FC<{
       };
 
       socket.onmessage = async (event) => {
-        const wsMessage = JSON.parse(event.data);
+        const wsMessage: ReceiveWsMessage = JSON.parse(event.data);
+        if (wsMessage.confirmation_id) {
+          sendMessage({
+            data: wsMessage.data,
+            receiver_id: wsMessage.receiver_id,
+            sender_id: wsMessage.sender_id,
+            type: "private_chat_confirmation",
+            confirmation_id: wsMessage.confirmation_id,
+          });
+        }
         console.log("[WEB_SOCKET]: Message received: ", wsMessage);
         await routeMessage(wsMessage, db, dbPrefix);
       };

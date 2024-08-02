@@ -5,6 +5,8 @@ from channels.layers import get_channel_layer
 import json
 import redis
 import time
+import uuid
+from .models import ChatMessage
 
 # Initialize the Redis connection
 redis_instance = redis.StrictRedis(host='localhost', port=6379, db=0)
@@ -60,6 +62,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("received it", text_data)
         message = json.loads(text_data)
+
         message_type = message.get('type')
         data = message.get('data')
         receiver_id = message.get('receiver_id')
@@ -74,61 +77,91 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not sender_id:
             print("Message must have sender_id")
             return
-        if message_type not in ["private_chat", "private_chat_batch"]:
+        if message_type not in ["private_chat", "private_chat_batch", "private_chat_confirmation"]:
             print("message_type not supported")
             return
 
-        receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
-
-        if not receiver_channel_name:
+        if message_type in ["private_chat", "private_chat_batch"]:
             # Store in database to deliver when receiver_id gets online
-            print("Storing message in db")
+            confirmation_id = str(await self.save_message(sender_id, receiver_id, data))
+            print("Storing message in db", confirmation_id)
 
-            # Reply status to sender
             sender_channel_name = await self.get_channel_name_for_user(sender_id)
             await self.channel_layer.send(
                 sender_channel_name,
                 {
-                    "data": data,
-                    'type': "private_chat_status",
-                    'status': "SENT",
+                    'data': data,
+                    'type': 'private_chat_status',
+                    'status': 'SENT',
+                    'receiver_id': receiver_id,
+                    'sender_id': sender_id
+                }
+            )
+
+            receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
+
+            await self.channel_layer.send(
+                receiver_channel_name,
+                {
+                    'data': data,
+                    'type': message_type,
+                    'receiver_id': receiver_id,
+                    'sender_id': sender_id,
+                    'confirmation_id': confirmation_id
                 }
             )
             return
 
-        await self.channel_layer.send(
-            receiver_channel_name,
-            {
-                'type': message_type,
-                'message': data,
-                'sender_id': sender_id
-            }
-        )
+        if message_type in ["private_chat_confirmation"]:
+            confirmation_id = message.get('confirmation_id')
+            og_sender_channel_name = await self.get_channel_name_for_user(sender_id)
+            if not og_sender_channel_name:
+                print("no og_sender_channel_name found")
+                return
+
+            await self.channel_layer.send(
+                og_sender_channel_name,
+                {
+                    'data': data,
+                    'type': 'private_chat_status',
+                    'status': 'RECEIVED',
+                    'receiver_id': receiver_id,
+                    'sender_id': sender_id
+                }
+            )
+
+            await self.delete_message(confirmation_id)
 
     async def private_chat(self, event):
-        data = event['message']
+        data = event['data']
+        message_type = 'private_chat'
+        receiver_id = event['receiver_id']
         sender_id = event['sender_id']
+        confirmation_id = event['confirmation_id']
 
-        sender_channel_name = await self.get_channel_name_for_user(sender_id)
+        # sender_channel_name = await self.get_channel_name_for_user(sender_id)
 
         current_time_js_format = int(time.time() * 1000)
         data['timestamp'] = current_time_js_format
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "data": data,
-            "type": "private_chat"
+            'data': data,
+            'type': message_type,
+            'receiver_id': receiver_id,
+            'sender_id': sender_id,
+            'confirmation_id': confirmation_id
         }))
 
         # Reply status to sender
-        await self.channel_layer.send(
-            sender_channel_name,
-            {
-                "data": data,
-                'type': "private_chat_status",
-                'status': "RECEIVED",
-            }
-        )
+        # await self.channel_layer.send(
+        #     sender_channel_name,
+        #     {
+        #         "data": data,
+        #         'type': "private_chat_status",
+        #         'status': "RECEIVED",
+        #     }
+        # )
 
     async def private_chat_status(self, event):
         data = event['data']
@@ -176,3 +209,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Get the channel name for the given user from Redis
         user_key = f"user_{user_id}"
         return redis_instance.get(user_key).decode('utf-8') if redis_instance.get(user_key) else None
+
+    @database_sync_to_async
+    def save_message(self, sender_id, receiver_id, data):
+        message = ChatMessage.objects.create(
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            message=data
+        )
+        return message.id  # Return the UUID of the created message
+
+    @database_sync_to_async
+    def delete_message(self, message_id):
+        try:
+            message = ChatMessage.objects.get(id=message_id)
+            message.delete()
+            return True
+        except ChatMessage.DoesNotExist:
+            return False
+
+    @database_sync_to_async
+    def get_message(self, message_id):
+        try:
+            message = ChatMessage.objects.get(id=message_id)
+            return {
+                'id': message.id,
+                'sender_id': message.sender_id,
+                'receiver_id': message.receiver_id,
+                'message': message.message,
+                'timestamp': message.timestamp,
+            }
+        except ChatMessage.DoesNotExist:
+            return None
