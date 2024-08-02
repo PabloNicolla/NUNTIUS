@@ -99,17 +99,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
             receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
-
-            await self.channel_layer.send(
-                receiver_channel_name,
-                {
-                    'data': data,
-                    'type': message_type,
-                    'receiver_id': receiver_id,
-                    'sender_id': sender_id,
-                    'confirmation_id': confirmation_id
-                }
-            )
+            if receiver_channel_name:
+                await self.channel_layer.send(
+                    receiver_channel_name,
+                    {
+                        'data': data,
+                        'type': message_type,
+                        'receiver_id': receiver_id,
+                        'sender_id': sender_id,
+                        'confirmation_id': confirmation_id
+                    }
+                )
             return
 
         if message_type in ["private_chat_confirmation"]:
