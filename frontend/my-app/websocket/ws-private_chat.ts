@@ -3,7 +3,7 @@ import {
   GetContactRequestData,
   GetContactResponseData,
 } from "@/API/get-contact";
-import { Condition, Message } from "@/db/schemaTypes";
+import { Condition } from "@/db/schemaTypes";
 import {
   getFirstMessageBySenderRef,
   getFirstPrivateChat,
@@ -16,16 +16,16 @@ import {
 import axios from "axios";
 import { SQLiteDatabase } from "expo-sqlite";
 import { MutableRefObject } from "react";
+import { Ws_private_chat } from "./ws-types";
 
 export async function handlePrivateMessage(
-  wsMessage: { message: Message; type: string },
+  wsMessage: Ws_private_chat,
   db: MutableRefObject<SQLiteDatabase>,
   dbPrefix: string,
 ) {
-  const message: Message = wsMessage.message;
+  const message = wsMessage.data;
 
-  if (message.condition === Condition.NORMAL) {
-    message.timestamp = Date.now();
+  const handleNormal = async () => {
     message.chatId = message.senderId;
 
     const msgOutcome = await insertMessage(db.current, dbPrefix, message);
@@ -70,10 +70,12 @@ export async function handlePrivateMessage(
           lastMessageTimestamp: message.timestamp,
           lastMessageValue: message.value,
         },
-        true,
+        1,
       );
     }
-  } else {
+  };
+
+  const handleEditOrDelete = async () => {
     message.chatId = message.senderId;
     await updateMessage(db.current, dbPrefix, message);
     const chat = await getFirstPrivateChat(
@@ -91,26 +93,24 @@ export async function handlePrivateMessage(
 
     if (!localMessage) {
       console.log(
-        "[handlePrivateMessage]: ERROR localMessage is could not be found",
+        "[HANDLE_PRIVATE_MESSAGE]: ERROR localMessage is could not be found",
       );
     }
 
     if (chat?.lastMessageId === localMessage?.id) {
-      await updatePrivateChatById(
-        db.current,
-        dbPrefix,
-        {
-          contactId: message.senderId,
-          id: message.chatId,
-          lastMessageId: localMessage!.id,
-          lastMessageTimestamp: localMessage!.timestamp,
-          lastMessageValue: localMessage!.value,
-        },
-        false,
-      );
+      await updatePrivateChatById(db.current, dbPrefix, {
+        contactId: message.senderId,
+        id: message.chatId,
+        lastMessageId: localMessage!.id,
+        lastMessageTimestamp: localMessage!.timestamp,
+        lastMessageValue: localMessage!.value,
+      });
     }
+  };
+
+  if (message.condition === Condition.NORMAL) {
+    await handleNormal();
+  } else {
+    await handleEditOrDelete();
   }
 }
-export function handleGroupMessage(message: any) {}
-export function handleStatusUpdate(message: any) {}
-export function handleAcknowledgment(message: any) {}
