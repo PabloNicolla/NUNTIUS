@@ -60,13 +60,13 @@ const MessageItem = React.memo(function MessageItem({
             : "items-start bg-gray-500/40"
         }`}
       >
-        <View style={styles.container}>
-          <ThemedText style={styles.messageText}>
+        <View className="px-2 pt-1">
+          <ThemedText>
             {item.condition === Condition.DELETED
               ? "[message was deleted]"
               : item.value}
           </ThemedText>
-          <ThemedText className="text-right" style={styles.dateText}>
+          <ThemedText className="text-right text-xs">
             {formattedTime}{" "}
             {item.condition === Condition.EDITED ? "edited" : ""}
           </ThemedText>
@@ -76,17 +76,4 @@ const MessageItem = React.memo(function MessageItem({
   );
 });
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 8,
-    paddingTop: 4,
-    position: "relative",
-  },
-  messageText: {
-    marginBottom: 0,
-  },
-  dateText: {
-    fontSize: 12,
-  },
-});
 export default MessageItem;
