@@ -1,12 +1,14 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, useColorScheme } from "react-native";
 import { format } from "date-fns";
+import { Colors } from "@/constants/Colors";
 
 type DateDividerProps = {
   date: Date;
 };
 
 const DateDivider: React.FC<DateDividerProps> = ({ date }) => {
+  const theme = useColorScheme() ?? "dark";
   const isOlderThanOneYear = (date: Date) => {
     const now = new Date();
     const oneYearAgo = new Date(
@@ -22,8 +24,10 @@ const DateDivider: React.FC<DateDividerProps> = ({ date }) => {
     : format(date, "dd-MMMM");
 
   return (
-    <View style={{ padding: 10, alignItems: "center" }}>
-      <Text style={{ fontSize: 14, color: "grey" }}>{formattedDate}</Text>
+    <View className="items-center p-2">
+      <Text className="rounded-full p-1 text-sm" style={{ color: "grey" }}>
+        {formattedDate}
+      </Text>
     </View>
   );
 };

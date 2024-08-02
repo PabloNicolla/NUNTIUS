@@ -13,9 +13,11 @@ import { format } from "date-fns";
 const MessageItem = React.memo(function MessageItem({
   item,
   user,
+  previousMessageSender,
 }: {
   item: MessageItemType;
   user: SessionUser;
+  previousMessageSender: string | null;
 }) {
   const theme = useColorScheme() ?? "dark";
   const [isSelected, setIsSelected] = useState(item.isSelected);
@@ -46,11 +48,12 @@ const MessageItem = React.memo(function MessageItem({
       rippleColor={
         theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
       }
-      className={`mb-4 ${item.senderId === user.id ? "items-end" : "items-start"}`}
+      className={`${item.senderId === user.id ? "items-end" : "items-start"}`}
       style={{
         backgroundColor: isSelected
           ? Colors[theme].primary + "40"
           : "#00000000",
+        marginTop: previousMessageSender === item.senderId ? 4 : 12,
       }}
     >
       <View

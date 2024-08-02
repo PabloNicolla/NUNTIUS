@@ -183,10 +183,16 @@ export default function ChatScreen() {
       currentMessageDate.getMonth() !== previousMessageDate.getMonth() ||
       currentMessageDate.getFullYear() !== previousMessageDate.getFullYear();
 
+    const previousMessageSender =
+      index < messages.length - 1 ? messages[index + 1].senderId : null;
     return (
       <View>
         {showDateDivider && <DateDivider date={currentMessageDate} />}
-        <MessageItem item={item} user={user} />
+        <MessageItem
+          item={item}
+          user={user}
+          previousMessageSender={previousMessageSender}
+        />
       </View>
     );
   };
@@ -342,7 +348,7 @@ const FooterComponent = ({
   };
 
   return (
-    <View className="flex-row">
+    <View className="mt-2 flex-row">
       <View className="mx-2 mb-2 justify-end overflow-hidden rounded-full">
         <TouchableRipple
           className="rounded-full bg-primary-light/50 p-3 dark:bg-primary-light"
