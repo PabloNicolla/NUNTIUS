@@ -5,7 +5,7 @@ export const updatePrivateChatById = async (
   db: SQLiteDatabase,
   dbPrefix: string,
   chat: PrivateChat,
-  updateNotificationCount?: boolean,
+  updateNotificationCount?: number,
 ) => {
   try {
     if (!chat.lastMessageId || !chat.lastMessageTimestamp) {
@@ -22,7 +22,7 @@ export const updatePrivateChatById = async (
                 lastMessageId = $lastMessageId,
                 lastMessageValue = $lastMessageValue,
                 lastMessageTimestamp = $lastMessageTimestamp,
-                notificationCount = COALESCE(notificationCount, 0) + 1
+                notificationCount = COALESCE(notificationCount, 0) + $notificationCount
               WHERE
                 id = $id;
             `,
@@ -30,6 +30,7 @@ export const updatePrivateChatById = async (
           $lastMessageId: chat.lastMessageId,
           $lastMessageValue: chat.lastMessageValue ?? "Something went wrong",
           $lastMessageTimestamp: chat.lastMessageTimestamp,
+          $notificationCount: updateNotificationCount,
           $id: chat.id,
         },
       );
