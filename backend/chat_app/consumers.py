@@ -4,6 +4,7 @@ from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 import json
 import redis
+import time
 
 # Initialize the Redis connection
 redis_instance = redis.StrictRedis(host='localhost', port=6379, db=0)
@@ -92,18 +93,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def private_chat(self, event):
         data = event['message']
 
+        current_time_js_format = int(time.time() * 1000)
+        data['timestamp'] = current_time_js_format
+
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "message": data,
+            "data": data,
             "type": "private_chat"
         }))
 
     async def private_chat_batch(self, event):
         data = event['message']
 
+        current_time_js_format = int(time.time() * 1000)
+        for message in data:
+            message['timestamp'] = current_time_js_format
+
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "message": data,
+            "data": data,
             "type": "private_chat_batch"
         }))
 
