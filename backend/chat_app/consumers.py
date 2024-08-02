@@ -83,6 +83,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not receiver_channel_name:
             # Store in database to deliver when receiver_id gets online
             print("Storing message in db")
+
+            # Reply status to sender
+            sender_channel_name = await self.get_channel_name_for_user(sender_id)
+            await self.channel_layer.send(
+                sender_channel_name,
+                {
+                    "data": data,
+                    'type': "private_chat_status",
+                    'status': "SENT",
+                }
+            )
             return
 
         await self.channel_layer.send(
