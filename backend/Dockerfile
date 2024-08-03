@@ -1,0 +1,71 @@
+# backend/Dockerfile
+
+# Stage 1: Build stage
+FROM python:3.10-slim AS builder
+
+# Set work directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+
+
+
+
+# Stage 2: Runtime stage
+FROM python:3.10-slim
+
+# Create a non-root user
+RUN useradd -m myuser
+
+# Set work directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SETTINGS_MODULE core.settings
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
+
+
+# Copy wheel files from builder
+COPY --from=builder /app/wheels /wheels
+
+# Install Python dependencies
+RUN pip install --no-cache /wheels/*
+
+# Copy project files
+COPY . .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Change ownership of the app directory to myuser
+RUN chown -R myuser:myuser /app
+
+# Switch to non-root user
+USER myuser
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Run the application
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "core.asgi:application"]

@@ -26,6 +26,9 @@ npx eslint .
 
 ## Backend
 
+pip install -r requirements.txt
+
+
 ```sh
 django-admin startproject <>
 python manage.py runserver

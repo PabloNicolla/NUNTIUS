@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres-db:
     image: postgres:16.3
@@ -15,21 +17,6 @@ services:
     networks:
       - app-network
 
-  pgadmin:
-    image: dpage/pgadmin4:8.9
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
-      PGADMIN_DEFAULT_PASSWORD: password
-      PGADMIN_LISTEN_PORT: 80
-    ports:
-      - 15432:80
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-    depends_on:
-      - postgres-db
-    networks:
-      - app-network
-
   redis:
     image: redis:latest
     restart: always
@@ -38,22 +25,32 @@ services:
     networks:
       - app-network
 
-  # web:
-  #   build: .
-  #   command: daphne -b 0.0.0.0 -p 8000 core.asgi:application
-  #   volumes:
-  #     - ./testing_bk/core:/app
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - postgres-db
-  #     - redis
-  #   networks:
-  #     - app-network
+  web:
+    build: ./backend/
+    command: daphne -b 0.0.0.0 -p 8000 core.asgi:application
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres-db
+      - redis
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-e3-dfc5$67!z!scs=mex6xmq=5l@1u4g)ckajac+dhh)jl*91o
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - POSTGRES_DB=my_django
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgrespassword
+      - POSTGRES_HOST=postgres-db
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
-  pgadmin:
 
 networks:
   app-network:

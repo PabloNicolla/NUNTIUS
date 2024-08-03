@@ -1,4 +1,4 @@
-# requirements.txt
+# backend/requirements.txt
 
 aioredis==2.0.1
 asgiref==3.8.1
