@@ -214,7 +214,7 @@ const GoogleSignInOption = ({}) => {
   const { login } = useSession();
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    redirectUri: makeRedirectUri({ scheme: "com.anonymous.myapp" }),
+    redirectUri: makeRedirectUri({ scheme: "com.nuntius" }),
   });
 
   useEffect(() => {

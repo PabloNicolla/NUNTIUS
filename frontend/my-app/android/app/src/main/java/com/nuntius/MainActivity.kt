@@ -1,4 +1,4 @@
-package com.anonymous.myapp
+package com.nuntius
 
 import android.os.Build
 import android.os.Bundle
