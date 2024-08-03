@@ -6,7 +6,7 @@ import json
 import redis
 import time
 import uuid
-from .models import ChatMessage
+from .models import ChatMessage, ChatConfirmation
 
 # Initialize the Redis connection
 redis_instance = redis.StrictRedis(host='localhost', port=6379, db=0)
@@ -50,6 +50,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
         print(f"User {self.user_id} connected.")
 
+        # Fetch and send stored messages
+        await self.fetch_and_send_stored_messages()
+
     async def disconnect(self, close_code):
         # Leave user's group
         # await self.channel_layer.group_discard(
@@ -83,7 +86,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if message_type in ["private_chat", "private_chat_batch"]:
             # Store in database to deliver when receiver_id gets online
-            confirmation_id = str(await self.save_message(sender_id, receiver_id, data))
+            confirmation_id = str(await self.save_message(sender_id, receiver_id, data, message_type))
             print("Storing message in db", confirmation_id)
 
             sender_channel_name = await self.get_channel_name_for_user(sender_id)
@@ -114,9 +117,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if message_type in ["private_chat_confirmation"]:
             confirmation_id = message.get('confirmation_id')
+
             og_sender_channel_name = await self.get_channel_name_for_user(sender_id)
             if not og_sender_channel_name:
-                print("no og_sender_channel_name found")
+                print("no og_sender_channel_name found, saving confirmation")
+                await self.save_confirmation(sender_id, receiver_id, data, message_type)
+                await self.delete_message(confirmation_id)
                 return
 
             await self.channel_layer.send(
@@ -129,7 +135,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'sender_id': sender_id
                 }
             )
-
             await self.delete_message(confirmation_id)
 
     async def private_chat(self, event):
@@ -223,11 +228,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return redis_instance.get(user_key).decode('utf-8') if redis_instance.get(user_key) else None
 
     @database_sync_to_async
-    def save_message(self, sender_id, receiver_id, data):
+    def save_message(self, sender_id, receiver_id, data, message_type):
         message = ChatMessage.objects.create(
             sender_id=sender_id,
             receiver_id=receiver_id,
-            message=data
+            message=data,
+            message_type=message_type
         )
         return message.id  # Return the UUID of the created message
 
@@ -250,6 +256,67 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'receiver_id': message.receiver_id,
                 'message': message.message,
                 'timestamp': message.timestamp,
+                'message_type': message.message_type,
             }
         except ChatMessage.DoesNotExist:
             return None
+
+    @database_sync_to_async
+    def save_confirmation(self, sender_id, receiver_id, data, message_type):
+        message = ChatConfirmation.objects.create(
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            message=data,
+            message_type=message_type
+        )
+        return message.id  # Return the UUID of the created ChatConfirmation
+
+    @database_sync_to_async
+    def delete_confirmation(self, message_id):
+        try:
+            message = ChatConfirmation.objects.get(id=message_id)
+            message.delete()
+            return True
+        except ChatConfirmation.DoesNotExist:
+            return False
+
+    @database_sync_to_async
+    def get_confirmation(self, message_id):
+        try:
+            message = ChatConfirmation.objects.get(id=message_id)
+            return {
+                'id': message.id,
+                'sender_id': message.sender_id,
+                'receiver_id': message.receiver_id,
+                'message': message.message,
+                'timestamp': message.timestamp,
+                'message_type': message.message_type,
+            }
+        except ChatConfirmation.DoesNotExist:
+            return None
+
+    @database_sync_to_async
+    def fetch_stored_messages(self, user_id):
+        messages = ChatMessage.objects.filter(receiver_id=user_id)
+        grouped_messages = {}
+        for msg in messages:
+            if msg.sender_id not in grouped_messages:
+                grouped_messages[msg.sender_id] = []
+            grouped_messages[msg.sender_id].append({
+                'id': str(msg.id),
+                'data': msg.message,
+            })
+        return grouped_messages
+
+    async def fetch_and_send_stored_messages(self):
+        stored_messages = await self.fetch_stored_messages(self.user_id)
+        for sender_id, messages in stored_messages.items():
+            await self.send(text_data=json.dumps({
+                'data': [msg['data'] for msg in messages],
+                'type': 'private_chat_batch',
+                'receiver_id': str(self.user_id),
+                'sender_id': str(sender_id),
+                'confirmation_id': str(uuid.uuid4())  # Convert UUID to string
+            }))
+            for msg in messages:
+                await self.delete_message(msg['id'])

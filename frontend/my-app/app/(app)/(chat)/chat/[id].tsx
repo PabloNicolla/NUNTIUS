@@ -45,6 +45,7 @@ import {
   ConnectionStatus,
   useWebSocketController,
 } from "@/providers/ws-controller-provider";
+import { StatusBar } from "expo-status-bar";
 
 export type MessageItemType = Message & {
   isSelected?: boolean;
@@ -58,7 +59,7 @@ export default function ChatScreen() {
   const [requestMoreMsg, setRequestMoreMsg] = useState(false);
   const [openEditMsgModal, setOpenEditMsgModal] = useState(false);
   const [openDeleteMsgModal, setOpenDeleteMsgModal] = useState(false);
-  const PAGE_LIMIT = 50;
+  const PAGE_LIMIT = 20;
 
   const { id: chatId, contactId, canCreateChatIfNull } = useLocalSearchParams();
   const theme = useColorScheme() ?? "dark";
@@ -203,6 +204,7 @@ export default function ChatScreen() {
 
   return (
     <ThemedView className="flex-1">
+      <StatusBar style="auto" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
@@ -360,7 +362,7 @@ const FooterComponent = ({
   };
 
   return (
-    <View className="mt-2 flex-row">
+    <ThemedView className="mt-2 flex-row">
       <View className="mx-2 mb-2 justify-end overflow-hidden rounded-full">
         <TouchableRipple
           className="rounded-full bg-primary-light/50 p-3 dark:bg-primary-light"
@@ -452,7 +454,7 @@ const FooterComponent = ({
           </TouchableRipple>
         </View>
       </View>
-    </View>
+    </ThemedView>
   );
 };
 

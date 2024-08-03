@@ -98,36 +98,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="groups"
-        options={{
-          title: "groups",
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              color={color}
-              focused={focused}
-              icon="people"
-              iconFocused="people-outline"
-            />
-          ),
-        }}
-      /> */}
-      {/* <Tabs.Screen
-        name="chat"
-        options={{
-          title: "chat",
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              color={color}
-              focused={focused}
-              icon="chatbox-ellipses"
-              iconFocused="chatbox-ellipses-outline"
-            />
-          ),
-        }}
-      /> */}
       <Tabs.Screen
         name="myProfile"
         options={{

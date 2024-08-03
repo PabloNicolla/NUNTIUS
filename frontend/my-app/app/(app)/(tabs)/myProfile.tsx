@@ -13,7 +13,7 @@ import { Colors } from "@/constants/Colors";
 type Props = {};
 
 const MyProfileScreen = (props: Props) => {
-  const { user } = useSession();
+  const { user, logout } = useSession();
 
   if (!user) {
     throw new Error("Cannot load profile screen without a logged user");
@@ -59,7 +59,9 @@ const MyProfileScreen = (props: Props) => {
               icon="log-out"
               title={`Logout`}
               onlyTitle
-              handlePress={() => {}}
+              handlePress={() => {
+                logout();
+              }}
             />
           </View>
         </ScrollView>

@@ -82,6 +82,7 @@ export function SessionProvider({
     await setAccessToken(data.access);
     await setRefreshToken(data.refresh);
     await storeUser(newUser);
+    changeConnectionStatus(ConnectionStatus.DISCONNECTED);
   };
 
   const login = async (data: LoginResponseData) => {
@@ -111,6 +112,7 @@ export function SessionProvider({
     await setAccessToken(data.access);
     await setRefreshToken(data.refresh);
     await storeUser(newUser);
+    changeConnectionStatus(ConnectionStatus.DISCONNECTED);
   };
 
   const logout = async () => {

@@ -117,13 +117,19 @@ export const WebSocketProvider: React.FC<{
       socket.onmessage = async (event) => {
         const wsMessage: ReceiveWsMessage = JSON.parse(event.data);
         if (wsMessage.confirmation_id) {
-          sendMessage({
+          const msg = {
             data: wsMessage.data,
             receiver_id: wsMessage.receiver_id,
             sender_id: wsMessage.sender_id,
             type: "private_chat_confirmation",
             confirmation_id: wsMessage.confirmation_id,
-          });
+          };
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            console.log("[WEB_SOCKET]: Message sent: ", msg);
+            socket.send(JSON.stringify(msg));
+          } else {
+            console.warn("[WEB_SOCKET]: WebSocket is not connected111");
+          }
         }
         console.log("[WEB_SOCKET]: Message received: ", wsMessage);
         await routeMessage(wsMessage, db, dbPrefix);
