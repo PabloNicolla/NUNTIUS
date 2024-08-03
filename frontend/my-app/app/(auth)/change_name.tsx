@@ -31,7 +31,7 @@ import {
 } from "@/API/change-name";
 
 const formSchema = z.object({
-  first_name: z.string().min(1, "first_name is required"),
+  first_name: z.string().min(1, "first name is required"),
   last_name: z.string(),
 });
 
@@ -58,14 +58,10 @@ export default function ChangeNameScreen() {
 
       const accessToken = await getAccessToken();
 
-      console.log(accessToken);
-
       const requestData: ChangeNameRequestData = {
         first_name: values.first_name,
         last_name: values.last_name,
       };
-
-      console.log(requestData);
 
       const response: ChangeNameResponseData = (
         await axios.patch(CHANGE_NAME_URL, requestData, {
