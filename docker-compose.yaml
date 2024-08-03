@@ -16,19 +16,24 @@ services:
       - app-network
 
   redis:
-    image: redis:latest
+    image: redis:7.4.0-alpine
     restart: always
     container_name: redis
     ports:
       - 6379:6379
     networks:
       - app-network
-#  python manage.py runserver 0.0.0.0:8000
+
   web:
     build: ./backend/
     command: >
       sh -c "python manage.py migrate &&
-             daphne -p 8000 core.asgi:application"
+             daphne -b 0.0.0.0 -p 8000 core.asgi:application"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     volumes:
       - ./backend:/app
     ports:
@@ -40,19 +45,28 @@ services:
       - DEBUG=${DEBUG:-True}
       - SECRET_KEY=${SECRET_KEY:-django-insecure-e3-dfc5$67!z!scs=mex6xmq=5l@1u4g)ckajac+dhh)jl*91o}
       - DJANGO_SETTINGS_MODULE=core.settings
+
       - POSTGRES_DB=${POSTGRES_DB:-my_django}
       - POSTGRES_USER=${POSTGRES_USER:-postgresuser}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgrespassword}
-      - POSTGRES_HOST=postgres-db
-      - POSTGRES_PORT=5432
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres-db}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost:8000}
+      - CORS_ALLOW_ALL_ORIGINS=${CORS_ALLOW_ALL_ORIGINS:-True}
+
+      - ACCOUNT_EMAIL_VERIFICATION=${ACCOUNT_EMAIL_VERIFICATION:-none}
+      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
     networks:
       - app-network
 
   nginx:
-    image: nginx:latest
-    container_name: nginx
+    image: nginx:1.27.0
+    restart: always
     ports:
       - "7777:80"
     volumes:

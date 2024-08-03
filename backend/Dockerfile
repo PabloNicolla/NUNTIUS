@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM python:3.10-slim AS builder
+FROM python:3.10-slim-bullseye AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 # Stage 2: Runtime stage
-FROM python:3.10-slim
+FROM python:3.10-slim-bullseye
 
 RUN useradd -m myuser
 
@@ -41,4 +41,7 @@ USER myuser
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "core.asgi:application"]

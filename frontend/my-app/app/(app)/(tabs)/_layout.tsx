@@ -67,7 +67,6 @@ export default function TabsLayout() {
           activeIndicatorStyle={{ backgroundColor: navIconBgColor }}
           renderTouchable={(props) => {
             return (
-              // TODO: Add IOS compatibility
               <TouchableRipple
                 {...props}
                 rippleColor={

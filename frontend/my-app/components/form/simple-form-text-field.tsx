@@ -16,8 +16,6 @@ export type SimpleFormTextFieldProps = ViewProps & {
   titleTransformX?: number;
 };
 
-// TODO: Handle error messages. E.G. user typed invalid value -> make border red & display help message
-
 const SimpleFormTextField = forwardRef<TextInput, SimpleFormTextFieldProps>(
   function FormTextField(
     {
