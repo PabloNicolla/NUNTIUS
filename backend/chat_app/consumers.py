@@ -175,6 +175,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sender_id = event['sender_id']
         status = event['status']
 
+        if isinstance(data, list):
+            message_type = 'private_chat_batch'
+
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'data': {'message': data, 'status': status, 'message_type': message_type},

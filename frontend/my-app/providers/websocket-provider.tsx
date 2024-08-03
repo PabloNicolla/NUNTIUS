@@ -16,6 +16,8 @@ import {
   useWebSocketController,
 } from "./ws-controller-provider";
 import { ReceiveWsMessage, SendWsMessage } from "@/websocket/ws-types";
+import { getAllPendingMessages } from "@/db/statements";
+import { Message } from "@/db/schemaTypes";
 
 type WebSocketContextType = {
   sendMessage: (message: SendWsMessage) => void;
@@ -41,10 +43,8 @@ export const WebSocketProvider: React.FC<{
 }> = ({ children, db }) => {
   const { loadStoredUser, getAccessToken, getRefreshToken, getDbPrefix } =
     useSession();
-
   const { changeConnectionStatus, changeSocket, connectionStatus, socket } =
     useWebSocketController();
-
   const connectionStatusRef = useRef(connectionStatus);
 
   useEffect(() => {
@@ -62,6 +62,46 @@ export const WebSocketProvider: React.FC<{
       connect();
     }
   }, [connectionStatus]);
+
+  useEffect(() => {
+    if (connectionStatusRef.current === ConnectionStatus.CONNECTED && socket) {
+      console.log("[WEB_SOCKET]: Checking for pending messages...");
+      const sendPendingMessages = async () => {
+        const dbPrefix = getDbPrefix();
+        if (!dbPrefix) {
+          return;
+        }
+        const pendingMessages = await getAllPendingMessages(
+          db.current,
+          dbPrefix,
+        );
+
+        if (!pendingMessages || pendingMessages.length === 0) {
+          return;
+        }
+
+        const messagesMap = new Map<string, Message[]>();
+
+        pendingMessages.forEach((message) => {
+          const receiverId = message.receiverId;
+          if (!messagesMap.has(receiverId)) {
+            messagesMap.set(receiverId, []);
+          }
+          messagesMap.get(receiverId)!.push(message);
+        });
+
+        messagesMap.forEach((elements) => {
+          sendMessage({
+            data: elements,
+            receiver_id: elements[0].receiverId,
+            sender_id: elements[0].senderId,
+            type: "private_chat_batch",
+          });
+        });
+      };
+      sendPendingMessages();
+    }
+  }, [connectionStatus, socket]);
 
   // Use a ref to keep track of the latest connectionStatus
 

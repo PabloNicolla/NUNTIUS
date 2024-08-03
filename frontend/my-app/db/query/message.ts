@@ -1,5 +1,11 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Contact, Message, PrivateChat, ReceiverType } from "../schemaTypes";
+import {
+  Contact,
+  Message,
+  MessageStatus,
+  PrivateChat,
+  ReceiverType,
+} from "../schemaTypes";
 
 export const getAllMessages = async (db: SQLiteDatabase, dbPrefix: string) => {
   try {
@@ -129,5 +135,23 @@ export const getNewestMessageByChatId = async (
     );
   } catch (error) {
     console.log("[STATEMENTS]: getNewestMessageByChatId", error);
+  }
+};
+
+export const getAllPendingMessages = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+) => {
+  try {
+    return await db.getAllAsync<Message>(
+      `
+      SELECT *
+      FROM _${dbPrefix}_message
+      WHERE status = $status
+      `,
+      { $status: MessageStatus.PENDING },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: getAllMessages", error);
   }
 };

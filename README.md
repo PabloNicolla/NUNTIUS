@@ -13,6 +13,7 @@ npx expo install --fix
 
 # production
 ./gradlew clean
+npx expo prebuild --clean
 npx expo start --no-dev --minify
 npx expo run:android --variant release
 ```
