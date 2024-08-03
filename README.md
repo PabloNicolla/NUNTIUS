@@ -27,7 +27,7 @@ npx eslint .
 ## Backend
 
 pip install -r requirements.txt
-
+daphne -p 8000 core.asgi:application
 
 ```sh
 django-admin startproject <>

@@ -18,17 +18,16 @@ services:
   redis:
     image: redis:latest
     restart: always
-    container_name: redis
     ports:
       - 6379:6379
     networks:
       - app-network
-#  python manage.py runserver 0.0.0.0:8000
+
   web:
     build: ./backend/
     command: >
       sh -c "python manage.py migrate &&
-             daphne -p 8000 core.asgi:application"
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./backend:/app
     ports:
@@ -47,18 +46,6 @@ services:
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    networks:
-      - app-network
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    ports:
-      - "7777:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - web
     networks:
       - app-network
 

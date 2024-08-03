@@ -1,0 +1,44 @@
+# Stage 1: Build stage
+FROM python:3.10-slim AS builder
+
+# Set work directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        libc6-dev \
+        build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+ENV DJANGO_SETTINGS_MODULE=core.settings
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy project files
+COPY . .
+
+# Check that the core directory exists and the asgi.py file is present
+RUN ls -l core
+RUN ls -l core/asgi.py
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Run the application
+# CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "core.asgi:application"]
+CMD ["sleep", "infinity"]

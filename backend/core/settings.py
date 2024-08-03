@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "corsheaders",
     "chat_app",
+    "auth_app",
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
@@ -216,7 +217,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [(os.getenv('REDIS_HOST', 'localhost'), int(os.getenv('REDIS_PORT', 6379)))],
+            "hosts": [(os.getenv('REDIS_HOST', 'redis'), 6379)],
         },
     },
 }

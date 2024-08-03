@@ -9,7 +9,7 @@ import uuid
 from .models import ChatMessage, ChatConfirmation
 
 # Initialize the Redis connection
-redis_instance = redis.StrictRedis(host='localhost', port=6379, db=0)
+redis_instance = redis.StrictRedis(host='redis', port=6379, db=0)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
