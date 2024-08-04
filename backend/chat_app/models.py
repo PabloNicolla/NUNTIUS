@@ -11,7 +11,7 @@ class ChatMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sender_id = models.CharField(max_length=36)
     receiver_id = models.CharField(max_length=36)
-    message = models.JSONField()
+    data = models.JSONField()
     timestamp = models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=50)
 
@@ -23,7 +23,7 @@ class ChatConfirmation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sender_id = models.CharField(max_length=36)
     receiver_id = models.CharField(max_length=36)
-    message = models.JSONField()
+    data = models.JSONField()
     timestamp = models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=50)
 

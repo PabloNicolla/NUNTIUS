@@ -13,5 +13,5 @@ export type ChangeNameResponseData = {
 };
 
 export const CHANGE_NAME_URL = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/auth/user/`,
+  url: `http://${process.env.EXPO_PUBLIC_SERVER_DOMAIN_NAME_OR_IP}:8000/api/v1/auth/user/`,
 });

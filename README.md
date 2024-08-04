@@ -1,113 +1,71 @@
-# Initial documentation
+# NUNTIUS documentation
 
 ## Frontend
 
-```
-npx expo install expo-dev-client
-npx expo run:android
+Open [Frontend](frontend/README.md) instructions for building the Expo app
 
-# upgrade
+## Backend 
 
-npm install expo@latest
-npx expo install --fix
+[docker-compose.yaml](docker-compose.yaml) file already contains all the default variables for development set up.
 
-# production
-./gradlew clean
-npx expo prebuild --clean
-npx expo start --no-dev --minify
-npx expo run:android --variant release
-```
-
-## Linter
+you can modify as needed, for example if you already have container or services running on the ports that are going to be used.
 
 ```
-npx eslint .
+docker compose up --build
 ```
 
-## Backend
+### (OPTIONAL)
 
-pip install -r requirements.txt
-daphne -p 8000 core.asgi:application
+> [!IMPORTANT]
+> (OPTIONAL): If you want to use Google Authentication, you will need to access django admin and create a 
+
+first shut down docker compose
+
+```
+docker compose down
+```
+
+Modify [docker-compose.yaml](docker-compose.yaml) adding a new port forwarding between web (django) container and your host machine
+
+For example:
+
+```yaml
+    ports:
+      - "8000:8000"
+      - "8899:8899" # try one that is available both on the container and on host: <host>:<container>
+```
+
+run docker compose again
+
+```
+docker compose up --build
+```
 
 ```sh
-django-admin startproject <>
-python manage.py runserver
+# access django container
+docker-compose exec web bash # web is the django container name
 
-django-admin  startapp <>
-python manage.py startapp <>
+# create superuser
+python manage.py createsuperuser
 
-daphne -p 8000 core.asgi # for HTTP2, WebSocket. (ASGI SERVER)
-
-pip install psycopg[binary]
-
-
-# Change your models (in models.py).
-python manage.py makemigrations # to create migrations for those changes
-python manage.py migrate        # to apply those changes to the database.
-
-
-# models # "<chat>.apps.<Chat>Config"
-python manage.py makemigrations <chat>
-python manage.py sqlmigrate <chat> <0001>
-python manage.py migrate
-
-
-python manage.py shell
-
-
-python manage.py createsuperuser # access domain/admin/
-
-
-python manage.py test chat
+# run django with runserver using the correct port
+python manage.py runserver 0.0.0.0:8899
 ```
 
-## Shell
+On host machine access `http://localhost:8899/admin` and add Social applications
 
-```python
-from <>.models import <>, <>
+after that you can close the runserver, compose down docker, and rebuild again without the additional port forwarding
 
-q = Question(question_text="What's new?", pub_date=timezone.now())
-q.save() # save to DB
+> [!NOTE]
+> For more experienced users, the above may be achieved using `manage.py shell` and creating the object
 
-q = Question.objects.all()
-q = Question.objects.filter(<>=target_id)
-rq = Question.objects.get(<>=current_year)
+### Alternative Backend
 
-# pk=<> # alias for Primary Key UUI
+- run only postgres and redis containers.
+- open [Backend](backend/README.md) and follow steps
 
-# question is a FK in choice schema/model
-q.choice_set.create(<>=..., <>=...)
-q.choice_set.all()
-q.choice_set.count()
+## IAAS
 
-# choice.questions.pub_data.year 
-Choice.objects.filter(question__pub_date__year=current_year)
+Deploy on Azure with Terraform script
 
-q.delete()
-```
-
-## Mock view
-
-```python shell
-from django.test.utils import setup_test_environment
-setup_test_environment()
-
-from django.test import Client
-client = Client()
-
-response = client.get("/")
-response.status_code
-
-from django.urls import reverse
-response = client.get(reverse("chat:index"))
-response.status_code
-response.content
-response.context["latest_question_list"]
-```
-
-## Coverage
-
-```sh
-coverage run --source='.' manage.py test chat
-coverage report
-```
+Follow instructions at [Terraform](terraform/README.md)

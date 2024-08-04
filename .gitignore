@@ -5,3 +5,9 @@ test.session.sql
 diagram.drawio
 webscoket.code-workspace
 test/test.json
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.backup
+.terraform/

@@ -2,6 +2,10 @@
 import os
 import django
 
+# MAKE SURE THAT `os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')`
+# AND `django.setup()`
+# ARE ABOVE ALL `imports`, EXCEPT FOR `import os` and `import django`
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 

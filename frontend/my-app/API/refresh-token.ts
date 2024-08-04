@@ -10,5 +10,5 @@ export type RefreshTokenResponseData = {
 };
 
 export const REFRESH_TOKEN_URL = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/auth/token/refresh/`,
+  url: `http://${process.env.EXPO_PUBLIC_SERVER_DOMAIN_NAME_OR_IP}:8000/api/v1/auth/token/refresh/`,
 });

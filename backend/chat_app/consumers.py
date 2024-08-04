@@ -6,23 +6,18 @@ import json
 import redis
 import time
 import uuid
+import os
 from .models import ChatMessage, ChatConfirmation
 
-# Initialize the Redis connection
-redis_instance = redis.StrictRedis(host='redis', port=6379, db=0)
-
+redis_instance = redis.StrictRedis(
+  host=os.getenv('REDIS_HOST', 'localhost'),
+  port=os.getenv('REDIS_PORT', '6379'),
+  password=os.getenv('REDIS_PASSWORD', None))
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user_id = self.scope['url_route']['kwargs']['user_id']
         self.group_name = f"user_{self.user_id}"
-
-        # self.user = self.scope["user"]
-
-        # # Ensure the user is authenticated
-        # if not self.user.is_authenticated:
-        #     await self.close()
-        #     return
 
         # Generate unique user key
         self.user_key = f"user_{self.user_id}"
@@ -38,12 +33,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "type": "close_connection"
             })
 
-        # # Join user's group
-        # await self.channel_layer.group_add(
-        #     self.group_name,
-        #     self.channel_name
-        # )
-
         # Add the new connection
         await self.add_connection()
 
@@ -52,13 +41,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Fetch and send stored messages
         await self.fetch_and_send_stored_messages()
+        await self.fetch_and_send_stored_confirmations()
 
     async def disconnect(self, close_code):
-        # Leave user's group
-        # await self.channel_layer.group_discard(
-        #     self.group_name,
-        #     self.channel_name
-        # )
         await self.remove_connection()
         print(f"User {self.user_id} disconnected.")
 
@@ -144,8 +129,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sender_id = event['sender_id']
         confirmation_id = event['confirmation_id']
 
-        # sender_channel_name = await self.get_channel_name_for_user(sender_id)
-
         current_time_js_format = int(time.time() * 1000)
         data['timestamp'] = current_time_js_format
 
@@ -157,16 +140,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender_id': sender_id,
             'confirmation_id': confirmation_id
         }))
-
-        # Reply status to sender
-        # await self.channel_layer.send(
-        #     sender_channel_name,
-        #     {
-        #         "data": data,
-        #         'type': "private_chat_status",
-        #         'status': "RECEIVED",
-        #     }
-        # )
 
     async def private_chat_status(self, event):
         data = event['data']
@@ -235,7 +208,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = ChatMessage.objects.create(
             sender_id=sender_id,
             receiver_id=receiver_id,
-            message=data,
+            data=data,
             message_type=message_type
         )
         return message.id  # Return the UUID of the created message
@@ -257,7 +230,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': message.id,
                 'sender_id': message.sender_id,
                 'receiver_id': message.receiver_id,
-                'message': message.message,
+                'data': message.data,
                 'timestamp': message.timestamp,
                 'message_type': message.message_type,
             }
@@ -269,7 +242,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = ChatConfirmation.objects.create(
             sender_id=sender_id,
             receiver_id=receiver_id,
-            message=data,
+            data=data,
             message_type=message_type
         )
         return message.id  # Return the UUID of the created ChatConfirmation
@@ -291,7 +264,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': message.id,
                 'sender_id': message.sender_id,
                 'receiver_id': message.receiver_id,
-                'message': message.message,
+                'data': message.data,
                 'timestamp': message.timestamp,
                 'message_type': message.message_type,
             }
@@ -305,21 +278,67 @@ class ChatConsumer(AsyncWebsocketConsumer):
         for msg in messages:
             if msg.sender_id not in grouped_messages:
                 grouped_messages[msg.sender_id] = []
-            grouped_messages[msg.sender_id].append({
-                'id': str(msg.id),
-                'data': msg.message,
-            })
+            if msg.message_type == "private_chat_batch":
+                for batch_msg in msg.data:
+                    grouped_messages[msg.sender_id].append({
+                        'id': str(msg.id),
+                        'data': batch_msg,
+                    })
+            else:
+                grouped_messages[msg.sender_id].append({
+                    'id': str(msg.id),
+                    'data': msg.data,
+                })
         return grouped_messages
 
     async def fetch_and_send_stored_messages(self):
         stored_messages = await self.fetch_stored_messages(self.user_id)
+        prev_id = None
         for sender_id, messages in stored_messages.items():
             await self.send(text_data=json.dumps({
                 'data': [msg['data'] for msg in messages],
                 'type': 'private_chat_batch',
                 'receiver_id': str(self.user_id),
                 'sender_id': str(sender_id),
-                'confirmation_id': str(uuid.uuid4())  # Convert UUID to string
+                'confirmation_id': str(uuid.uuid4())
             }))
             for msg in messages:
-                await self.delete_message(msg['id'])
+                if prev_id != msg['id']:
+                    prev_id = msg['id']
+                    await self.delete_message(msg['id'])
+
+    @database_sync_to_async
+    def fetch_stored_confirmations(self, user_id):
+        confirmations = ChatConfirmation.objects.filter(sender_id=user_id)
+        grouped_confirmations = {}
+        for conf in confirmations:
+            if conf.receiver_id not in grouped_confirmations:
+                grouped_confirmations[conf.receiver_id] = []
+            if isinstance(conf.data, list):
+                for batch_conf in conf.data:
+                    grouped_confirmations[conf.receiver_id].append({
+                        'id': str(conf.id),
+                        'data': batch_conf,
+                    })
+            else :
+                grouped_confirmations[conf.receiver_id].append({
+                    'id': str(conf.id),
+                    'data': conf.data,
+                })
+        return grouped_confirmations
+
+    async def fetch_and_send_stored_confirmations(self):
+        stored_confirmations = await self.fetch_stored_confirmations(self.user_id)
+        prev_id = None
+        for receiver_id, confirmations in stored_confirmations.items():
+            await self.send(text_data=json.dumps({
+                'data': {'message': [conf['data'] for conf in confirmations], 'status': 'RECEIVED', 'message_type': 'private_chat_batch'},
+                'type': 'private_chat_status',
+                'sender_id': str(self.user_id),
+                'receiver_id': str(receiver_id)
+            }))
+            for conf in confirmations:
+                if prev_id != conf['id']:
+                    prev_id = conf['id']
+                    await self.delete_confirmation(conf['id'])
+            

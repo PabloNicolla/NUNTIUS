@@ -27,10 +27,13 @@ services:
   web:
     build: ./backend/
     command: >
-      sh -c "python manage.py migrate &&
-             daphne -b 0.0.0.0 -p 8000 core.asgi:application"
+      sh -c "
+            python manage.py makemigrations &&
+            python manage.py migrate &&
+            daphne -b 0.0.0.0 -p 8000 core.asgi:application
+            "
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -38,6 +41,7 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
+      # - "8899:8899"
     depends_on:
       - postgres-db
       - redis
@@ -54,11 +58,11 @@ services:
 
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
+      # -REDIS_PASSWORD${...} # only for production environment
 
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost:8000}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost:8000,http://localhost:7777}
       - CORS_ALLOW_ALL_ORIGINS=${CORS_ALLOW_ALL_ORIGINS:-True}
-
       - ACCOUNT_EMAIL_VERIFICATION=${ACCOUNT_EMAIL_VERIFICATION:-none}
       - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
     networks:
@@ -78,6 +82,7 @@ services:
 
 volumes:
   postgres_data:
+
 
 networks:
   app-network:
