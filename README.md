@@ -17,7 +17,7 @@ docker compose up --build
 ### (OPTIONAL)
 
 > [!IMPORTANT]
-> (OPTIONAL): If you want to use Google Authentication, you will need to access django admin and create a 
+> (OPTIONAL): If you want to use Google Authentication, you will need to access django admin and create a new Social application
 
 first shut down docker compose
 
