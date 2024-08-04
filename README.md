@@ -2,7 +2,7 @@
 
 ## Frontend
 
-Open [Frontend](frontend/README.md) instructions for building the Expo app
+Open [Frontend](frontend/my-app/README.md) instructions for building the Expo app
 
 ## Backend 
 
