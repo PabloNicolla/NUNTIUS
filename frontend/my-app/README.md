@@ -10,6 +10,8 @@ Install dependencies.
 npm i
 ```
 
+Open [sample.env](sample.env), rename to .env and add the variables
+
 ### STEP 2 (Development)
 
 Run project in development mode.

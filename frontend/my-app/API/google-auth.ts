@@ -10,5 +10,5 @@ export type GoogleAuthResponseData = {
 };
 
 export const GOOGLE_AUTH = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_SERVER_IP}:8000/api/v1/auth/google/`,
+  url: `http://${process.env.EXPO_PUBLIC_SERVER_DOMAIN_NAME_OR_IP}:8000/api/v1/auth/google/`,
 });

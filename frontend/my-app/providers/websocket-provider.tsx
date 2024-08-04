@@ -131,7 +131,7 @@ export const WebSocketProvider: React.FC<{
 
     try {
       socket = new WebSocket(
-        `ws://${process.env.EXPO_PUBLIC_SERVER_IP}:8000/ws/user/${user.id}/`,
+        `ws://${process.env.EXPO_PUBLIC_SERVER_DOMAIN_NAME_OR_IP}:8000/ws/user/${user.id}/`,
       );
 
       socket.onopen = () => {
