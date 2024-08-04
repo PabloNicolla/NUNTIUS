@@ -120,4 +120,10 @@ terraform plan
 terraform apply
 
 az login
+az account show
+
+az acr login --name mydjangoappacr
+docker build -t mydjangoappacr.azurecr.io/djangoapp:latest .
+docker push mydjangoappacr.azurecr.io/djangoapp:latest
+az acr repository show-tags --name mydjangoappacr --repository djangoapp
 ```

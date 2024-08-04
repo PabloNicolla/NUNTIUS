@@ -1,5 +1,3 @@
-# main.tf
-
 terraform {
   required_providers {
     azurerm = {
@@ -18,7 +16,6 @@ resource "azurerm_resource_group" "rg" {
   location = "East US"
 }
 
-# Azure Container Registry
 resource "azurerm_container_registry" "acr" {
   name                = "mydjangoappacr"
   resource_group_name = azurerm_resource_group.rg.name
@@ -27,7 +24,6 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = true
 }
 
-# Azure Key Vault
 resource "azurerm_key_vault" "kv" {
   name                       = "mydjangoappsecrets"
   location                   = azurerm_resource_group.rg.location
@@ -37,18 +33,16 @@ resource "azurerm_key_vault" "kv" {
   soft_delete_retention_days = 7
 }
 
-# Key Vault Access Policy
 resource "azurerm_key_vault_access_policy" "kv_access_policy" {
   key_vault_id = azurerm_key_vault.kv.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
+  object_id    = "" # Replace with the fetched object_id
 
   secret_permissions = [
     "Get", "List", "Set", "Delete"
   ]
 }
 
-# Secrets
 resource "azurerm_key_vault_secret" "secret_key" {
   name         = "DJANGO-SECRET-KEY"
   value        = var.django_secret_key
@@ -67,7 +61,6 @@ resource "azurerm_key_vault_secret" "redis_password" {
   key_vault_id = azurerm_key_vault.kv.id
 }
 
-# Azure Container Instance
 resource "azurerm_container_group" "aci" {
   name                = "mydjangoapplication"
   location            = azurerm_resource_group.rg.location
@@ -117,6 +110,4 @@ resource "azurerm_container_group" "aci" {
   }
 }
 
-
 data "azurerm_client_config" "current" {}
-
