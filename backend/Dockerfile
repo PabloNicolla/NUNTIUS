@@ -64,6 +64,8 @@ RUN pip install --no-cache /wheels/*
 
 COPY . .
 
+RUN chmod +x entrypoint.sh
+
 RUN chown -R myuser:myuser /app
 
 USER myuser
@@ -73,7 +75,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
-# RUN python manage.py makemigrations
-# RUN python manage.py migrate
-
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "core.asgi:application"]
+ENTRYPOINT ["/app/entrypoint.sh"]

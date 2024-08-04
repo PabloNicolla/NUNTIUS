@@ -21,6 +21,9 @@ add your variables and follow the next step
 > [!IMPORTANT]
 > The first time you run the `terraform apply` it will fail. Just follow the instructions.
 
+> [!IMPORTANT]
+> Make sure you are logged into Azure by running `az login`
+
 ```
 terraform init
 terraform plan
@@ -49,6 +52,12 @@ Re-run terraform
 
 ```
 terraform apply
+```
+
+### Check container logs
+
+```
+az container logs --resource-group myDjangoApp-rg --name mydjangoapplication
 ```
 
 ## SHUTDOWN deployment
