@@ -13,5 +13,5 @@ export type POST_ProfileImageResponseData = {
 };
 
 export const PROFILE_IMAGE_URL = qs.stringifyUrl({
-  url: `http://${process.env.EXPO_PUBLIC_LOCAL_IP}:8000/api/v1/user/profile/imageURL/`,
+  url: `http://${process.env.EXPO_PUBLIC_SERVER_IP}:8000/api/v1/user/profile/imageURL/`,
 });
