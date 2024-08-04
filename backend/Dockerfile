@@ -31,7 +31,7 @@ ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=core.settings
 
 # Add environment variables
-ENV DEBUG=${DEBUG:-False}
+ENV DEBUG=${DEBUG:-True}
 ENV SECRET_KEY=${SECRET_KEY}
 
 # Postgres
