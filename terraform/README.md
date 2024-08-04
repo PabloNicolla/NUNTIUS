@@ -50,3 +50,9 @@ Re-run terraform
 ```
 terraform apply
 ```
+
+## SHUTDOWN deployment
+
+```
+terraform destroy
+```
