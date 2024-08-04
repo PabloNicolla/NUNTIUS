@@ -24,43 +24,6 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = true
 }
 
-resource "azurerm_key_vault" "kv" {
-  name                       = "mydjangoappsecrets"
-  location                   = azurerm_resource_group.rg.location
-  resource_group_name        = azurerm_resource_group.rg.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "standard"
-  soft_delete_retention_days = 7
-}
-
-resource "azurerm_key_vault_access_policy" "kv_access_policy" {
-  key_vault_id = azurerm_key_vault.kv.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = "" # Replace with the fetched object_id
-
-  secret_permissions = [
-    "Get", "List", "Set", "Delete"
-  ]
-}
-
-resource "azurerm_key_vault_secret" "secret_key" {
-  name         = "DJANGO-SECRET-KEY"
-  value        = var.django_secret_key
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
-resource "azurerm_key_vault_secret" "postgres_password" {
-  name         = "POSTGRES-PASSWORD"
-  value        = var.postgres_password
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
-resource "azurerm_key_vault_secret" "redis_password" {
-  name         = "REDIS-PASSWORD"
-  value        = var.redis_password
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
 resource "azurerm_container_group" "aci" {
   name                = "mydjangoapplication"
   location            = azurerm_resource_group.rg.location
@@ -96,9 +59,9 @@ resource "azurerm_container_group" "aci" {
     }
 
     secure_environment_variables = {
-      "SECRET_KEY"        = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.secret_key.versionless_id})"
-      "POSTGRES_PASSWORD" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.postgres_password.versionless_id})"
-      "REDIS_PASSWORD"    = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.redis_password.versionless_id})"
+      "SECRET_KEY"        = var.django_secret_key
+      "POSTGRES_PASSWORD" = var.postgres_password
+      "REDIS_PASSWORD"    = var.redis_password
     }
 
   }
