@@ -64,6 +64,7 @@ export default function GetStartedModal({
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    values.email = values.email.toLowerCase().trim();
     try {
       console.log("[GET_STARTED_MODAL]: SUBMITTING GET STARTED FORM", values);
 

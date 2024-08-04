@@ -13,7 +13,6 @@ export async function handlePrivateMessageStatus(
 
   if (wsMessage.data.message_type === "private_chat") {
     const message = wsMessage.data.message;
-    message.chatId = message.senderId;
     if (message.condition === Condition.NORMAL) {
       message.condition = Condition.STATUS_CHANGED;
     }
@@ -30,7 +29,6 @@ export async function handlePrivateMessageStatus(
   if (wsMessage.data.message_type === "private_chat_batch") {
     const messages = wsMessage.data.message;
     const updatedMessages = messages.map((message: Message) => {
-      message.chatId = message.senderId;
       if (message.condition === Condition.NORMAL) {
         message.condition = Condition.STATUS_CHANGED;
       }

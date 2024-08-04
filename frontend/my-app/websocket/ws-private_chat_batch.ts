@@ -3,9 +3,8 @@ import {
   GetContactRequestData,
   GetContactResponseData,
 } from "@/API/get-contact";
-import { Condition, Message } from "@/db/schemaTypes";
+import { Condition, Message, MessageStatus } from "@/db/schemaTypes";
 import {
-  getFirstMessageBySenderRef,
   getFirstPrivateChat,
   getNewestMessageByChatId,
   insertContact,
@@ -30,6 +29,7 @@ export async function handlePrivateMessageBatch(
 
   for (const message of messages) {
     message.chatId = message.senderId;
+    message.status = MessageStatus.RECEIVED;
     switch (message.condition) {
       case Condition.NORMAL:
         normalMessages.push(message);

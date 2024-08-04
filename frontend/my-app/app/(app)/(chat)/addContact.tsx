@@ -55,6 +55,7 @@ const AddContact = (props: Props) => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    values.username = values.username.toLowerCase().trim();
     try {
       console.log("[ADD_CONTACT]: SUBMITTING ADD CONTACT FORM", values);
       setGetContactErrorMessage("");

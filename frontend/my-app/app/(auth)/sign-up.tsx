@@ -80,6 +80,8 @@ export default function SignUpScreen() {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    values.email = values.email.toLowerCase().trim();
+    values.username = values.username.toLowerCase().trim();
     try {
       console.log("[SIGN_UP_SCREEN]: SUBMITTING SIGN UP FORM", values);
       setRegisterErrorMessage("");

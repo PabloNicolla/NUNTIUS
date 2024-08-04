@@ -51,6 +51,7 @@ export default function SignInScreen() {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    values.email = values.email.toLowerCase().trim();
     try {
       console.log("[SIGN_IN_SCREEN]: SUBMITTING SIGN IN FORM", values);
       setLoginErrorMessage("");

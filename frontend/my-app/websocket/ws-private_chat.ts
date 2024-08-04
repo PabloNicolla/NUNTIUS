@@ -3,7 +3,7 @@ import {
   GetContactRequestData,
   GetContactResponseData,
 } from "@/API/get-contact";
-import { Condition } from "@/db/schemaTypes";
+import { Condition, MessageStatus } from "@/db/schemaTypes";
 import {
   getFirstMessageBySenderRef,
   getFirstPrivateChat,
@@ -27,6 +27,7 @@ export async function handlePrivateMessage(
 
   const handleNormal = async () => {
     message.chatId = message.senderId;
+    message.status = MessageStatus.RECEIVED;
 
     const msgOutcome = await insertMessage(db.current, dbPrefix, message);
 
