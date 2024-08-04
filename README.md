@@ -111,3 +111,13 @@ response.context["latest_question_list"]
 coverage run --source='.' manage.py test chat
 coverage report
 ```
+
+## IAAS
+
+```
+terraform init
+terraform plan
+terraform apply
+
+az login
+```

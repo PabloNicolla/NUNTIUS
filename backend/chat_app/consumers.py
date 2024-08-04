@@ -6,23 +6,18 @@ import json
 import redis
 import time
 import uuid
+import os
 from .models import ChatMessage, ChatConfirmation
 
-# Initialize the Redis connection
-redis_instance = redis.StrictRedis(host='redis', port=6379, db=0)
-
+redis_instance = redis.StrictRedis(
+  host=os.getenv('REDIS_HOST', 'localhost'),
+  port=os.getenv('REDIS_PORT', '6379'),
+  password=os.getenv('REDIS_PASSWORD', None))
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user_id = self.scope['url_route']['kwargs']['user_id']
         self.group_name = f"user_{self.user_id}"
-
-        # self.user = self.scope["user"]
-
-        # # Ensure the user is authenticated
-        # if not self.user.is_authenticated:
-        #     await self.close()
-        #     return
 
         # Generate unique user key
         self.user_key = f"user_{self.user_id}"
@@ -38,12 +33,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "type": "close_connection"
             })
 
-        # # Join user's group
-        # await self.channel_layer.group_add(
-        #     self.group_name,
-        #     self.channel_name
-        # )
-
         # Add the new connection
         await self.add_connection()
 
@@ -54,11 +43,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.fetch_and_send_stored_messages()
 
     async def disconnect(self, close_code):
-        # Leave user's group
-        # await self.channel_layer.group_discard(
-        #     self.group_name,
-        #     self.channel_name
-        # )
         await self.remove_connection()
         print(f"User {self.user_id} disconnected.")
 
@@ -144,8 +128,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sender_id = event['sender_id']
         confirmation_id = event['confirmation_id']
 
-        # sender_channel_name = await self.get_channel_name_for_user(sender_id)
-
         current_time_js_format = int(time.time() * 1000)
         data['timestamp'] = current_time_js_format
 
@@ -157,16 +139,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender_id': sender_id,
             'confirmation_id': confirmation_id
         }))
-
-        # Reply status to sender
-        # await self.channel_layer.send(
-        #     sender_channel_name,
-        #     {
-        #         "data": data,
-        #         'type': "private_chat_status",
-        #         'status': "RECEIVED",
-        #     }
-        # )
 
     async def private_chat_status(self, event):
         data = event['data']

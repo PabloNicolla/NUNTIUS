@@ -5,11 +5,13 @@ from .serializers import ProfileImageSerializer, ContactRequestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from uuid import UUID
 import logging
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
+def health_check(request):
+    return HttpResponse("OK")
 
 class CheckEmailView(APIView):
     throttle_classes = [AnonRateThrottle]
