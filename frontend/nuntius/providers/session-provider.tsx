@@ -35,12 +35,12 @@ export type SessionUser = Contact & {
 
 type SessionContextType = {
   user: SessionUser | null;
-  register: (data: RegisterResponseData) => void;
-  login: (data: LoginResponseData) => void;
-  logout: () => void;
+  register: (data: RegisterResponseData) => Promise<void>;
+  login: (data: LoginResponseData) => Promise<void>;
+  logout: () => Promise<void>;
   resetPassword: () => Promise<boolean>;
   changePassword: () => Promise<boolean>;
-  changeName: (data: ChangeNameResponseData) => void;
+  changeName: (data: ChangeNameResponseData) => Promise<void>;
   // verifyIfAccessTokenIsValid: () => Promise<boolean>;
   // refreshAccessToken: () => Promise<boolean>;
   // setAccessToken: (token: string) => void;

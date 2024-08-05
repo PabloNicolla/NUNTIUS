@@ -71,7 +71,7 @@ export default function ChangeNameScreen() {
         })
       ).data;
 
-      changeName(response);
+      await changeName(response);
 
       form.reset();
       if (router.canGoBack()) {

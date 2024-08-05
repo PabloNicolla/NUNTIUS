@@ -105,7 +105,7 @@ export default function SignUpScreen() {
         await axios.post(REGISTER_URL, requestData)
       ).data;
 
-      register(response);
+      await register(response);
 
       form.reset();
       if (router.canGoBack()) {

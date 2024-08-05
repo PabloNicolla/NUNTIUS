@@ -68,7 +68,7 @@ export default function SignInScreen() {
         await axios.post(LOGIN_URL, requestData)
       ).data;
 
-      login(response);
+      await login(response);
 
       form.reset();
       if (router.canGoBack()) {

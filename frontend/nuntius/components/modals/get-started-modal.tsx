@@ -244,7 +244,7 @@ const GoogleSignInOption = ({}) => {
           })
         ).data;
 
-        login({
+        await login({
           access: responseData.access,
           refresh: responseData.refresh,
           user: {

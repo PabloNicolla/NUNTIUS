@@ -11,7 +11,7 @@ const LogoutButton = (props: Props) => {
 
   const handlePress = async () => {
     setIsLoading(true);
-    logout();
+    await logout();
     if (router.canGoBack()) {
       router.dismissAll();
     }

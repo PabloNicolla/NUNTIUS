@@ -58,8 +58,8 @@ const MyProfileScreen = (props: Props) => {
               icon="log-out"
               title={`Logout`}
               onlyTitle
-              handlePress={() => {
-                logout();
+              handlePress={async () => {
+                await logout();
               }}
             />
           </View>
