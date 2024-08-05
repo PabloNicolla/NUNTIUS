@@ -2,7 +2,7 @@
   "expo": {
     "name": "nuntius",
     "slug": "nuntius",
-    "version": "2.0.0", // User-facing version
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-logo.png",
     "scheme": "com.nuntius.aurora.ts",
@@ -14,14 +14,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "2" // Incremented build number for iOS
+      "buildNumber": "2",
+      "bundleIdentifier": "com.nuntius.aurora.ts"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 2, // Incremented version code for Android
+      "versionCode": 2,
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.nuntius.aurora.ts"
     },
@@ -30,7 +31,10 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
     "experiments": {
       "typedRoutes": true
     },

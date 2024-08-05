@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 10.2.1"
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -11,6 +11,7 @@
       "distribution": "internal"
     },
     "production": {
+      "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_REST_API_SERVER": "https://novablog.me",
         "EXPO_PUBLIC_WEBSOCKET_SERVER": "wss://novablog.me",

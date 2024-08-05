@@ -81,3 +81,11 @@ npx eslint .
 ```
 npx expo-doctor
 ```
+
+## Production
+
+```
+eas build:version:set
+eas build:version:sync
+eas build --platform android
+```

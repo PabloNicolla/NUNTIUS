@@ -7,8 +7,10 @@ import redis
 import time
 import uuid
 import os
+# import asyncio
+# import aioredis
 from .models import ChatMessage, ChatConfirmation
-import asyncio
+from channels.exceptions import StopConsumer
 
 redis_instance = redis.StrictRedis(
     host=os.getenv('REDIS_HOST', 'localhost'),
@@ -64,6 +66,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(f"An error occurred: {e}")
             await self.close()
             print(f"User {self.user_id} disconnected. FORCED")
+        finally:
+            raise StopConsumer()
 
     async def receive(self, text_data):
         try:
