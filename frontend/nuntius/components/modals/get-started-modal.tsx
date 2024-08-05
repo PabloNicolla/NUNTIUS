@@ -76,7 +76,7 @@ export default function GetStartedModal({
         await axios.post(CHECK_EMAIL_URL, requestData)
       ).data;
 
-      let pathname = "/sign-up";
+      let pathname: "/sign-up" | "/sign-in" = "/sign-up";
       if (response.code === "IN_USE") {
         pathname = "/sign-in";
       } else if (response.code !== "AVAILABLE") {
@@ -140,6 +140,9 @@ export default function GetStartedModal({
                   </ThemedText>
                   <ThemedText className="mb-10 text-lg text-text-light/70 dark:text-text-dark/70">
                     Enter your email to create or sign in to your account
+                  </ThemedText>
+                  <ThemedText className="mb-10 text-lg text-text-light/70 dark:text-text-dark/70">
+                    {CHECK_EMAIL_URL}
                   </ThemedText>
 
                   <Controller
