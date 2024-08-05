@@ -8,119 +8,153 @@ import time
 import uuid
 import os
 from .models import ChatMessage, ChatConfirmation
+import asyncio
 
 redis_instance = redis.StrictRedis(
-  host=os.getenv('REDIS_HOST', 'localhost'),
-  port=os.getenv('REDIS_PORT', '6379'),
-  password=os.getenv('REDIS_PASSWORD', None))
+    host=os.getenv('REDIS_HOST', 'localhost'),
+    port=os.getenv('REDIS_PORT', '6379'),
+    password=os.getenv('REDIS_PASSWORD', None))
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.user_id = self.scope['url_route']['kwargs']['user_id']
-        self.group_name = f"user_{self.user_id}"
+        try:
+            self.user_id = self.scope['url_route']['kwargs']['user_id']
+            self.group_name = f"user_{self.user_id}"
 
-        # Generate unique user key
-        self.user_key = f"user_{self.user_id}"
+            # Generate unique user key
+            self.user_key = f"user_{self.user_id}"
 
-        # Get the channel layer
-        self.channel_layer = get_channel_layer()
+            # Get the channel layer
+            self.channel_layer = get_channel_layer()
 
-        # Check for existing connection
-        existing_channel_name = await self.get_existing_connection()
-        if existing_channel_name:
-            print("FOUND MATCH", existing_channel_name)
-            await self.channel_layer.send(existing_channel_name, {
-                "type": "close_connection"
-            })
+            # Check for existing connection
+            existing_channel_name = await self.get_existing_connection()
+            if existing_channel_name:
+                print("FOUND MATCH", existing_channel_name)
+                await self.channel_layer.send(existing_channel_name, {
+                    "type": "close_connection"
+                })
 
-        # Add the new connection
-        await self.add_connection()
+            # Add the new connection
+            await self.add_connection()
 
-        await self.accept()
-        print(f"User {self.user_id} connected.")
+            await self.accept()
+            print(f"User {self.user_id} connected.")
 
-        # Fetch and send stored messages
-        await self.fetch_and_send_stored_messages()
-        await self.fetch_and_send_stored_confirmations()
+            # Fetch and send stored messages
+            await self.fetch_and_send_stored_messages()
+            await self.fetch_and_send_stored_confirmations()
+
+            # self.connected = True
+            # self.keep_alive_task = asyncio.create_task(self.send_keep_alive())
+            # print(f"Keep-alive task created for user {self.user_id}")
+            # self.send_keep_alive()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            await self.close()
+            print(f"User {self.user_id} connected. FORCED")
 
     async def disconnect(self, close_code):
-        await self.remove_connection()
-        print(f"User {self.user_id} disconnected.")
+        try:
+            self.connected = False
+            await self.remove_connection()
+            print(f"User {self.user_id} disconnected.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            await self.close()
+            print(f"User {self.user_id} disconnected. FORCED")
 
     async def receive(self, text_data):
-        print("received it", text_data)
-        message = json.loads(text_data)
+        try:
+            print("received it", text_data)
+            message = json.loads(text_data)
 
-        message_type = message.get('type')
-        data = message.get('data')
-        receiver_id = message.get('receiver_id')
-        sender_id = message.get('sender_id')
+            message_type = message.get('type')
+            data = message.get('data')
+            receiver_id = message.get('receiver_id')
+            sender_id = message.get('sender_id')
 
-        if not message_type:
-            print("Message must have type")
-            return
-        if not receiver_id:
-            print("Message must have receiver_id")
-            return
-        if not sender_id:
-            print("Message must have sender_id")
-            return
-        if message_type not in ["private_chat", "private_chat_batch", "private_chat_confirmation"]:
-            print("message_type not supported")
-            return
-
-        if message_type in ["private_chat", "private_chat_batch"]:
-            # Store in database to deliver when receiver_id gets online
-            confirmation_id = str(await self.save_message(sender_id, receiver_id, data, message_type))
-            print("Storing message in db", confirmation_id)
-
-            sender_channel_name = await self.get_channel_name_for_user(sender_id)
-            await self.channel_layer.send(
-                sender_channel_name,
-                {
-                    'data': data,
-                    'type': 'private_chat_status',
-                    'status': 'SENT',
-                    'receiver_id': receiver_id,
-                    'sender_id': sender_id
-                }
-            )
-
-            receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
-            if receiver_channel_name:
-                await self.channel_layer.send(
-                    receiver_channel_name,
-                    {
-                        'data': data,
-                        'type': message_type,
-                        'receiver_id': receiver_id,
-                        'sender_id': sender_id,
-                        'confirmation_id': confirmation_id,
-                    }
-                )
-            return
-
-        if message_type in ["private_chat_confirmation"]:
-            confirmation_id = message.get('confirmation_id')
-
-            og_sender_channel_name = await self.get_channel_name_for_user(sender_id)
-            if not og_sender_channel_name:
-                print("no og_sender_channel_name found, saving confirmation")
-                await self.save_confirmation(sender_id, receiver_id, data, message_type)
-                await self.delete_message(confirmation_id)
+            if not message_type:
+                print("Message must have type")
+                return
+            if not receiver_id:
+                print("Message must have receiver_id")
+                return
+            if not sender_id:
+                print("Message must have sender_id")
+                return
+            if message_type not in ["private_chat", "private_chat_batch", "private_chat_confirmation"]:
+                print("message_type not supported")
                 return
 
-            await self.channel_layer.send(
-                og_sender_channel_name,
-                {
-                    'data': data,
-                    'type': 'private_chat_status',
-                    'status': 'RECEIVED',
-                    'receiver_id': receiver_id,
-                    'sender_id': sender_id
-                }
-            )
-            await self.delete_message(confirmation_id)
+            if message_type in ["private_chat", "private_chat_batch"]:
+                # Store in database to deliver when receiver_id gets online
+                confirmation_id = str(await self.save_message(sender_id, receiver_id, data, message_type))
+                print("Storing message in db", confirmation_id)
+
+                sender_channel_name = await self.get_channel_name_for_user(sender_id)
+                await self.channel_layer.send(
+                    sender_channel_name,
+                    {
+                        'data': data,
+                        'type': 'private_chat_status',
+                        'status': 'SENT',
+                        'receiver_id': receiver_id,
+                        'sender_id': sender_id
+                    }
+                )
+
+                receiver_channel_name = await self.get_channel_name_for_user(receiver_id)
+                if receiver_channel_name:
+                    await self.channel_layer.send(
+                        receiver_channel_name,
+                        {
+                            'data': data,
+                            'type': message_type,
+                            'receiver_id': receiver_id,
+                            'sender_id': sender_id,
+                            'confirmation_id': confirmation_id,
+                        }
+                    )
+                return
+
+            if message_type in ["private_chat_confirmation"]:
+                confirmation_id = message.get('confirmation_id')
+
+                og_sender_channel_name = await self.get_channel_name_for_user(sender_id)
+                if not og_sender_channel_name:
+                    print("no og_sender_channel_name found, saving confirmation")
+                    await self.save_confirmation(sender_id, receiver_id, data, message_type)
+                    await self.delete_message(confirmation_id)
+                    return
+
+                await self.channel_layer.send(
+                    og_sender_channel_name,
+                    {
+                        'data': data,
+                        'type': 'private_chat_status',
+                        'status': 'RECEIVED',
+                        'receiver_id': receiver_id,
+                        'sender_id': sender_id
+                    }
+                )
+                await self.delete_message(confirmation_id)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            await self.close()
+            print(f"User {self.user_id} on receive closed. FORCED")
+
+    async def send_keep_alive(self):
+        print(f"Starting keep-alive for user {self.user_id}")
+        try:
+            # while self.connected:
+            print(f"Sending keep-alive for user {self.user_id}")
+            await self.send(text_data=json.dumps({'type': 'keep_alive'}))
+            # await asyncio.sleep(15)  # send every 15 seconds
+        except Exception as e:
+            print(
+                f"An error occurred in keep-alive for user {self.user_id}: {e}")
 
     async def private_chat(self, event):
         data = event['data']
@@ -320,7 +354,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'id': str(conf.id),
                         'data': batch_conf,
                     })
-            else :
+            else:
                 grouped_confirmations[conf.receiver_id].append({
                     'id': str(conf.id),
                     'data': conf.data,
@@ -341,4 +375,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 if prev_id != conf['id']:
                     prev_id = conf['id']
                     await self.delete_confirmation(conf['id'])
-            
