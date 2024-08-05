@@ -12,4 +12,4 @@ else
 fi
 
 # Start Daphne server
-exec daphne -b 0.0.0.0 -p 8000 core.asgi:application
+exec daphne -b 0.0.0.0 -p 8000 -t 20 core.asgi:application
