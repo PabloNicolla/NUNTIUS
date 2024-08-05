@@ -2,7 +2,7 @@
   "expo": {
     "name": "nuntius",
     "slug": "nuntius",
-    "version": "1.0.0",
+    "version": "2.0.0", // User-facing version
     "orientation": "portrait",
     "icon": "./assets/images/app-logo.png",
     "scheme": "com.nuntius.aurora.ts",
@@ -13,14 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "2" // Incremented build number for iOS
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 1,
+      "versionCode": 2, // Incremented version code for Android
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.nuntius.aurora.ts"
     },
