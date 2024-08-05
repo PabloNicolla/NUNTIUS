@@ -79,6 +79,11 @@ resource "azurerm_application_gateway" "appgw" {
   }
 
   frontend_port {
+    name = "http-port"
+    port = 80
+  }
+
+  frontend_port {
     name = "https-port"
     port = 443
   }
@@ -104,6 +109,13 @@ resource "azurerm_application_gateway" "appgw" {
     name     = "novablog-me-cert"
     data     = filebase64("./secure/novablog_me.pfx")
     password = var.ssl_cert_password
+  }
+
+  http_listener {
+    name                           = "http-listener"
+    frontend_ip_configuration_name = "public-frontend-ip"
+    frontend_port_name             = "http-port"
+    protocol                       = "Http"
   }
 
   http_listener {
@@ -152,6 +164,21 @@ resource "azurerm_application_gateway" "appgw" {
       body        = ""
       status_code = ["200-399"]
     }
+  }
+
+  redirect_configuration {
+    name                 = "http-to-https-redirect"
+    redirect_type        = "Permanent"
+    target_listener_name = "https-listener"
+    include_path         = true
+    include_query_string = true
+  }
+
+  request_routing_rule {
+    name                        = "http-to-https-rule"
+    rule_type                   = "Basic"
+    http_listener_name          = "http-listener"
+    redirect_configuration_name = "http-to-https-redirect"
   }
 }
 

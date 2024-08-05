@@ -13,6 +13,12 @@ rename file [terraform.tfvars.example](terraform.tfvars.example) to `terraform.t
 
 add your variables and follow the next step
 
+open [main.tf](main.tf) and update `filebase64("./secure/novablog_me.pfx")` to your SSL certificate + private key
+
+```
+openssl pkcs12 -export -out novablog_me.pfx -inkey private.key -in novablog_me.crt
+```
+
 ## Run terraform (First time)
 
 > [!IMPORTANT]
@@ -64,6 +70,12 @@ az container logs --resource-group myDjangoApp-rg --name mydjangoapplication
 
 ```
 az network public-ip show --resource-group myDjangoApp-rg --name myPublicIP --query ipAddress --output tsv
+```
+
+### Manually add container to Application gateway
+
+```
+az network application-gateway address-pool update --resource-group myDjangoApp-rg --gateway-name myAppGateway  --name backend-pool --add backendAddresses ipAddress=10.0.2.4
 ```
 
 ## SHUTDOWN deployment
