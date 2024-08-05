@@ -215,7 +215,7 @@ if REDIS_PASSWORD:
     REDIS_URL = f'redis://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
     # Parse the Redis URL (optional, if you need to use the parsed parts)
     url = urlparse.urlparse(REDIS_URL)
-    
+
     # Production configuration using the full Redis URL
     CHANNEL_LAYERS = {
         'default': {

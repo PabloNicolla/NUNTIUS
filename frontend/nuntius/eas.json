@@ -12,7 +12,8 @@
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_SERVER_DOMAIN_NAME_OR_IP": "mydjangoapplication.eastus.azurecontainer.io",
+        "EXPO_PUBLIC_REST_API_SERVER": "https://novablog.me",
+        "EXPO_PUBLIC_WEBSOCKET_SERVER": "wss://novablog.me",
         "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "test"
       }
     }
