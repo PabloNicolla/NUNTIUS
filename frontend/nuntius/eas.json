@@ -13,7 +13,7 @@
     "production": {
       "env": {
         "EXPO_PUBLIC_SERVER_DOMAIN_NAME_OR_IP": "mydjangoapplication.eastus.azurecontainer.io",
-        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": ""
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "test"
       }
     }
   },

@@ -80,3 +80,9 @@ variable "email_backend" {
   type        = string
   default     = "django.core.mail.backends.console.EmailBackend"
 }
+
+variable "ssl_cert_password" {
+  description = "Password for the SSL certificate PFX file"
+  type        = string
+  sensitive   = true
+}
