@@ -13,12 +13,15 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from channels.auth import AuthMiddlewareStack
 import chat_app.routing
+from .middleware import TimeoutMiddleware 
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            chat_app.routing.websocket_urlpatterns
+    'websocket': TimeoutMiddleware(
+        AuthMiddlewareStack(
+            URLRouter(
+                chat_app.routing.websocket_urlpatterns
+            )
         )
     ),
 })

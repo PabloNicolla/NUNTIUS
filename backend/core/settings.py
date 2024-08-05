@@ -89,7 +89,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER', 'postgresuser'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgrespassword'),
         'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'PORT': os.getenv('POSTGRES_PORT', '5600'),
     }
 }
 
@@ -206,7 +206,7 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 
 # Retrieve environment variables
-REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 
@@ -232,6 +232,12 @@ else:
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
                 "hosts": [(REDIS_HOST, REDIS_PORT)],
+                "capacity": 1500,
+                "expiry": 120,
             },
         },
     }
+
+WEB_SOCKET_CLOSE_TIMEOUT = 120  # seconds
+WEB_SOCKET_CONNECT_TIMEOUT = 20  # seconds
+WEBSOCKET_TIMEOUT = 120
