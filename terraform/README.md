@@ -60,6 +60,12 @@ terraform apply
 az container logs --resource-group myDjangoApp-rg --name mydjangoapplication
 ```
 
+### APPLICATION GATEWAY IP
+
+```
+az network public-ip show --resource-group myDjangoApp-rg --name myPublicIP --query ipAddress --output tsv
+```
+
 ## SHUTDOWN deployment
 
 ```
