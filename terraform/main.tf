@@ -1,8 +1,14 @@
 terraform {
+  required_version = ">=1.2"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.65"
+      version = "~> 3.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
     }
   }
 }
@@ -67,6 +73,8 @@ resource "azurerm_application_gateway" "appgw" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
+  enable_http2 = true
+
   sku {
     name     = "Standard_v2"
     tier     = "Standard_v2"
@@ -102,7 +110,11 @@ resource "azurerm_application_gateway" "appgw" {
     cookie_based_affinity = "Disabled"
     port                  = 8000
     protocol              = "Http"
-    request_timeout       = 60
+    request_timeout       = 3600
+    connection_draining {
+      enabled           = true
+      drain_timeout_sec = 60
+    }
   }
 
   ssl_certificate {
@@ -142,6 +154,7 @@ resource "azurerm_application_gateway" "appgw" {
     http_listener_name         = "https-listener"
     backend_address_pool_name  = "backend-pool"
     backend_http_settings_name = "http-setting"
+    priority                   = 102
   }
 
   request_routing_rule {
@@ -150,6 +163,7 @@ resource "azurerm_application_gateway" "appgw" {
     http_listener_name         = "https-listener-www"
     backend_address_pool_name  = "backend-pool"
     backend_http_settings_name = "http-setting"
+    priority                   = 103
   }
 
   probe {
@@ -159,10 +173,27 @@ resource "azurerm_application_gateway" "appgw" {
     interval                                  = 30
     timeout                                   = 30
     unhealthy_threshold                       = 3
-    pick_host_name_from_backend_http_settings = true
+    pick_host_name_from_backend_http_settings = false
+    host                                      = "127.0.0.1"
+
     match {
       body        = ""
       status_code = ["200-399"]
+    }
+  }
+
+  probe {
+    name                                      = "websocket-probe"
+    protocol                                  = "Http"
+    path                                      = "/ws/user/1/" # Adjust to your WebSocket path
+    interval                                  = 30
+    timeout                                   = 30
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = false
+    host                                      = "127.0.0.1"
+    match {
+      body        = ""
+      status_code = ["101"] # WebSocket upgrade status code
     }
   }
 
@@ -179,6 +210,7 @@ resource "azurerm_application_gateway" "appgw" {
     rule_type                   = "Basic"
     http_listener_name          = "http-listener"
     redirect_configuration_name = "http-to-https-redirect"
+    priority                    = 101
   }
 }
 
@@ -204,7 +236,7 @@ resource "azurerm_container_group" "aci" {
   ip_address_type     = "Private"
   os_type             = "Linux"
 
-  network_profile_id = azurerm_network_profile.example.id
+  subnet_ids = [azurerm_subnet.backend.id]
 
   container {
     name   = "djangoapp"
@@ -247,13 +279,17 @@ resource "azurerm_container_group" "aci" {
 
   provisioner "local-exec" {
     command = <<EOT
-    az network application-gateway address-pool update --resource-group ${azurerm_resource_group.rg.name} --gateway-name ${azurerm_application_gateway.appgw.name} --name ${azurerm_application_gateway.appgw.backend_address_pool[0].name} --add backendAddresses ipAddress=${self.ip_address}
+    az network application-gateway address-pool update `
+      --resource-group ${azurerm_resource_group.rg.name} `
+      --gateway-name ${azurerm_application_gateway.appgw.name} `
+      --name ${one(azurerm_application_gateway.appgw.backend_address_pool).name} `
+      --add backendAddresses ipAddress=${self.ip_address}
   EOT
+
+    interpreter = ["PowerShell", "-Command"]
   }
 
   depends_on = [azurerm_application_gateway.appgw]
 }
 
-output "container_ip_address" {
-  value = azurerm_container_group.aci.ip_address
-}
+
