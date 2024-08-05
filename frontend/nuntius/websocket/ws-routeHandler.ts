@@ -33,7 +33,9 @@ export async function routeMessage(
         dbPrefix,
       );
       break;
+    case "keep_alive":
+      break;
     default:
-      console.error("Unknown message type:", wsMessage.type);
+      console.error("[ROUTE_MESSAGE]: Unknown message type:", wsMessage.type);
   }
 }

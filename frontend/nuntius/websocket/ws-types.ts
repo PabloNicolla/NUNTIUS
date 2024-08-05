@@ -10,7 +10,11 @@ export type SendWsMessage = {
 
 export type ReceiveWsMessage = {
   data: any;
-  type: "private_chat_batch" | "private_chat" | "private_chat_status";
+  type:
+    | "private_chat_batch"
+    | "private_chat"
+    | "private_chat_status"
+    | "keep_alive";
   receiver_id: string;
   sender_id: string;
   confirmation_id?: string;

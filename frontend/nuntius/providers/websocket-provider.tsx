@@ -168,7 +168,7 @@ export const WebSocketProvider: React.FC<{
             console.log("[WEB_SOCKET]: Message sent: ", msg);
             socket.send(JSON.stringify(msg));
           } else {
-            console.warn("[WEB_SOCKET]: WebSocket is not connected111");
+            console.warn("[WEB_SOCKET]: WebSocket is not connected");
           }
         }
         console.log("[WEB_SOCKET]: Message received: ", wsMessage);
@@ -195,7 +195,7 @@ export const WebSocketProvider: React.FC<{
   );
 
   const retryConnection = () => {
-    const retryInterval = 5000;
+    const retryInterval = 1000;
     const checkNetworkAndReconnect = () => {
       console.log("[WEB_SOCKET]: Reconnecting Loop");
       NetInfo.fetch().then((state) => {
@@ -213,7 +213,7 @@ export const WebSocketProvider: React.FC<{
   };
 
   const retryGetAuth = () => {
-    const retryInterval = 5000;
+    const retryInterval = 2000;
     const checkNetworkAndReconnect = () => {
       NetInfo.fetch().then((state) => {
         if (
