@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 #### WINDOWS
 
-Open [requirements.txt](requirements.txt) and uncomment the following line
+Open [requirements.txt](requirements.txt) and uncomment the following line:
 
 ```
 # twisted-iocpsupport==1.0.4 for Windows only
@@ -35,11 +35,10 @@ pip install -r requirements.txt
 > [!NOTE]
 > This is step is only necessary if you want only the postgres and redis database running on containers.
 
-This step assumes that you have followed the [root readme.md](../README.md) file, has all the correct environment variables correctly configured, and the database is online
+This step assumes that you have followed the [root readme.md](../README.md) file, has all the correct environment variables correctly configured, and the database is online.
 
 ```sh
-# Change your models (in models.py).
-python manage.py makemigrations # to create migrations for those changes
+python manage.py makemigrations # to create migrations for those changes.
 python manage.py migrate        # to apply those changes to the database.
 ```
 

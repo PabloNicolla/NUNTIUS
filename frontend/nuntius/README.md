@@ -10,7 +10,7 @@ Install dependencies.
 npm i
 ```
 
-Open [sample.env](sample.env), rename to .env and add the variables
+Open [sample.env](sample.env), rename to .env and add the variables.
 
 ### STEP 2 (Development)
 
@@ -50,18 +50,18 @@ npx expo prebuild --clean
 
 after this run `npx expo run:android --variant release` again.
 
-### STEP 2 ("Production EXPO APP") 
+### STEP 2 ("Production EXPO APP")
 
 > [!NOTE]
-> This has not more use for this project
+> This does not have more use for this project.
 
 ```
 npx expo start --no-dev --minify
 ```
 
-# upgrade
+## Upgrade
 
-Upgrade expo version
+Upgrade expo version.
 
 ```
 npm install expo@latest
@@ -70,7 +70,7 @@ npx expo install --fix
 
 ## Linter
 
-Run eslint on project
+Run eslint on project.
 
 ```
 npx eslint .

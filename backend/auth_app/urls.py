@@ -3,6 +3,8 @@ from django.urls import path, include
 from .views import GoogleLogin, CustomLoginView, CustomTokenRefreshView, CustomRegisterView
 from dj_rest_auth.views import PasswordResetConfirmView
 
+# TODO fix clash /login
+
 urlpatterns = [
     path('public/', PublicView.as_view(), name='public'),
     path('private/', PrivateView.as_view(), name='private'),
