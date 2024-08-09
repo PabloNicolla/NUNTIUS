@@ -103,12 +103,14 @@ const DeleteMessageModal = ({
       return acc;
     }, []);
 
-    sendMessage({
-      data: messagesToDelete,
-      type: "private_chat_batch",
-      receiver_id: messages[0].receiverId,
-      sender_id: user.id,
-    });
+    if (messagesToDelete.length > 0) {
+      sendMessage({
+        data: messagesToDelete,
+        type: "private_chat_batch",
+        receiver_id: messages[0].receiverId,
+        sender_id: user.id,
+      });
+    }
 
     confirmDeletion();
     clearSelected();
