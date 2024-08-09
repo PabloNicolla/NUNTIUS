@@ -12,7 +12,6 @@ import {
   getFirstMessage,
   getMessagesValueByIds,
 } from "@/lib/db/statements";
-import { useMessageSelection } from "@/hooks/providers/message-selection-provider";
 import { useMessageSelected } from "@/hooks/providers/message-selected-provider";
 import { useSession } from "@/hooks/providers/session-provider";
 import * as Clipboard from "expo-clipboard";
@@ -42,8 +41,8 @@ const TopNavBarChat = ({
     throw new Error("[TOP_NAV_BAR_CHAT] ERROR: invalid dbPrefix");
   }
 
-  const { isSelectionActive } = useMessageSelection();
   const { clearSelected, selectedMessages } = useMessageSelected();
+  const isSelectionActive = selectedMessages.size > 0;
 
   useEffect(() => {
     console.log("[TOP_NAV_BAR_CHAT]: for user_id:", contactId);

@@ -220,7 +220,7 @@ export default function ChatScreen() {
               inverted={true}
               initialNumToRender={PAGE_LIMIT}
               maxToRenderPerBatch={PAGE_LIMIT}
-              windowSize={21}
+              windowSize={6}
               nestedScrollEnabled={true}
               onEndReachedThreshold={1}
               onEndReached={() => {

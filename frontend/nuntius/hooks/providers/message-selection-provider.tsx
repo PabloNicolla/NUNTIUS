@@ -10,8 +10,11 @@ import { useMessageSelected } from "./message-selected-provider";
 import { Message } from "@/lib/db/schemaTypes";
 
 type SelectionContextType = {
-  isSelectionActive: boolean;
-  selectModeHandler: (id: Message["id"], state: boolean) => boolean;
+  selectModeHandler: (
+    id: Message["id"],
+    state: boolean,
+    pressType: "LONG" | "SHORT",
+  ) => boolean;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
@@ -33,27 +36,20 @@ export const MessageSelectionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isSelectionActive, setIsSelectionActive] = useState(false);
   const { action, selectedMessages } = useMessageSelected();
 
-  useEffect(() => {
-    if (selectedMessages.size === 0) {
-      setIsSelectionActive(false);
-    } else if (selectedMessages.size !== 0 && !isSelectionActive) {
-      setIsSelectionActive(true);
-    }
-  }, [selectedMessages, isSelectionActive]);
-
-  const selectModeHandler = useCallback((id: Message["id"], state: boolean) => {
-    return action(id, state);
-  }, []);
+  const selectModeHandler = useCallback(
+    (id: Message["id"], state: boolean, pressType: "LONG" | "SHORT") => {
+      return action(id, state, pressType);
+    },
+    [],
+  );
 
   const contextMemo = useMemo(
     () => ({
-      isSelectionActive,
       selectModeHandler,
     }),
-    [isSelectionActive, selectModeHandler],
+    [selectModeHandler],
   );
 
   return (

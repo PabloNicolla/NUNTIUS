@@ -9,7 +9,11 @@ import {
 
 type SelectedContextType = {
   selectedMessages: Set<Message["id"]>;
-  action: (id: Message["id"], state: boolean) => boolean;
+  action: (
+    id: Message["id"],
+    state: boolean,
+    pressType: "LONG" | "SHORT",
+  ) => boolean;
   clearSelected: () => void;
 };
 
@@ -36,17 +40,28 @@ export const MessageSelectedProvider = ({
     new Set(),
   );
 
-  const action = useCallback((id: Message["id"], state: boolean) => {
-    setSelectedMessages((prevSelectedMessages) => {
-      if (state) {
-        prevSelectedMessages.add(id);
-      } else {
-        prevSelectedMessages.delete(id);
+  const action = useCallback(
+    (id: Message["id"], state: boolean, pressType: "LONG" | "SHORT") => {
+      if (selectedMessages.size === 0 && pressType === "SHORT") {
+        return false;
       }
-      return new Set(prevSelectedMessages);
-    });
-    return state;
-  }, []);
+      setSelectedMessages((prevSelectedMessages) => {
+        if (prevSelectedMessages.size === 0 && pressType === "SHORT") {
+          state = false;
+          return new Set();
+        }
+
+        if (state) {
+          prevSelectedMessages.add(id);
+        } else {
+          prevSelectedMessages.delete(id);
+        }
+        return new Set(prevSelectedMessages);
+      });
+      return state;
+    },
+    [selectedMessages.size],
+  );
 
   const clearSelected = () => {
     setSelectedMessages(new Set());

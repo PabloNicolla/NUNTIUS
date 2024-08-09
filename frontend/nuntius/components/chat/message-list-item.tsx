@@ -22,7 +22,7 @@ const MessageItem = React.memo(function MessageItem({
 }) {
   const theme = useColorScheme() ?? "dark";
   const [isSelected, setIsSelected] = useState(item.isSelected);
-  const { isSelectionActive, selectModeHandler } = useMessageSelection();
+  const { selectModeHandler } = useMessageSelection();
 
   useEffect(() => {
     setIsSelected(item.isSelected);
@@ -36,14 +36,12 @@ const MessageItem = React.memo(function MessageItem({
     <TouchableRipple
       onPress={() => {
         console.log("pressed");
-        if (isSelectionActive) {
-          item.isSelected = selectModeHandler(item.id, !item.isSelected);
-          setIsSelected(item.isSelected);
-        }
+        item.isSelected = selectModeHandler(item.id, !item.isSelected, "SHORT");
+        setIsSelected(item.isSelected);
       }}
       onLongPress={() => {
         console.log("long");
-        item.isSelected = selectModeHandler(item.id, !item.isSelected);
+        item.isSelected = selectModeHandler(item.id, !item.isSelected, "LONG");
         setIsSelected(item.isSelected);
       }}
       rippleColor={
