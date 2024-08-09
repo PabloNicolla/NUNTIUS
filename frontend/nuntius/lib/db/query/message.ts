@@ -155,3 +155,22 @@ export const getAllPendingMessages = async (
     console.log("[STATEMENTS]: getAllMessages", error);
   }
 };
+
+export const getMessagesValueByIds = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  ids: Message["id"][],
+) => {
+  try {
+    const placeholders = ids.map(() => "?").join(",");
+    const query = `
+      SELECT
+        value
+      FROM _${dbPrefix}_message 
+      WHERE id IN (${placeholders});
+    `;
+    return await db.getAllAsync<{ value: Message["value"] }>(query, ids);
+  } catch (error) {
+    console.log("[STATEMENTS]: getMessagesValueByIds", error);
+  }
+};

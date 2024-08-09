@@ -7,10 +7,15 @@ import { ThemedText } from "../themed-text";
 import { TouchableRipple } from "react-native-paper";
 import { useSQLiteContext } from "expo-sqlite";
 import { Contact } from "@/lib/db/schemaTypes";
-import { getFirstContact, getFirstMessage } from "@/lib/db/statements";
+import {
+  getFirstContact,
+  getFirstMessage,
+  getMessagesValueByIds,
+} from "@/lib/db/statements";
 import { useMessageSelection } from "@/hooks/providers/message-selection-provider";
 import { useMessageSelected } from "@/hooks/providers/message-selected-provider";
 import { useSession } from "@/hooks/providers/session-provider";
+import * as Clipboard from "expo-clipboard";
 import UserAvatar from "../profile/avatar";
 
 type Props = {
@@ -67,14 +72,32 @@ const TopNavBarChat = ({
     editSelectedMessage();
   };
 
+  const handleCopy = async () => {
+    const msgIds = Array.from(selectedMessages);
+    const msgValues = await getMessagesValueByIds(db, dbPrefix, msgIds);
+
+    if (!msgValues) {
+      console.log(
+        "[TOP_NAV_BAR_CHAT]: ERROR not message was found to be copied",
+      );
+      return;
+    }
+
+    const values = msgValues.map((msgValue) => msgValue.value);
+
+    console.log("[TOP_NAV_BAR_CHAT]: copying:", values);
+
+    await Clipboard.setStringAsync(values.join("\n"));
+  };
+
   return (
     <ThemedView className="h-14 w-full flex-row items-center border-b-[1px] border-primary-light/50 px-2">
       <Pressable
         className="mr-4"
         onPress={() => {
           if (isSelectionActive) {
-            clearSelected();
             clearSelectedMessages();
+            clearSelected();
           } else {
             router.back();
           }
@@ -104,8 +127,8 @@ const TopNavBarChat = ({
           {selectedMessages.size === 1 && (
             <CustomIcon
               icon="pencil-outline"
-              handlePress={() => {
-                handleEdit();
+              handlePress={async () => {
+                await handleEdit();
               }}
               showIfOwner={true}
             />
@@ -113,8 +136,17 @@ const TopNavBarChat = ({
 
           <CustomIcon
             icon="trash-outline"
-            handlePress={() => {
-              handleDelete();
+            handlePress={async () => {
+              await handleDelete();
+            }}
+          />
+
+          <CustomIcon
+            icon="copy-outline"
+            handlePress={async () => {
+              await handleCopy();
+              clearSelectedMessages();
+              clearSelected();
             }}
           />
 

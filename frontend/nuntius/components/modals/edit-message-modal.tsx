@@ -62,17 +62,12 @@ const EditMessageModal = ({
     const getMessage = async () => {
       if (selectedMessages.size === 1) {
         const msgId = selectedMessages.values().next().value;
-
-        console.log(msgId);
-
         const message = await getFirstMessage(db, dbPrefix, Number(msgId));
 
         if (!message) {
           console.log("[EDIT_MESSAGE_MODAL]: Error selected message not found");
           return;
         }
-        console.log("up");
-
         setMessage(message);
       }
     };
