@@ -1,4 +1,4 @@
-# NUNTIUS documentation
+# NUNTIUS
 
 ## Frontend
 
