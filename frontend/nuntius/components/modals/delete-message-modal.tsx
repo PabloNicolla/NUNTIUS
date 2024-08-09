@@ -92,6 +92,14 @@ const DeleteMessageModal = ({
 
     await deleteMessagesByIds(db, dbPrefix, messageIds);
 
+    if (user.id === messages[0].chatId) {
+      confirmDeletion();
+      clearSelected();
+      await updateChatDetails();
+      onClose();
+      return;
+    }
+
     const messagesToDelete = messages.reduce<Message[]>((acc, msg) => {
       if (msg.senderId === user.id) {
         acc.push({
