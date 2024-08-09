@@ -1,4 +1,4 @@
-import { Message } from "@/db/schemaTypes";
+import { Message } from "@/lib/db/schemaTypes";
 import {
   createContext,
   useCallback,

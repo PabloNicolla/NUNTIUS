@@ -1,7 +1,7 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { addMessageTableIndexes, loadDatabaseSchema } from "./schema";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SessionUser } from "@/providers/session-provider";
+import { SessionUser } from "@/hooks/providers/session-provider";
 
 export async function migrateDbIfNeeded(db: SQLiteDatabase) {
   const user = await CustomGetUser();

@@ -1,5 +1,5 @@
-import { MessageSelectedProvider } from "@/providers/message-selected-provider";
-import { MessageSelectionProvider } from "@/providers/message-selection-provider";
+import { MessageSelectedProvider } from "@/hooks/providers/message-selected-provider";
+import { MessageSelectionProvider } from "@/hooks/providers/message-selection-provider";
 import { Stack } from "expo-router";
 import React from "react";
 

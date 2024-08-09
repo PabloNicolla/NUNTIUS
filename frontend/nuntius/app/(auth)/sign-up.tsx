@@ -17,7 +17,7 @@ import { StatusBar } from "expo-status-bar";
 import axios from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
@@ -28,12 +28,12 @@ import {
   REGISTER_URL,
   RegisterRequestData,
   RegisterResponseData,
-} from "@/API/register";
+} from "@/lib/API/register";
 import {
   CHECK_EMAIL_URL,
   CheckEmailRequestData,
   CheckEmailResponseData,
-} from "@/API/check-email";
+} from "@/lib/API/check-email";
 
 const formSchema = z.object({
   email: z.string().email("Invalid Email format").min(1, "Email is required"),

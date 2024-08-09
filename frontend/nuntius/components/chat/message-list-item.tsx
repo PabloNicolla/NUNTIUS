@@ -1,11 +1,11 @@
 import { ThemedText } from "@/components/themed-text";
-import { Condition, MessageStatus } from "@/db/schemaTypes";
-import { SessionUser } from "@/providers/session-provider";
+import { Condition, MessageStatus } from "@/lib/db/schemaTypes";
+import { SessionUser } from "@/hooks/providers/session-provider";
 import { useEffect, useState } from "react";
 import { useColorScheme, View } from "react-native";
 import { TouchableRipple } from "react-native-paper";
 import React from "react";
-import { useMessageSelection } from "@/providers/message-selection-provider";
+import { useMessageSelection } from "@/hooks/providers/message-selection-provider";
 import { Colors } from "@/constants/Colors";
 import { MessageItemType } from "@/app/(app)/(chat)/chat/[id]";
 import { format } from "date-fns";

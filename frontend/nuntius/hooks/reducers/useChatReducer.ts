@@ -1,4 +1,4 @@
-import { PrivateChatJoinContact } from "@/db/schemaTypes";
+import { PrivateChatJoinContact } from "@/lib/db/schemaTypes";
 import { useReducer } from "react";
 
 export type ChatState = {

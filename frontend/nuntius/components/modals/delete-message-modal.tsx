@@ -4,15 +4,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import TopNavBar from "../custom-nav-bar/top-nav-bar";
 import { Colors } from "@/constants/Colors";
 import { useSQLiteContext } from "expo-sqlite";
-import { useWebSocket } from "@/providers/websocket-provider";
-import { useSession } from "@/providers/session-provider";
-import { useMessageSelected } from "@/providers/message-selected-provider";
+import { useWebSocket } from "@/hooks/providers/websocket-provider";
+import { useSession } from "@/hooks/providers/session-provider";
+import { useMessageSelected } from "@/hooks/providers/message-selected-provider";
 import {
   deleteMessagesByIds,
   getMessagesByIds,
   getNewestMessageByChatId,
   updatePrivateChatById,
-} from "@/db/statements";
+} from "@/lib/db/statements";
 import { ThemedText } from "../themed-text";
 import { TouchableRipple } from "react-native-paper";
 import {
@@ -20,7 +20,7 @@ import {
   Message,
   PrivateChat,
   ReceiverType,
-} from "@/db/schemaTypes";
+} from "@/lib/db/schemaTypes";
 
 const DeleteMessageModal = ({
   isVisible,

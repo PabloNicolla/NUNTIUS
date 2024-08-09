@@ -8,7 +8,7 @@ import {
   MessageType,
   PrivateChat,
   ReceiverType,
-} from "@/db/schemaTypes";
+} from "@/lib/db/schemaTypes";
 import {
   getAllMessagesByChatIdWithPagination,
   getFirstMessage,
@@ -17,8 +17,8 @@ import {
   insertPrivateChat,
   resetPrivateChatNotificationCount,
   updatePrivateChatById,
-} from "@/db/statements";
-import { useSession } from "@/providers/session-provider";
+} from "@/lib/db/statements";
+import { useSession } from "@/hooks/providers/session-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
@@ -34,7 +34,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { TouchableRipple } from "react-native-paper";
-import { useWebSocket } from "@/providers/websocket-provider";
+import { useWebSocket } from "@/hooks/providers/websocket-provider";
 import React from "react";
 import EditMessageModal from "@/components/modals/edit-message-modal";
 import MessageItem from "@/components/chat/message-list-item";
@@ -44,7 +44,7 @@ import { Colors } from "@/constants/Colors";
 import {
   ConnectionStatus,
   useWebSocketController,
-} from "@/providers/ws-controller-provider";
+} from "@/hooks/providers/ws-controller-provider";
 import { StatusBar } from "expo-status-bar";
 
 export type MessageItemType = Message & {

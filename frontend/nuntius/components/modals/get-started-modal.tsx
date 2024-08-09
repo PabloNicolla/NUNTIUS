@@ -25,16 +25,16 @@ import {
   CHECK_EMAIL_URL,
   CheckEmailRequestData,
   CheckEmailResponseData,
-} from "@/API/check-email";
+} from "@/lib/API/check-email";
 import { makeRedirectUri } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import {
   GOOGLE_AUTH,
   GoogleAuthRequestData,
   GoogleAuthResponseData,
-} from "@/API/google-auth";
-import { GET_USER_URL } from "@/API/get-user";
-import { useSession } from "@/providers/session-provider";
+} from "@/lib/API/google-auth";
+import { GET_USER_URL } from "@/lib/API/get-user";
+import { useSession } from "@/hooks/providers/session-provider";
 
 type GetStartedModalProps = {
   isVisible: boolean;

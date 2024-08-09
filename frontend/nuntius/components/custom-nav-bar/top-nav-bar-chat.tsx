@@ -6,11 +6,11 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "../themed-text";
 import { TouchableRipple } from "react-native-paper";
 import { useSQLiteContext } from "expo-sqlite";
-import { Contact } from "@/db/schemaTypes";
-import { getFirstContact, getFirstMessage } from "@/db/statements";
-import { useMessageSelection } from "@/providers/message-selection-provider";
-import { useMessageSelected } from "@/providers/message-selected-provider";
-import { useSession } from "@/providers/session-provider";
+import { Contact } from "@/lib/db/schemaTypes";
+import { getFirstContact, getFirstMessage } from "@/lib/db/statements";
+import { useMessageSelection } from "@/hooks/providers/message-selection-provider";
+import { useMessageSelected } from "@/hooks/providers/message-selected-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import UserAvatar from "../profile/avatar";
 
 type Props = {

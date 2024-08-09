@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PrimaryButton from "./primary-button";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import { router } from "expo-router";
 
 type Props = {};

@@ -1,28 +1,31 @@
-import { Contact } from "@/db/schemaTypes";
+import { Contact } from "@/lib/db/schemaTypes";
 import React, { createContext, useState, useContext, useMemo } from "react";
 import * as SecureStore from "expo-secure-store";
-import { LoginResponseData } from "@/API/login";
-import { RegisterResponseData } from "@/API/register";
-import { ChangeNameResponseData } from "@/API/change-name";
+import { LoginResponseData } from "@/lib/API/login";
+import { RegisterResponseData } from "@/lib/API/register";
+import { ChangeNameResponseData } from "@/lib/API/change-name";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { VERIFY_TOKEN_URL, VerifyTokenRequestData } from "@/API/verify-token";
+import {
+  VERIFY_TOKEN_URL,
+  VerifyTokenRequestData,
+} from "@/lib/API/verify-token";
 import { Platform } from "react-native";
 import * as Application from "expo-application";
 import {
   GET_ProfileImageResponseData,
   PROFILE_IMAGE_URL,
-} from "@/API/profile-image";
+} from "@/lib/API/profile-image";
 import {
   REFRESH_TOKEN_URL,
   RefreshTokenRequestData,
   RefreshTokenResponseData,
-} from "@/API/refresh-token";
+} from "@/lib/API/refresh-token";
 import {
   REFRESH_JWT_URL,
   RefreshJWTRequestData,
   RefreshJWTResponseData,
-} from "@/API/refresh-jwt";
+} from "@/lib/API/refresh-jwt";
 import {
   ConnectionStatus,
   useWebSocketController,

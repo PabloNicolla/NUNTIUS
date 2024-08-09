@@ -15,15 +15,15 @@ import { Controller, useForm } from "react-hook-form";
 import { StatusBar } from "expo-status-bar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import { ThemedText } from "@/components/themed-text";
 import FormTextField from "@/components/form/form-text-field";
 import {
   GET_CONTACT_URL,
   GetContactRequestData,
   GetContactResponseData,
-} from "@/API/get-contact";
-import { insertContact } from "@/db/statements";
+} from "@/lib/API/get-contact";
+import { insertContact } from "@/lib/db/statements";
 import { useSQLiteContext } from "expo-sqlite";
 import { router } from "expo-router";
 

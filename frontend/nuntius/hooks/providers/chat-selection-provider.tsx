@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
@@ -6,47 +6,50 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useMessageSelected } from "./message-selected-provider";
-import { Message } from "@/db/schemaTypes";
+import { useChatSelected } from "./chat-selection-provider copy";
+import { PrivateChat } from "@/lib/db/schemaTypes";
 
 type SelectionContextType = {
   isSelectionActive: boolean;
-  selectModeHandler: (id: Message["id"], state: boolean) => boolean;
+  selectModeHandler: (id: PrivateChat["id"], state: boolean) => void;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
   undefined,
 );
 
-export const useMessageSelection = () => {
+export const useChatSelection = () => {
   const context = useContext(SelectionContext);
   if (!context) {
     throw new Error(
-      "useMessageSelection must be used within a MessageSelectionProvider",
+      "useChatSelection must be used within a ChatSelectionProvider",
     );
   }
   return context;
 };
 
-export const MessageSelectionProvider = ({
+export const ChatSelectionProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const [isSelectionActive, setIsSelectionActive] = useState(false);
-  const { action, selectedMessages } = useMessageSelected();
+  const { action, selectedChats } = useChatSelected();
 
   useEffect(() => {
-    if (selectedMessages.size === 0) {
+    if (selectedChats.size === 0) {
       setIsSelectionActive(false);
-    } else if (selectedMessages.size !== 0 && !isSelectionActive) {
+    } else if (selectedChats.size !== 0 && !isSelectionActive) {
       setIsSelectionActive(true);
     }
-  }, [selectedMessages, isSelectionActive]);
+  }, [selectedChats, isSelectionActive]);
 
-  const selectModeHandler = useCallback((id: Message["id"], state: boolean) => {
-    return action(id, state);
-  }, []);
+  const selectModeHandler = useCallback(
+    (id: PrivateChat["id"], state: boolean) => {
+      return action(id, state);
+    },
+    [],
+  );
 
   const contextMemo = useMemo(
     () => ({

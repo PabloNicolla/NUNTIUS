@@ -1,5 +1,8 @@
-import { Condition, Message, MessageStatus } from "@/db/schemaTypes";
-import { updateMessagesStatusBulk, updateMessageStatus } from "@/db/statements";
+import { Condition, Message, MessageStatus } from "@/lib/db/schemaTypes";
+import {
+  updateMessagesStatusBulk,
+  updateMessageStatus,
+} from "@/lib/db/statements";
 import { SQLiteDatabase } from "expo-sqlite";
 import { MutableRefObject } from "react";
 import { Ws_private_chat_status } from "./ws-types";

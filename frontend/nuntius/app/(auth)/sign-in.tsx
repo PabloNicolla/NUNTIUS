@@ -17,14 +17,18 @@ import { StatusBar } from "expo-status-bar";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
 import FormTextField from "@/components/form/form-text-field";
 import BottomNavbar from "@/components/custom-nav-bar/bottom-nav-bar";
 import { Colors } from "@/constants/Colors";
-import { LOGIN_URL, LoginRequestData, LoginResponseData } from "@/API/login";
+import {
+  LOGIN_URL,
+  LoginRequestData,
+  LoginResponseData,
+} from "@/lib/API/login";
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid Email format"),

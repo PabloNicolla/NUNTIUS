@@ -1,4 +1,4 @@
-import { Contact } from "@/db/schemaTypes";
+import { Contact } from "@/lib/db/schemaTypes";
 import { useReducer } from "react";
 
 export type ContactState = {

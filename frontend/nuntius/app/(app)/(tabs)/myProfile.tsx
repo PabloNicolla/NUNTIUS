@@ -6,7 +6,7 @@ import UserAvatar from "@/components/profile/avatar";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableRipple } from "react-native-paper";
 import { ThemedText } from "@/components/themed-text";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import { Colors } from "@/constants/Colors";
 
 type Props = {};

@@ -10,14 +10,14 @@ import {
 import NetInfo from "@react-native-community/netinfo";
 import { useSession } from "./session-provider";
 import { SQLiteDatabase } from "expo-sqlite";
-import { routeMessage } from "@/websocket/ws-routeHandler";
+import { routeMessage } from "@/lib/websocket/ws-routeHandler";
 import {
   ConnectionStatus,
   useWebSocketController,
 } from "./ws-controller-provider";
-import { ReceiveWsMessage, SendWsMessage } from "@/websocket/ws-types";
-import { getAllPendingMessages } from "@/db/statements";
-import { Message } from "@/db/schemaTypes";
+import { ReceiveWsMessage, SendWsMessage } from "@/lib/websocket/ws-types";
+import { getAllPendingMessages } from "@/lib/db/statements";
+import { Message } from "@/lib/db/schemaTypes";
 
 type WebSocketContextType = {
   sendMessage: (message: SendWsMessage) => void;

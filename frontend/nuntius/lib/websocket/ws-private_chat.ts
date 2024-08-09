@@ -2,8 +2,8 @@ import {
   GET_CONTACT_URL,
   GetContactRequestData,
   GetContactResponseData,
-} from "@/API/get-contact";
-import { Condition, MessageStatus } from "@/db/schemaTypes";
+} from "@/lib/API/get-contact";
+import { Condition, MessageStatus } from "@/lib/db/schemaTypes";
 import {
   getFirstMessageBySenderRef,
   getFirstPrivateChat,
@@ -12,7 +12,7 @@ import {
   insertPrivateChat,
   updateMessage,
   updatePrivateChatById,
-} from "@/db/statements";
+} from "@/lib/db/statements";
 import axios from "axios";
 import { SQLiteDatabase } from "expo-sqlite";
 import { MutableRefObject } from "react";

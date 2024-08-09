@@ -3,7 +3,7 @@ import React from "react";
 import { TouchableRipple } from "react-native-paper";
 import { ThemedText } from "../themed-text";
 import { router } from "expo-router";
-import { Contact } from "@/db/schemaTypes";
+import { Contact } from "@/lib/db/schemaTypes";
 import UserAvatar from "../profile/avatar";
 
 export type ContactListItemProps = Contact;

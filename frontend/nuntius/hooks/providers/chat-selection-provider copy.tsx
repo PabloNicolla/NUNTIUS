@@ -1,4 +1,4 @@
-import { PrivateChat } from "@/db/schemaTypes";
+import { PrivateChat } from "@/lib/db/schemaTypes";
 import React, {
   createContext,
   useCallback,

@@ -17,16 +17,16 @@ import {
   Message,
   MessageStatus,
   MessageType,
-} from "@/db/schemaTypes";
+} from "@/lib/db/schemaTypes";
 import { useSQLiteContext } from "expo-sqlite";
-import { useWebSocket } from "@/providers/websocket-provider";
-import { useSession } from "@/providers/session-provider";
-import { useMessageSelected } from "@/providers/message-selected-provider";
+import { useWebSocket } from "@/hooks/providers/websocket-provider";
+import { useSession } from "@/hooks/providers/session-provider";
+import { useMessageSelected } from "@/hooks/providers/message-selected-provider";
 import {
   getFirstMessage,
   updateMessage,
   updatePrivateChatById,
-} from "@/db/statements";
+} from "@/lib/db/statements";
 import MessageItem from "../chat/message-list-item";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 

@@ -13,14 +13,14 @@ import {
 import { router } from "expo-router";
 
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import { useAvatarModal } from "@/providers/avatarModal-provider";
+import { useAvatarModal } from "@/hooks/providers/avatarModal-provider";
 import AvatarModal from "@/components/modals/avatar-modal";
 import { Ionicons } from "@expo/vector-icons";
-import useContactReducer from "@/reducers/useContactReducer";
-import { getAllContacts } from "@/db/statements";
-import { Contact } from "@/db/schemaTypes";
+import useContactReducer from "@/hooks/reducers/useContactReducer";
+import { getAllContacts } from "@/lib/db/statements";
+import { Contact } from "@/lib/db/schemaTypes";
 import ContactListItem from "@/components/contacts/contact-list-item";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 
 type Props = {};
 

@@ -1,11 +1,11 @@
 import { useColorScheme, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { TouchableRipple } from "react-native-paper";
-import { useChatSelection } from "@/providers/chat-selection-provider";
+import { useChatSelection } from "@/hooks/providers/chat-selection-provider";
 import { ThemedText } from "../themed-text";
 import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
-import { PrivateChatJoinContact } from "@/db/schemaTypes";
+import { PrivateChatJoinContact } from "@/lib/db/schemaTypes";
 import UserAvatar from "../profile/avatar";
 
 export type ChatListItemProps = PrivateChatJoinContact;
@@ -145,18 +145,21 @@ const MostRecentMessage = ({
   );
 };
 
+const truncateToDay = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
 const formatDate = (lastMessageTime: number) => {
   const now = new Date();
   const messageDate = new Date(lastMessageTime);
+  const truncatedNow = truncateToDay(now);
+  const truncatedMsgDate = truncateToDay(messageDate);
 
-  const diffInMinutes = (now.getTime() - messageDate.getTime()) / 60000;
-  const diffInDays = differenceInDays(now, messageDate);
+  const diffInDays = differenceInDays(truncatedNow, truncatedMsgDate);
 
-  if (diffInMinutes < 1440) {
-    // less than 1 day
-    return format(messageDate, "hh:mm");
+  if (diffInDays === 0) {
+    return format(messageDate, "HH:mm");
   } else if (diffInDays === 1) {
-    // yesterday
     return "yesterday";
   } else {
     return format(messageDate, "yyyy-MM-dd");

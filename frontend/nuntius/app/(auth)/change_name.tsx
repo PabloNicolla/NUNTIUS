@@ -17,7 +17,7 @@ import { StatusBar } from "expo-status-bar";
 import axios from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/hooks/providers/session-provider";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import PrimaryButton from "@/components/buttons/primary-button";
@@ -28,7 +28,7 @@ import {
   CHANGE_NAME_URL,
   ChangeNameRequestData,
   ChangeNameResponseData,
-} from "@/API/change-name";
+} from "@/lib/API/change-name";
 
 const formSchema = z.object({
   first_name: z.string().min(1, "first name is required"),

@@ -1,4 +1,4 @@
-import { useAvatarModal } from "@/providers/avatarModal-provider";
+import { useAvatarModal } from "@/hooks/providers/avatarModal-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, Pressable, View } from "react-native";

@@ -4,25 +4,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChatListItem, {
   ChatListItemProps,
 } from "@/components/chat/chat-list-item";
-import { useChatSelection } from "@/providers/chat-selection-provider";
+import { useChatSelection } from "@/hooks/providers/chat-selection-provider";
 import { ThemedText } from "@/components/themed-text";
 import { StatusBar } from "expo-status-bar";
 import ListWithDynamicHeader from "@/components/list/list-with-dynamic-header";
-import { useAvatarModal } from "@/providers/avatarModal-provider";
+import { useAvatarModal } from "@/hooks/providers/avatarModal-provider";
 import AvatarModal from "@/components/modals/avatar-modal";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedView } from "@/components/themed-view";
 import { FAB, TouchableRipple } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import useChatReducer from "@/reducers/useChatReducer";
+import useChatReducer from "@/hooks/reducers/useChatReducer";
 import {
   deleteAllMessagesByChatId,
   deletePrivateChat,
   getAllPrivateChatsJoinContacts,
-} from "@/db/statements";
-import { useChatSelected } from "@/providers/chat-selection-provider copy";
-import { useSession } from "@/providers/session-provider";
+} from "@/lib/db/statements";
+import { useChatSelected } from "@/hooks/providers/chat-selection-provider copy";
+import { useSession } from "@/hooks/providers/session-provider";
 const headerHeight = 50;
 
 const App = () => {
