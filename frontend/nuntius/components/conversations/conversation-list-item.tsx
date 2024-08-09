@@ -8,9 +8,9 @@ import { router } from "expo-router";
 import { PrivateChatJoinContact } from "@/lib/db/schemaTypes";
 import UserAvatar from "../profile/avatar";
 
-export type ChatListItemProps = PrivateChatJoinContact;
+export type ConversationListItemProps = PrivateChatJoinContact;
 
-const ChatListItem = React.memo(function ChatListItem({
+const ConversationListItem = React.memo(function ChatListItem({
   id,
   contactId,
   lastMessageId,
@@ -21,7 +21,7 @@ const ChatListItem = React.memo(function ChatListItem({
   first_name,
   last_name,
   imageURL,
-}: ChatListItemProps) {
+}: ConversationListItemProps) {
   const theme = useColorScheme() ?? "dark";
   const { isSelectionActive, selectModeHandler } = useChatSelection();
   const [isSelected, setIsSelected] = useState(false);
@@ -166,4 +166,4 @@ const formatDate = (lastMessageTime: number) => {
   }
 };
 
-export default ChatListItem;
+export default ConversationListItem;
