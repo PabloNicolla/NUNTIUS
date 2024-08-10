@@ -6,7 +6,7 @@ import { Redirect, Stack } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useRef, useState } from "react";
 import { WebSocketProvider } from "@/hooks/providers/websocket-provider";
-import { ChatSelectedProvider } from "@/hooks/providers/chat-selection-provider copy";
+import { ChatSelectedProvider } from "@/hooks/providers/chat-selected-provider";
 import SplashScreenL from "@/components/splash-screen";
 import { migrateDbIfNeeded } from "@/lib/db/migration";
 

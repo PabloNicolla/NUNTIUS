@@ -1,17 +1,13 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useChatSelected } from "./chat-selection-provider copy";
+import React, { createContext, useCallback, useContext, useMemo } from "react";
+import { useChatSelected } from "./chat-selected-provider";
 import { PrivateChat } from "@/lib/db/schemaTypes";
 
 type SelectionContextType = {
-  isSelectionActive: boolean;
-  selectModeHandler: (id: PrivateChat["id"], state: boolean) => void;
+  selectModeHandler: (
+    id: PrivateChat["id"],
+    state: boolean,
+    pressType: "LONG" | "SHORT",
+  ) => boolean;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(
@@ -33,30 +29,20 @@ export const ChatSelectionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isSelectionActive, setIsSelectionActive] = useState(false);
-  const { action, selectedChats } = useChatSelected();
-
-  useEffect(() => {
-    if (selectedChats.size === 0) {
-      setIsSelectionActive(false);
-    } else if (selectedChats.size !== 0 && !isSelectionActive) {
-      setIsSelectionActive(true);
-    }
-  }, [selectedChats, isSelectionActive]);
+  const { action } = useChatSelected();
 
   const selectModeHandler = useCallback(
-    (id: PrivateChat["id"], state: boolean) => {
-      return action(id, state);
+    (id: PrivateChat["id"], state: boolean, pressType: "LONG" | "SHORT") => {
+      return action(id, state, pressType);
     },
     [],
   );
 
   const contextMemo = useMemo(
     () => ({
-      isSelectionActive,
       selectModeHandler,
     }),
-    [isSelectionActive, selectModeHandler],
+    [selectModeHandler],
   );
 
   return (

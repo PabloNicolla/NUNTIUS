@@ -7,50 +7,54 @@ import { differenceInDays, format } from "date-fns";
 import { router } from "expo-router";
 import { PrivateChatJoinContact } from "@/lib/db/schemaTypes";
 import UserAvatar from "../profile/avatar";
+import { ConversationItemType } from "@/hooks/reducers/useChatReducer";
 
 export type ConversationListItemProps = PrivateChatJoinContact;
 
 const ConversationListItem = React.memo(function ChatListItem({
-  id,
-  contactId,
-  lastMessageId,
-  lastMessageValue,
-  lastMessageTimestamp,
-  notificationCount,
-  username,
-  first_name,
-  last_name,
-  imageURL,
-}: ConversationListItemProps) {
+  item,
+}: {
+  item: ConversationItemType;
+}) {
   const theme = useColorScheme() ?? "dark";
-  const { isSelectionActive, selectModeHandler } = useChatSelection();
-  const [isSelected, setIsSelected] = useState(false);
+  const { selectModeHandler } = useChatSelection();
+  const [isSelected, setIsSelected] = useState(item.isSelected);
 
   useEffect(() => {
-    selectModeHandler(id, isSelected);
-  }, [isSelected, selectModeHandler, id]);
+    setIsSelected(item.isSelected);
+  }, [item.isSelected]);
 
-  console.log("[CHAT_LIST_ITEM]: MOUNTING:", id);
+  console.log("[CHAT_LIST_ITEM]: MOUNTING:", item.id, item.isSelected);
 
   return (
     <View className="h-[80] w-full">
       <TouchableRipple
-        className={` ${isSelected && "bg-primary-light/30 dark:bg-primary-light/40"} z-20 flex-1`}
+        className={` ${item.isSelected && "bg-primary-light/30 dark:bg-primary-light/40"} z-20 flex-1`}
         onPress={() => {
-          if (!isSelectionActive) {
-            console.log("Pressed");
+          console.log("Pressed");
+          const prevState = item.isSelected;
+          item.isSelected = selectModeHandler(
+            item.id,
+            !item.isSelected,
+            "SHORT",
+          );
+          if (!prevState && !item.isSelected) {
             router.push({
               pathname: `/chat/[id]`,
-              params: { id: id, contactId: contactId },
+              params: { id: item.id, contactId: item.contactId },
             });
           } else {
-            setIsSelected(!isSelected);
+            setIsSelected(item.isSelected);
           }
-          return true;
         }}
         onLongPress={() => {
           console.log("long");
-          setIsSelected(!isSelected);
+          item.isSelected = selectModeHandler(
+            item.id,
+            !item.isSelected,
+            "LONG",
+          );
+          setIsSelected(item.isSelected);
         }}
         rippleColor={
           theme === "dark" ? "rgba(255, 255, 255, .32)" : "rgba(0, 0, 0, .15)"
@@ -59,22 +63,22 @@ const ConversationListItem = React.memo(function ChatListItem({
         <View className="flex-1 flex-row items-center gap-x-2 px-2">
           <View className="relative">
             <UserAvatar
-              firstName={first_name}
-              isSelectionActive={isSelectionActive}
-              isSelected={isSelected}
-              imageURl={imageURL}
+              firstName={item.first_name}
+              isSelectionActive={item.isSelected}
+              isSelected={item.isSelected}
+              imageURl={item.imageURL}
               size={50}
             />
           </View>
 
           <View className="h-[50] flex-1 flex-col">
             <ChatDetails
-              chatName={first_name}
-              lastMessageTime={lastMessageTimestamp}
+              chatName={item.first_name}
+              lastMessageTime={item.lastMessageTimestamp}
             />
             <MostRecentMessage
-              recentMessage={lastMessageValue}
-              notificationCount={notificationCount}
+              recentMessage={item.lastMessageValue}
+              notificationCount={item.notificationCount}
             />
           </View>
         </View>
