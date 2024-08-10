@@ -134,7 +134,7 @@ const DeleteMessageModal = ({
       onRequestClose={onClose}
     >
       <TopNavBar
-        title="Edit message"
+        title="Delete Messages"
         customBack={() => {
           onClose();
         }}
