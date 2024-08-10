@@ -28,7 +28,7 @@ const MessageItem = React.memo(function MessageItem({
     setIsSelected(item.isSelected);
   }, [item.isSelected]);
 
-  console.log("MMM", item.id, item.isSelected);
+  console.log("[MSG]: MOUNTING:", item.id, item.isSelected);
 
   const formattedTime = format(new Date(item.timestamp), "HH:mm");
 

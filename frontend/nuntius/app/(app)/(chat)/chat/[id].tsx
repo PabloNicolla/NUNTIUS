@@ -51,7 +51,6 @@ export default function ChatScreen() {
   const theme = useColorScheme() ?? "dark";
   const db = useSQLiteContext();
   const { user, getDbPrefix } = useSession();
-
   const dbPrefix = getDbPrefix();
 
   if (!dbPrefix) {
@@ -152,7 +151,9 @@ export default function ChatScreen() {
       } else {
         setMessages((prevMessages) =>
           prevMessages.map((message) =>
-            message.id === new_message.id ? new_message : message,
+            message.id === new_message.id
+              ? { ...new_message, isSelected: message.isSelected }
+              : message,
           ),
         );
       }
