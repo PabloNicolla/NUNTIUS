@@ -9,7 +9,9 @@ import { ThemedView } from "@/components/themed-view";
 import { FAB } from "react-native-paper";
 import { router } from "expo-router";
 import { addDatabaseChangeListener, useSQLiteContext } from "expo-sqlite";
-import useChatReducer from "@/hooks/reducers/useChatReducer";
+import useChatReducer, {
+  ConversationItemType,
+} from "@/hooks/reducers/useChatReducer";
 import {
   getAllPrivateChatsJoinContacts,
   getFirstContactByRowId,
@@ -37,6 +39,10 @@ const App = () => {
     throw new Error("[GROUPS] ERROR: invalid dbPrefix");
   }
 
+  const clearSelectedChats = () => {
+    dispatch({ payload: null, type: "CLEAR_SELECTED" });
+  };
+
   const deleteSelectedChats = () => {};
 
   const fetchAllPrivateChats = useCallback(async () => {
@@ -52,21 +58,21 @@ const App = () => {
     fetchAllPrivateChats();
   }, [db, dispatch, fetchAllPrivateChats]);
 
-  const useDebounce = (callback: () => void, delay: number) => {
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // const useDebounce = (callback: () => void, delay: number) => {
+  //   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const debouncedFunction = useCallback(() => {
-      if (timeoutRef.current === null) {
-        timeoutRef.current = setTimeout(() => {
-          console.log("[CHAT_LIST]: useDebounce");
-          callback();
-          timeoutRef.current = null;
-        }, delay);
-      }
-    }, [callback, delay]);
+  //   const debouncedFunction = useCallback(() => {
+  //     if (timeoutRef.current === null) {
+  //       timeoutRef.current = setTimeout(() => {
+  //         console.log("[CHAT_LIST]: useDebounce");
+  //         callback();
+  //         timeoutRef.current = null;
+  //       }, delay);
+  //     }
+  //   }, [callback, delay]);
 
-    return debouncedFunction;
-  };
+  //   return debouncedFunction;
+  // };
 
   // const debouncedFetchAllChats = useDebounce(fetchAllPrivateChats, 200);
 
@@ -110,7 +116,7 @@ const App = () => {
     });
 
     return () => listener.remove();
-  }, [db, dispatch, dbPrefix]);
+  }, [db, dispatch, dbPrefix, state.chatIds]);
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -123,9 +129,9 @@ const App = () => {
     item,
     index,
   }: {
-    item: ConversationListItemProps;
+    item: ConversationItemType;
     index: number;
-  }) => <ConversationListItem key={item.id} {...item} test-index={index} />;
+  }) => <ConversationListItem key={item.id} item={item} test-index={index} />;
 
   return (
     <ThemedView className="flex-1">
@@ -157,7 +163,15 @@ const App = () => {
             color="white"
           />
 
-          <ActionsHeaderOnSelect headerHeight={headerHeight} />
+          <ActionsHeaderOnSelect
+            headerHeight={headerHeight}
+            handleDelete={() => {
+              deleteSelectedChats();
+            }}
+            handleClearSelected={() => {
+              clearSelectedChats();
+            }}
+          />
         </View>
       </SafeAreaView>
     </ThemedView>

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import { useMessageSelected } from "./message-selected-provider";
 import { Message } from "@/lib/db/schemaTypes";
 
@@ -36,7 +29,7 @@ export const MessageSelectionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { action, selectedMessages } = useMessageSelected();
+  const { action } = useMessageSelected();
 
   const selectModeHandler = useCallback(
     (id: Message["id"], state: boolean, pressType: "LONG" | "SHORT") => {
