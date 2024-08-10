@@ -1,21 +1,25 @@
 import { Contact, PrivateChatJoinContact } from "@/lib/db/schemaTypes";
 import { useReducer } from "react";
 
+export type ConversationItemType = PrivateChatJoinContact & {
+  isSelected?: boolean;
+};
+
 export type ChatState = {
   chatIds: Set<string>;
-  chats: PrivateChatJoinContact[];
-  filteredChats: PrivateChatJoinContact[];
+  chats: ConversationItemType[];
+  filteredChats: ConversationItemType[];
   searchQuery: string;
 };
 
 export type SetChatsAction = {
   type: "SET_CHATS_FULL";
-  payload: PrivateChatJoinContact[];
+  payload: ConversationItemType[];
 };
 
 export type SetChatAction = {
   type: "UPDATE_CHAT" | "DELETE_CHAT" | "ADD_CHAT";
-  payload: PrivateChatJoinContact;
+  payload: ConversationItemType;
 };
 
 export type UpdateContactAction = {
@@ -28,18 +32,25 @@ export type SetSearchQueryAction = {
   payload: string;
 };
 
+export type SetSelectedChatsAction = {
+  type: "CLEAR_SELECTED";
+  payload: undefined | null;
+};
+
 export type ChatAction =
   | SetChatsAction
   | SetSearchQueryAction
   | SetChatAction
-  | UpdateContactAction;
+  | UpdateContactAction
+  | SetSelectedChatsAction;
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
-    case "SET_CHATS_FULL":
+    case "SET_CHATS_FULL": {
+      const chatIds = action.payload.map((chat) => chat.id);
       return {
         ...state,
-        chatIds: new Set(action.payload.map((chat) => chat.id)),
+        chatIds: new Set(chatIds),
         chats: sortChatsByLastMessageTime(action.payload),
         filteredChats: action.payload.filter((chat) =>
           chat.first_name
@@ -47,6 +58,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
             .includes(state.searchQuery.toLowerCase()),
         ),
       };
+    }
     case "SET_SEARCH_QUERY":
       return {
         ...state,
@@ -90,7 +102,10 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       const index = state.chats.findIndex(
         (chat) => chat.id === action.payload.id,
       );
-      state.chats[index] = { ...action.payload };
+      state.chats[index] = {
+        ...action.payload,
+        isSelected: state.chats[index].isSelected,
+      };
       return {
         ...state,
         chats: sortChatsByLastMessageTime(state.chats),
@@ -121,6 +136,21 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ),
       };
     }
+    case "CLEAR_SELECTED": {
+      const newChats = state.chats.map((chat) => ({
+        ...chat,
+        isSelected: false,
+      }));
+      return {
+        ...state,
+        chats: sortChatsByLastMessageTime(newChats),
+        filteredChats: newChats.filter((chat) =>
+          chat.first_name
+            .toLowerCase()
+            .includes(state.searchQuery.toLowerCase()),
+        ),
+      };
+    }
     default:
       return state;
   }
@@ -137,7 +167,7 @@ export default function useChatReducer() {
   return useReducer(chatReducer, initialState);
 }
 
-const sortChatsByLastMessageTime = (chats: PrivateChatJoinContact[]) => {
+const sortChatsByLastMessageTime = (chats: ConversationItemType[]) => {
   return chats.sort(
     (a, b) => (b.lastMessageTimestamp || 0) - (a.lastMessageTimestamp || 0),
   );
