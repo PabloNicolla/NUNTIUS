@@ -25,3 +25,20 @@ export const getFirstContact = async (
     console.log("[STATEMENTS]: getFirstContact", error);
   }
 };
+
+export const getFirstContactByRowId = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  rowId: number,
+) => {
+  try {
+    return await db.getFirstAsync<Contact>(
+      `SELECT * FROM _${dbPrefix}_contact WHERE $rowId = rowId`,
+      {
+        $rowId: rowId,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: getFirstContactByRowId", error);
+  }
+};
