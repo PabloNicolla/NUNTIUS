@@ -51,6 +51,7 @@ export const addMessageTableIndexes = async (
         CREATE INDEX IF NOT EXISTS idx_status ON _${dbPrefix}_message(status);
         CREATE INDEX IF NOT EXISTS idx_timestamp ON _${dbPrefix}_message(timestamp);
         CREATE INDEX IF NOT EXISTS idx_chatId ON _${dbPrefix}_message(chatId);
+        CREATE INDEX IF NOT EXISTS idx_senderReferenceId ON _${dbPrefix}_message(senderReferenceId);
     `);
   });
 };
