@@ -31,6 +31,38 @@ export const getFirstPrivateChat = async (
   }
 };
 
+export const getFirstPrivateChatJoinContactByRowId = async (
+  db: SQLiteDatabase,
+  dbPrefix: string,
+  rowId: number,
+) => {
+  try {
+    return await db.getFirstAsync<PrivateChatJoinContact>(
+      `
+      SELECT 
+          pc.id,
+          pc.contactId,
+          pc.lastMessageId,
+          pc.lastMessageValue,
+          pc.lastMessageTimestamp,
+          pc.notificationCount,
+          c.imageURL,
+          c.first_name,
+          c.last_name,
+          c.username
+      FROM _${dbPrefix}_private_chat pc
+          JOIN _${dbPrefix}_contact c ON pc.contactId = c.id
+      WHERE $rowId = pc.rowId;
+      `,
+      {
+        $rowId: rowId,
+      },
+    );
+  } catch (error) {
+    console.log("[STATEMENTS]: getFirstPrivateChatJoinContactByRowId", error);
+  }
+};
+
 export const getAllPrivateChatsJoinContacts = async (
   db: SQLiteDatabase,
   dbPrefix: string,
