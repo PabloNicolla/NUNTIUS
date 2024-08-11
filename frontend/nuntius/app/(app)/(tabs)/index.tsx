@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -25,10 +25,12 @@ import ListFooterComponent from "@/components/conversations/conversation-list-fo
 import ActionsHeaderOnSelect from "@/components/conversations/conversation-action-header";
 import ConversationHeader from "@/components/conversations/conversation-header";
 import ConversationHeaderComponent from "@/components/conversations/conversation-list-header";
+import DeleteChatModal from "@/components/modals/delete-chats-modal";
 
 const headerHeight = 50;
 
 const App = () => {
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [state, dispatch] = useChatReducer();
   const { hideModal, imageURL, isVisible } = useAvatarModal();
   const { getDbPrefix } = useSession();
@@ -43,7 +45,10 @@ const App = () => {
     dispatch({ payload: null, type: "CLEAR_SELECTED" });
   };
 
-  const deleteSelectedChats = () => {};
+  const confirmChatDeletion = () => {
+    dispatch({ payload: null, type: "DELETE_CHAT" });
+    clearSelectedChats();
+  };
 
   const fetchAllPrivateChats = useCallback(async () => {
     const allChats = await getAllPrivateChatsJoinContacts(db, dbPrefix);
@@ -166,7 +171,7 @@ const App = () => {
           <ActionsHeaderOnSelect
             headerHeight={headerHeight}
             handleDelete={() => {
-              deleteSelectedChats();
+              setOpenDeleteModal(true);
             }}
             handleClearSelected={() => {
               clearSelectedChats();
@@ -174,6 +179,19 @@ const App = () => {
           />
         </View>
       </SafeAreaView>
+
+      <DeleteChatModal
+        isVisible={openDeleteModal}
+        onClose={() => {
+          setOpenDeleteModal(false);
+        }}
+        clearSelectedChats={() => {
+          clearSelectedChats();
+        }}
+        confirmChatDeletion={() => {
+          confirmChatDeletion();
+        }}
+      />
     </ThemedView>
   );
 };

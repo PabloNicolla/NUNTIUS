@@ -48,8 +48,8 @@ const ActionsHeaderOnSelect = ({
           <View className="flex-row">
             <CustomIcon
               icon="trash-outline"
-              handlePress={async () => {
-                await handleDelete();
+              handlePress={() => {
+                handleDelete();
               }}
             />
 

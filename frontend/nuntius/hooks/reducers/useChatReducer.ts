@@ -18,8 +18,13 @@ export type SetChatsAction = {
 };
 
 export type SetChatAction = {
-  type: "UPDATE_CHAT" | "DELETE_CHAT" | "ADD_CHAT";
+  type: "UPDATE_CHAT" | "ADD_CHAT";
   payload: ConversationItemType;
+};
+
+export type DeleteChatAction = {
+  type: "DELETE_CHAT";
+  payload: null | undefined;
 };
 
 export type UpdateContactAction = {
@@ -42,7 +47,8 @@ export type ChatAction =
   | SetSearchQueryAction
   | SetChatAction
   | UpdateContactAction
-  | SetSelectedChatsAction;
+  | SetSelectedChatsAction
+  | DeleteChatAction;
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -85,11 +91,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     }
     case "DELETE_CHAT": {
       const newChats = sortChatsByLastMessageTime(
-        state.chats.filter((chat) => chat.id !== action.payload.id),
+        state.chats.filter((chat) => !chat.isSelected),
       );
-      state.chatIds.delete(action.payload.id);
+      const remainingIds = newChats.map((chat) => chat.id);
       return {
         ...state,
+        chatIds: new Set(remainingIds),
         chats: newChats,
         filteredChats: newChats.filter((chat) =>
           chat.first_name

@@ -64,9 +64,10 @@ const MessageItem = React.memo(function MessageItem({
       >
         <View className="px-2 pt-1">
           <ThemedText>
-            {item.condition === Condition.DELETED
+            {item.id}{" "}
+            {/* {item.condition === Condition.DELETED
               ? "[message was deleted]"
-              : item.value}
+              : item.value} */}
           </ThemedText>
           <ThemedText className="text-right text-xs">
             {formattedTime}{" "}

@@ -17,12 +17,15 @@ import {
 const DeleteChatModal = ({
   isVisible,
   onClose,
+  clearSelectedChats,
+  confirmChatDeletion,
 }: Readonly<{
   isVisible: boolean;
   onClose: () => void;
+  clearSelectedChats: () => void;
+  confirmChatDeletion: () => void;
 }>) => {
   const theme = useColorScheme() ?? "dark";
-  const [state, dispatch] = useChatReducer();
   const { clearSelected, selectedChats } = useChatSelected();
   const db = useSQLiteContext();
   const { getDbPrefix } = useSession();
@@ -36,7 +39,7 @@ const DeleteChatModal = ({
     selectedChats.forEach(async (chatId) => {
       await deletePrivateChat(db, dbPrefix, chatId);
     });
-    dispatch({ payload: null, type: "CLEAR_SELECTED" });
+    confirmChatDeletion();
     clearSelected();
     onClose();
   };
@@ -45,7 +48,7 @@ const DeleteChatModal = ({
       await deletePrivateChat(db, dbPrefix, chatId);
       await deleteAllMessagesByChatId(db, dbPrefix, chatId);
     });
-    dispatch({ payload: null, type: "CLEAR_SELECTED" });
+    confirmChatDeletion();
     clearSelected();
     onClose();
   };
@@ -92,7 +95,7 @@ const DeleteChatModal = ({
                 }
               >
                 <ThemedText className="font-bold text-primary-light">
-                  Delete only chats
+                  Delete chat
                 </ThemedText>
               </TouchableRipple>
             </View>
@@ -110,7 +113,25 @@ const DeleteChatModal = ({
                 }
               >
                 <ThemedText className="font-bold text-primary-light">
-                  Delete chats and Data
+                  Delete chat and data
+                </ThemedText>
+              </TouchableRipple>
+            </View>
+
+            <View className="overflow-hidden rounded-3xl">
+              <TouchableRipple
+                className="p-3"
+                onPress={() => {
+                  onClose();
+                }}
+                rippleColor={
+                  theme === "dark"
+                    ? "rgba(255, 255, 255, .32)"
+                    : "rgba(0, 0, 0, .15)"
+                }
+              >
+                <ThemedText className="font-bold text-primary-light">
+                  Cancel
                 </ThemedText>
               </TouchableRipple>
             </View>

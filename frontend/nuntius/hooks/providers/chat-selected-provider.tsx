@@ -43,9 +43,6 @@ export const ChatSelectedProvider = ({
 
   const action = useCallback(
     (id: PrivateChat["id"], state: boolean, pressType: "LONG" | "SHORT") => {
-      if (selectedChats.size === 0 && pressType === "SHORT") {
-        return false;
-      }
       setSelectedChats((prevSelectedChats) => {
         if (prevSelectedChats.size === 0 && pressType === "SHORT") {
           state = false;
@@ -61,7 +58,7 @@ export const ChatSelectedProvider = ({
       });
       return state;
     },
-    [selectedChats.size],
+    [],
   );
 
   const clearSelected = () => {
