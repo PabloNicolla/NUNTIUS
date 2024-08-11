@@ -83,9 +83,7 @@ const TopNavBarChat = ({
     }
 
     const values = msgValues.map((msgValue) => msgValue.value);
-
     console.log("[TOP_NAV_BAR_CHAT]: copying:", values);
-
     await Clipboard.setStringAsync(values.join("\n"));
   };
 

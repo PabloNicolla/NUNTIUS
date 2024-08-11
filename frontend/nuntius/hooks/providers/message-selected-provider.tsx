@@ -42,9 +42,6 @@ export const MessageSelectedProvider = ({
 
   const action = useCallback(
     (id: Message["id"], state: boolean, pressType: "LONG" | "SHORT") => {
-      if (selectedMessages.size === 0 && pressType === "SHORT") {
-        return false;
-      }
       setSelectedMessages((prevSelectedMessages) => {
         if (prevSelectedMessages.size === 0 && pressType === "SHORT") {
           state = false;
@@ -60,7 +57,7 @@ export const MessageSelectedProvider = ({
       });
       return state;
     },
-    [selectedMessages.size],
+    [],
   );
 
   const clearSelected = () => {

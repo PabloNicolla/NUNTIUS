@@ -49,7 +49,7 @@ const MessageItem = React.memo(function MessageItem({
       }
       className={`${item.senderId === user.id ? "items-end" : "items-start"}`}
       style={{
-        backgroundColor: isSelected
+        backgroundColor: item.isSelected
           ? Colors[theme].primary + "40"
           : "#00000000",
         marginTop: previousMessageSender === item.senderId ? 4 : 12,
@@ -64,10 +64,9 @@ const MessageItem = React.memo(function MessageItem({
       >
         <View className="px-2 pt-1">
           <ThemedText>
-            {item.id}{" "}
-            {/* {item.condition === Condition.DELETED
+            {item.condition === Condition.DELETED
               ? "[message was deleted]"
-              : item.value} */}
+              : item.value}
           </ThemedText>
           <ThemedText className="text-right text-xs">
             {formattedTime}{" "}

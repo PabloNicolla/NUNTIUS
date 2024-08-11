@@ -68,8 +68,11 @@ export default function ChatScreen() {
   const clearSelectedMessages = () => {
     setMessages((prevMessages) => {
       const newMessages = prevMessages.map((message) => {
-        message.isSelected = false;
-        return message;
+        if (message.isSelected) {
+          return { ...message, isSelected: false };
+        } else {
+          return message;
+        }
       });
       return [...newMessages];
     });
