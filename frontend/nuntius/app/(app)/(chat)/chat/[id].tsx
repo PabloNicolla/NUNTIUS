@@ -127,7 +127,7 @@ export default function ChatScreen() {
   }, [chatId, db, requestMoreMsg, dbPrefix]);
 
   useEffect(() => {
-    console.log("[CHAT_SCREEN]: GET CHAT BY ID: %d", String(chatId));
+    console.log("[CHAT_SCREEN]: GET CHAT BY ID: %s", String(chatId));
     async function getChat() {
       const chat = await getFirstPrivateChat(db, dbPrefix!, String(chatId));
       if (!chat) {

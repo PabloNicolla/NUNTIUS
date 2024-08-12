@@ -10,12 +10,16 @@ const UserAvatar = ({
   isSelected,
   imageURl,
   size,
+  editSize,
+  handleEdit,
 }: {
   firstName: string;
   imageURl?: string;
   isSelectionActive?: boolean;
   isSelected?: boolean;
   size: number;
+  editSize?: number;
+  handleEdit?: () => void;
 }) => {
   const [imageError, setImageError] = useState(false);
   const { showModal } = useAvatarModal();
@@ -55,6 +59,24 @@ const UserAvatar = ({
               size={20}
             />
           </View>
+        )}
+        {editSize && (
+          <Pressable
+            onPress={() => {
+              console.log("pressed");
+              if (handleEdit) {
+                handleEdit();
+              }
+            }}
+            className="absolute bottom-0 right-0 z-20 rounded-full bg-primary-light p-2"
+          >
+            <Ionicons
+              name="camera-outline"
+              color={"white"}
+              className="z-20"
+              size={editSize}
+            />
+          </Pressable>
         )}
       </Pressable>
     </View>
