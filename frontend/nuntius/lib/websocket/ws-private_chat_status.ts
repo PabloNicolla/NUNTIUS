@@ -5,7 +5,7 @@ import {
 } from "@/lib/db/statements";
 import { SQLiteDatabase } from "expo-sqlite";
 import { MutableRefObject } from "react";
-import { Ws_private_chat_status } from "./ws-types";
+import { messageStatus, Ws_private_chat_status } from "./ws-types";
 
 export async function handlePrivateMessageStatus(
   wsMessage: Ws_private_chat_status,
@@ -31,7 +31,7 @@ export async function handlePrivateMessageStatus(
 
   if (wsMessage.data.message_type === "private_chat_batch") {
     const messages = wsMessage.data.message;
-    const updatedMessages = messages.map((message: Message) => {
+    const updatedMessages = messages.map((message: messageStatus) => {
       if (message.condition === Condition.NORMAL) {
         message.condition = Condition.STATUS_CHANGED;
       }

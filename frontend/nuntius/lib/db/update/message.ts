@@ -1,5 +1,6 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { Message } from "../schemaTypes";
+import { messageStatus } from "@/lib/websocket/ws-types";
 
 export const updateMessage = async (
   db: SQLiteDatabase,
@@ -31,7 +32,7 @@ export const updateMessage = async (
 export const updateMessageStatus = async (
   db: SQLiteDatabase,
   dbPrefix: string,
-  message: Message,
+  message: messageStatus,
 ) => {
   try {
     return await db.runAsync(
@@ -56,7 +57,7 @@ export const updateMessageStatus = async (
 export const updateMessagesStatusBulk = async (
   db: SQLiteDatabase,
   dbPrefix: string,
-  messages: Message[],
+  messages: messageStatus[],
 ) => {
   const updateQueries = messages.map((message) => {
     return db.runAsync(

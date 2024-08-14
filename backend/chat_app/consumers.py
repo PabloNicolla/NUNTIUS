@@ -55,7 +55,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             print(f"An error occurred: {e}")
             await self.close()
-            print(f"User {self.user_id} connected. FORCED")
+            print(f"User {self.user_id} disconnected. FORCED")
 
     async def disconnect(self, close_code):
         try:
@@ -188,10 +188,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if isinstance(data, list):
             message_type = 'private_chat_batch'
+            reduced_data = [{"id": msg["id"], "status": msg["status"],
+                             "condition": msg["condition"]} for msg in data]
+        else:
+            reduced_data = {
+                "id": data["id"], "status": data["status"], "condition": data["condition"]}
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'data': {'message': data, 'status': status, 'message_type': message_type},
+            'data': {'message': reduced_data, 'status': status, 'message_type': message_type},
             'receiver_id': receiver_id,
             'sender_id': sender_id,
             'type': 'private_chat_status'

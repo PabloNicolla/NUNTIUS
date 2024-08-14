@@ -25,23 +25,26 @@ export type Ws_private_chat = {
   type: "private_chat";
 };
 
+export type Ws_private_chat_batch = {
+  data: Message[];
+  type: "private_chat_batch";
+  // receiver_id: string;
+};
+
+export type messageStatus = {id: Message["id"], condition: Message["condition"], status: Message["status"]}
+
 export type Ws_private_chat_status = {
   data:
     | {
-        message: Message[];
+        message: messageStatus[];
         status: "RECEIVED" | "SENT";
         message_type: "private_chat_batch";
       }
     | {
-        message: Message;
+        message: messageStatus;
         status: "RECEIVED" | "SENT";
         message_type: "private_chat";
       };
   type: "private_chat_status";
 };
 
-export type Ws_private_chat_batch = {
-  data: Message[];
-  type: "private_chat_batch";
-  // receiver_id: string;
-};
