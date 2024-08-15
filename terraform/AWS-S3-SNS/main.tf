@@ -37,6 +37,37 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "aurora_ts_s3_encr
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "aurora_ts_s3_lifecycle" {
+  bucket = aws_s3_bucket.aurora_ts_s3.id
+
+  rule {
+    id     = "rule1_mark_for_deletion"
+    status = "Enabled"
+
+    expiration {
+      days = 14
+    }
+  }
+
+  rule {
+    id     = "rule2_delete_expired"
+    status = "Enabled"
+
+    expiration {
+      expired_object_delete_marker = true
+    }
+  }
+
+  rule {
+    id     = "rule3_abort_multipart_upload"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+}
+
 resource "aws_sns_topic" "aurora_ts_sns" {
   name = "aurora-ts-sns"
 }
@@ -89,4 +120,15 @@ resource "aws_sns_topic_policy" "aurora_ts_sns_policy" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.aurora_ts_s3.id
+
+  topic {
+    topic_arn = aws_sns_topic.aurora_ts_sns.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_sns_topic_policy.aurora_ts_sns_policy]
 }
