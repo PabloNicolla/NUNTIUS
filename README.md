@@ -66,6 +66,6 @@ after that you can close the runserver, run compose down, and rebuild again with
 
 ## IAAS
 
-Deploy on Azure with Terraform script.
+Deploy on Azure & AWS with Terraform script.
 
-Follow instructions at [Terraform](terraform/AZURE/README.md)
+Follow instructions at [Terraform](terraform/README.md)
