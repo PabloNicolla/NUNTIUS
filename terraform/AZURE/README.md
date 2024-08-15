@@ -1,4 +1,4 @@
-# Terraform
+# Terraform (CORE)
 
 ## Login at Azure
 

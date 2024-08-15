@@ -68,4 +68,4 @@ after that you can close the runserver, run compose down, and rebuild again with
 
 Deploy on Azure with Terraform script.
 
-Follow instructions at [Terraform](terraform/README.md)
+Follow instructions at [Terraform](terraform/AZURE/README.md)
