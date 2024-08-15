@@ -57,14 +57,12 @@ class SNSNotificationView(APIView):
     def post(self, request):
         # Parse the incoming SNS message
         message_type = request.headers.get('x-amz-sns-message-type')
-        message = json.loads(request.body)
-
-        # print(message)
+        full_message = json.loads(request.body)
 
         # Check if it's a SubscriptionConfirmation message
         if message_type == 'SubscriptionConfirmation':
             # Confirm the subscription by visiting the SubscribeURL
-            subscribe_url = message['SubscribeURL']
+            subscribe_url = full_message['SubscribeURL']
             response = requests.get(subscribe_url)
             if response.status_code == 200:
                 return Response({"status": "Subscription confirmed"}, status=status.HTTP_200_OK)
@@ -75,9 +73,9 @@ class SNSNotificationView(APIView):
         elif message_type == 'Notification':
             # Process the SNS notification here
             # message['Message'] contains the actual message sent by SNS
-            print(json.loads(message['Message'])['Records'][0]['eventName'])
-            print(json.loads(message['Message'])[
-                  'Records'][0]['s3']['object']['key'])
+            message_data = json.loads(full_message['Message'])
+            print(message_data['Records'][0]['eventName'])
+            print(message_data['Records'][0]['s3']['object']['key'])
             return Response({"status": "Notification received"}, status=status.HTTP_200_OK)
 
         return Response({"status": "Invalid request"}, status=status.HTTP_400_BAD_REQUEST)
