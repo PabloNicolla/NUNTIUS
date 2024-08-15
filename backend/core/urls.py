@@ -5,5 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("auth_app.urls")),
     path("", include("user_app.urls")),
-    # path("", include("chat_app.urls")),
+    path("", include("aws_s3_service.urls")),
 ]
