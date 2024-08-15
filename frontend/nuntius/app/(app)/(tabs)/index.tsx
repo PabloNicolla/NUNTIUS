@@ -28,6 +28,7 @@ import ConversationHeaderComponent from "@/components/conversations/conversation
 import DeleteChatModal from "@/components/modals/delete-chats-modal";
 
 const headerHeight = 50;
+const PAGE_LIMIT = 10;
 
 const App = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -153,6 +154,9 @@ const App = () => {
             DynamicHeaderComponent={DynamicHeaderComponent}
             headerHeight={headerHeight}
             ListFooterComponent={ListFooterComponent}
+            initialNumToRender={PAGE_LIMIT}
+            maxToRenderPerBatch={PAGE_LIMIT}
+            windowSize={3}
           />
 
           <AvatarModal

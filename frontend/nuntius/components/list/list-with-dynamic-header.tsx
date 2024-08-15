@@ -10,6 +10,10 @@ type ListWithDynamicHeaderProps<T> = {
   ListFooterComponent?: React.ComponentType<any> | React.ReactElement | null;
   DynamicHeaderComponent: React.ComponentType<any>;
   headerHeight: number;
+
+  initialNumToRender?: number;
+  maxToRenderPerBatch?: number;
+  windowSize?: number;
 };
 
 const ListWithDynamicHeader = ({
@@ -20,6 +24,10 @@ const ListWithDynamicHeader = ({
   ListFooterComponent,
   DynamicHeaderComponent,
   headerHeight,
+
+  initialNumToRender,
+  maxToRenderPerBatch,
+  windowSize,
 }: ListWithDynamicHeaderProps<any>) => {
   const theme = useColorScheme() ?? "dark";
   const ref = useRef<FlatList>(null);
@@ -55,6 +63,9 @@ const ListWithDynamicHeader = ({
         ref={ref}
         contentContainerStyle={{ paddingTop: headerHeight }}
         ListFooterComponent={ListFooterComponent}
+        initialNumToRender={initialNumToRender}
+        maxToRenderPerBatch={maxToRenderPerBatch}
+        windowSize={windowSize}
       />
     </View>
   );
