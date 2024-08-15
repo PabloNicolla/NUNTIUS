@@ -2,6 +2,20 @@
 
 A local-first mobile messaging app. The goal is to not store messages in the server.
 
+## Table of Contents
+- [Tech Stack](#tech-stack)
+- [Project Configuration (Run locally or Cloud deployment)](#project-configuration-run-locally-or-cloud-deployment)
+  - [Backend](#backend)
+    - [Allow Social Login (Optional)](#allow-social-login-optional)
+    - [Allow Images, Audio, Videos, and Files Upload (Optional)](#allow-images-audio-videos-and-files-upload-optional)
+    - [Alternative Backend (Run Django on Host Machine)](#alternative-backend-run-django-on-host-machine)
+  - [IAAS](#iaas)
+  - [Frontend](#frontend)
+- [Features](#features)
+  - [Send/Receive Message Flow](#sendreceive-message-flow)
+- [API Reference](#api-reference)
+- [Authors](#authors)
+
 ## Tech Stack
 
 **Client:** React Native, EXPO, SQLite3
@@ -14,6 +28,8 @@ A local-first mobile messaging app. The goal is to not store messages in the ser
 
 ### Backend 
 
+---
+
 [docker-compose.yaml](docker-compose.yaml) file already contains all the default variables for development set up.
 
 you can modify as needed, for example if you already have containers or services running on the ports that are going to be used.
@@ -23,6 +39,8 @@ docker compose up --build
 ```
 
 #### Allow social login (OPTIONAL)
+
+---
 
 > [!IMPORTANT]
 > If you want to use Google Authentication, you will need to access django admin and create a new Social application.
@@ -69,9 +87,13 @@ after that you can close the runserver, run compose down, and rebuild again with
 
 #### Allow images, audio, videos and files upload (OPTIONAL)
 
+---
+
 To support these features you will need to follow the `#Support for file upload` at [Terraform](terraform/README.md) Readme file
 
 #### Alternative Backend (Run Django on host machine)
+
+---
 
 > [!NOTE]
 > This steps only apply if you don't want to run Django on a container
@@ -81,11 +103,15 @@ To support these features you will need to follow the `#Support for file upload`
 
 ### IAAS
 
+---
+
 Deploy backend infrastructure using Azure & AWS with Terraform script.
 
 Follow instructions at [Terraform](terraform/README.md)
 
 ### Frontend
+
+---
 
 Open [Frontend](frontend/nuntius/README.md) instructions for building the Expo app.
 
