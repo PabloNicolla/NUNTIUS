@@ -117,7 +117,7 @@ Open [Frontend](frontend/nuntius/README.md) instructions for building the Expo a
 
 ## Features
 
-### Send/Receive message flow
+### Send/Receive text message flow
 
 ```mermaid
 sequenceDiagram
