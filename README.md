@@ -26,9 +26,9 @@ A local-first mobile messaging app. The goal is to not store messages in the ser
 
 ## Project Configuration (Run locally or Cloud deployment)
 
-### Backend 
-
 ---
+
+### Backend
 
 [docker-compose.yaml](docker-compose.yaml) file already contains all the default variables for development set up.
 
@@ -38,9 +38,9 @@ you can modify as needed, for example if you already have containers or services
 docker compose up --build
 ```
 
-#### Allow social login (OPTIONAL)
-
 ---
+
+#### Allow social login (OPTIONAL)
 
 > [!IMPORTANT]
 > If you want to use Google Authentication, you will need to access django admin and create a new Social application.
@@ -85,15 +85,15 @@ after that you can close the runserver, run compose down, and rebuild again with
 > [!NOTE]
 > For more experienced users, the above may be achieved using `manage.py shell` and creating the object
 
-#### Allow images, audio, videos and files upload (OPTIONAL)
-
 ---
+
+#### Allow images, audio, videos and files upload (OPTIONAL)
 
 To support these features you will need to follow the `#Support for file upload` at [Terraform](terraform/README.md) Readme file
 
-#### Alternative Backend (Run Django on host machine)
-
 ---
+
+#### Alternative Backend (Run Django on host machine)
 
 > [!NOTE]
 > This steps only apply if you don't want to run Django on a container
@@ -101,17 +101,17 @@ To support these features you will need to follow the `#Support for file upload`
 - run only Postgres and Redis containers.
 - open [Backend](backend/README.md) and follow steps
 
-### IAAS
-
 ---
+
+### IAAS
 
 Deploy backend infrastructure using Azure & AWS with Terraform script.
 
 Follow instructions at [Terraform](terraform/README.md)
 
-### Frontend
-
 ---
+
+### Frontend
 
 Open [Frontend](frontend/nuntius/README.md) instructions for building the Expo app.
 
