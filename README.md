@@ -26,8 +26,6 @@ A local-first mobile messaging app. The goal is to not store messages in the ser
 
 ## Project Configuration (Run locally or Cloud deployment)
 
----
-
 ### Backend
 
 [docker-compose.yaml](docker-compose.yaml) file already contains all the default variables for development set up.
